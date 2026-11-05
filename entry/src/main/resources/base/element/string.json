@@ -1014,7 +1014,7 @@
         },
         {
             "name": "yt_home_kiosk_error",
-            "value": "Kiosk 请求失败，请稍后重试"
+            "value": "首页没拿到可显示的视频，请稍后重试"
         },
         {
             "name": "yt_home_load_error",
@@ -4251,6 +4251,58 @@
         {
             "name": "yt_update_upstream_channel_notice",
             "value": "下面的 AppTest 是原版 YourPipe 在华为应用市场的测试渠道；LiteVideo 只分发源码，没有商店渠道。"
+        },
+        {
+            "name": "yt_option_afdian",
+            "value": "爱发电"
+        },
+        {
+            "name": "yt_option_afdian_subtitle",
+            "value": "捐赠创作者"
+        },
+        {
+            "name": "yt_afdian_mine_title",
+            "value": "赞助 fork 作者（da3456）"
+        },
+        {
+            "name": "yt_afdian_mine_desc",
+            "value": "如果你觉得这些小改进用着还行，可以赞助我改这些所花的时间与 token。"
+        },
+        {
+            "name": "yt_afdian_upstream_title",
+            "value": "赞助原作者（Talon / YourPipe）"
+        },
+        {
+            "name": "yt_afdian_upstream_desc",
+            "value": "如果你想赞助原作者，可以点击这里。"
+        },
+        {
+            "name": "yt_afdian_note",
+            "value": "赞助完全自愿，不会解锁任何功能；LiteVideo 不接入任何支付，两个链接都会在浏览器里打开。"
+        },
+        {
+            "name": "yt_home_guest_notice",
+            "value": "当前以游客身份浏览：看视频、搜索不需要登录，但个性化推荐、稍后观看、订阅同步和「不感兴趣」反馈需要登录。"
+        },
+        {
+            "name": "yt_home_guest_notice_action",
+            "value": "去登录"
+        },
+        {
+            "name": "yt_changelog_fork_7",
+            "value": "通用页新增「爱发电」入口（赞助本 fork 作者 / 原版作者，只跳浏览器）；首页在游客身份下说明哪些功能需要登录"
+        },
+        {
+            "name": "yt_home_shorts_empty",
+            "value": "短视频只来自首页 feed 里的 Shorts 货架，以及订阅或看过频道的 Shorts 页；游客没有订阅频道，登录后再切过来。"
+        },
+        {
+            "name": "yt_changelog_fork_8",
+            "value": "游客首页改为匿名推荐流（不再是整屏直播），失败才回落直播；短视频维度空列表时给出来源说明，不再一片空白"
+        },
+        {
+            "name": "yt_changelog_fork_9",
+            "value": "游客首页改为三级回退：匿名推荐流 → 匿名 TV 首页 → 直播标签；空响应或加载卡住不再白屏，改为显示可重试的错误页"
         }
     ]
 }

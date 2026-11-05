@@ -1,5 +1,6 @@
 import { AppLog } from '../../common/AppLog';
 import { AuthSessionManager } from 'youtube_core';
+import { AuthAccountStatus, AuthStage } from 'youtube_core';
 import { VideoItem } from 'youtube_core';
 import { VideoCard } from '../../common/components/VideoCard';
 import { VideoCardGrid } from '../../common/components/VideoCardGrid';
@@ -18,6 +19,9 @@ import { WatchHistoryStore } from '../../common/WatchHistoryStore';
 import { COLOR_PRESETS } from '../../common/ThemeManager';
 
 const logger = AppLog.getInstance('HomeTabContent');
+
+/** 首页静默空白看门狗超时（ms）：这期间既没内容也没报错就判定为卡住。 */
+const HOME_BLANK_WATCHDOG_MS: number = 20000;
 
 /** 短视频列表少于该条数时，继续翻首页 feed 去收短视频（短视频就在这份混合 feed 里）。 */
 const HOME_SHORTS_TOPUP_THRESHOLD: number = 12;
@@ -142,6 +146,10 @@ export struct HomeTabContent {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig();
   @StorageLink('deviceWidth') deviceWidth: number = 0;
   @StorageProp('themePrimaryColor') themePrimary: string = COLOR_PRESETS[0].primary;
+  /** 登录态：登录后这条游客提示要立刻消失，所以走 AppStorage 而不是每次查 session。 */
+  @StorageProp('authStatus') authStatus: AuthAccountStatus = new AuthAccountStatus();
+  /** 游客提示里的「去登录」：由 Index 打开设置面板（登录入口在 数据与账号）。 */
+  onOpenLoginClick: () => void = () => {};
   @Consume('safeAreaTop') safeAreaTop: number = 0;
   @Consume('safeAreaBottom') safeAreaBottom: number = 0;
   @State longList: VideoItem[] = [];
@@ -183,6 +191,8 @@ export struct HomeTabContent {
    * （登录态/内容源切换与启动加载并发时，旧的 kiosk 响应会把推荐列表顶掉）。
    */
   private homeLoadGeneration: number = 0;
+  /** 静默空白看门狗的定时器 id（-1 = 未挂或已触发）。 */
+  private homeBlankWatchdog: number = -1;
 
   aboutToAppear() {
     this.controller.registerReset((clearList: boolean, reload: boolean) => {
@@ -198,6 +208,24 @@ export struct HomeTabContent {
     this.controller.registerRemoveFeedbackCards((videoId: string, channelId: string) => {
       this.removeFeedbackCards(videoId, channelId);
     });
+    // 静默空白看门狗：首页首个加载由 Index 挂在代理就绪之后，那一步卡住（或请求
+    // 长时间不返回）时列表和错误文案都是空的，用户只会看到一片白。超时就把它变成可重试的错误页。
+    this.homeBlankWatchdog = setTimeout(() => {
+      this.homeBlankWatchdog = -1;
+      if (this.longList.length === 0 && this.shortList.length === 0
+        && !this.isInitialLoading && this.homeErrorMessage.length === 0) {
+        logger.warn('[HomeFeed] stage=blank_watchdog no items and no error after startup window');
+        this.homeErrorMessage = getContext().resourceManager.getStringSync(
+          $r('app.string.yt_home_load_error').id);
+      }
+    }, HOME_BLANK_WATCHDOG_MS);
+  }
+
+  aboutToDisappear() {
+    if (this.homeBlankWatchdog >= 0) {
+      clearTimeout(this.homeBlankWatchdog);
+      this.homeBlankWatchdog = -1;
+    }
   }
 
   /**
@@ -882,6 +910,11 @@ export struct HomeTabContent {
     if (!message || message.length === 0) {
       message = fallback;
     }
+    // HomeFeedService 的空内容哨兵（"Empty live kiosk feed…" / "Empty recommended feed" /
+    // "Empty browse response…"）是给日志看的英文，不该直接甩给用户。
+    if (/^Empty\b/.test(message)) {
+      return fallback;
+    }
     return code.length > 0 ? `[${code}] ${message}` : message;
   }
 
@@ -945,6 +978,31 @@ export struct HomeTabContent {
     .padding({ left: 12, right: 12 })
   }
 
+  /**
+   * 游客态：没有可用凭据，或凭据总开关被关掉（此时首页拿的就是匿名 kiosk）。
+   * 浏览与播放本身不需要登录，需要登录的是个性化推荐、稍后观看、订阅云同步
+   * 和「不感兴趣」反馈，所以提示只讲这几项。
+   */
+  private isGuestBrowse(): boolean {
+    const hasCredential = this.authStatus.hasCredential
+      || this.authStatus.hasCookieCredential
+      || this.authStatus.hasRefreshToken
+      || this.authStatus.stage === AuthStage.SIGNED_IN;
+    return !hasCredential || this.authStatus.authEnabled === false;
+  }
+
+  /**
+   * 短视频维度空列表时的说明：这一维度只吃「首页 feed 里的 Shorts 货架」和
+   * 「订阅 / 看过频道的 /shorts」两条腿，游客或没订过频道的人两条腿都是空的，
+   * 不给文案就是一片纯空白。长视频维度不显示（几乎不会空，空了也有错误页兜）。
+   */
+  private homeEmptyHint(): ResourceStr {
+    if (this.isShortMode()) {
+      return $r('app.string.yt_home_shorts_empty');
+    }
+    return '';
+  }
+
   /** 推荐位 banner：grid 模式经 headerHorizontalBleed 抵消容器左右 12vp 内边距保持全宽；底部间距补齐到原 12vp */
   @LocalBuilder
   HomeBannerHeader() {
@@ -969,15 +1027,52 @@ export struct HomeTabContent {
     Stack() {
       if (this.homeErrorMessage.length > 0 && this.activeList().length === 0) {
         // 显示完整页面的错误页面
-        ErrorPage({
-          errorMessage: this.homeErrorMessage,
-          onRetry: () => {
-            this.loadLiveVideos(true);
-          }
-        })
+        if (this.isGuestBrowse()) {
+          // 游客：匿名内容源被服务端挡掉时报错最常见，主按钮直接给「去登录」，
+          // 「重试」降成描边次按钮（错误页会整屏替换 Refresh，下拉刷新此时不可用，必须留着）。
+          ErrorPage({
+            errorMessage: this.homeErrorMessage,
+            onRetry: () => {
+              this.loadLiveVideos(true);
+            },
+            altActionText: $r('app.string.yt_home_guest_notice_action'),
+            onAltAction: () => {
+              logger.info('home error page go login tapped');
+              this.onOpenLoginClick();
+            }
+          })
+        } else {
+          ErrorPage({
+            errorMessage: this.homeErrorMessage,
+            onRetry: () => {
+              this.loadLiveVideos(true);
+            }
+          })
+        }
       } else {
         Refresh({ refreshing: $$this.isHomeRefreshing }) {
           Column() {
+          if (this.isGuestBrowse()) {
+            Row({ space: 8 }) {
+              Text($r('app.string.yt_home_guest_notice'))
+                .fontSize(12)
+                .fontColor($r('app.color.yourtube_text_hint'))
+                .lineHeight(17)
+                .layoutWeight(1)
+              Text($r('app.string.yt_home_guest_notice_action'))
+                .fontSize(12)
+                .fontColor(this.themePrimary)
+                .padding({ left: 10, right: 10, top: 5, bottom: 5 })
+                .onClick(() => {
+                  logger.info('home guest notice open login tapped');
+                  this.onOpenLoginClick();
+                })
+            }
+            .width('100%')
+            .padding({ left: 16, right: 12 })
+            .margin({ top: 8 })
+          }
+
           if (this.homeModeNoticeMessage.length > 0) {
             Text(this.homeModeNoticeMessage)
               .fontSize(12)
@@ -1009,7 +1104,7 @@ export struct HomeTabContent {
               // 原网格分支无加载更多 footer，保持不显示
               isLoadingMore: this.uiConfig.homeLayoutMode === 'grid' ? false : this.isLoadingMore,
               errorMessage: '',
-              emptyText: '',
+              emptyText: this.homeEmptyHint(),
               hasHeader: this.shouldShowHomeRecommendBanner(),
               headerHorizontalBleed: 12,
               gridContentPadding: { left: 12, right: 12, bottom: this.safeAreaBottom + 72 },

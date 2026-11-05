@@ -966,7 +966,7 @@
         },
         {
             "name": "yt_home_kiosk_error",
-            "value": "Kiosk 請求失敗，請稍後重試"
+            "value": "首页攰唔到可顯示嘅片，請稍後再試"
         },
         {
             "name": "yt_home_load_error",
@@ -4251,6 +4251,58 @@
         {
             "name": "yt_update_upstream_channel_notice",
             "value": "下方的 AppTest 係原版 YourPipe 喺華為應用市場嘅測試頻道；LiteVideo 只係分發原始碼，冇商店頻道。"
+        },
+        {
+            "name": "yt_option_afdian",
+            "value": "愛發電"
+        },
+        {
+            "name": "yt_option_afdian_subtitle",
+            "value": "捐贈創作者"
+        },
+        {
+            "name": "yt_afdian_mine_title",
+            "value": "贊助 fork 作者（da3456）"
+        },
+        {
+            "name": "yt_afdian_mine_desc",
+            "value": "如果你觉得呢啲小改進用得順，可以贊助我改呢啲所花嘅時間與 token。"
+        },
+        {
+            "name": "yt_afdian_upstream_title",
+            "value": "贊助原作者（Talon / YourPipe）"
+        },
+        {
+            "name": "yt_afdian_upstream_desc",
+            "value": "如果你想贊助原作者，可以撳呢度。"
+        },
+        {
+            "name": "yt_afdian_note",
+            "value": "贊助完全出於自願，唔會解鎖任何功能；LiteVideo 冇接入任何支付，兩個連結都會喺瀏覽器開啟。"
+        },
+        {
+            "name": "yt_home_guest_notice",
+            "value": "而家以遊客身分瀏覽：睇片、搜尋唔需要登入，但個人化推薦、稍後觀看、訂閱同步同「冇興趣」回饋需要登入。"
+        },
+        {
+            "name": "yt_home_guest_notice_action",
+            "value": "去登入"
+        },
+        {
+            "name": "yt_changelog_fork_7",
+            "value": "通用頁新增「愛發電」入口（贊助本 fork 作者／原版作者，只跳瀏覽器）；首頁以遊客身分時會講明邊啲功能要登入"
+        },
+        {
+            "name": "yt_home_shorts_empty",
+            "value": "短視頻只嚟自首頁 feed 嘅 Shorts 貨架，同訂閱或睇過頻道嘅 Shorts 頁；遊客冇訂閱頻道，登入後再切過嚟。"
+        },
+        {
+            "name": "yt_changelog_fork_8",
+            "value": "遊客首頁改為匿名推薦流（唔再係整屏直播），失敗先回落直播；短視頻維度空列表時會講返來源，唔再係一片空白"
+        },
+        {
+            "name": "yt_changelog_fork_9",
+            "value": "遊客首頁改為三級回退：匿名推薦流 → 匿名 TV 首頁 → 直播標籤；空回應或卡住唔再白屏，改顯示可重試嘅錯誤頁"
         }
     ]
 }

@@ -125,6 +125,8 @@ struct Index {
   @StorageLink('pendingPlaybackContinuation') @Watch('onPendingContinuationChanged') pendingPlaybackContinuation: string = '';
   @Provide('actionHub') actionHub: ActionHub = new ActionHub();
   @State showOptions: boolean = false;
+  /** 打开设置 sheet 时直接跳到的子页 destination（首页「去登录」用 data_account），关 sheet 时清空。 */
+  @State optionsInitialRoute: string = '';
   /** 首次启动帮助引导全屏覆盖层（cfg_help_seen 未读时显示） */
   @State showHelpGuide: boolean = false;
   @State selectedLanguageCode: string = LanguageManager.DEFAULT_LANGUAGE;
@@ -1588,6 +1590,7 @@ struct Index {
       radiusRenderStrategy: RenderStrategy.OFFSCREEN,
       onDisappear: () => {
         this.optionsSheetActions.clearPath();
+        this.optionsInitialRoute = '';
       }
     })
     .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
@@ -1737,7 +1740,11 @@ struct Index {
   @Builder TabContentSection(index: number) {
     if (index === 0) {
       HomeTabContent({
-        controller: this.homeTabController
+        controller: this.homeTabController,
+        onOpenLoginClick: () => {
+          this.optionsInitialRoute = 'data_account';
+          this.showOptions = true;
+        }
       })
     }
     else if (index === 1) {
@@ -1759,6 +1766,7 @@ struct Index {
     OptionsSheetHost({
       params: {
         actions: this.optionsSheetActions,
+        initialRoute: this.optionsInitialRoute,
         appLangItems: this.appLangItems,
         contentLangItems: this.contentLangItems,
         contentCountryItems: this.contentCountryItems,

@@ -1014,7 +1014,7 @@
         },
         {
             "name": "yt_home_kiosk_error",
-            "value": "Kiosk リクエストに失敗しました。後でもう一度お試しください"
+            "value": "ホームに表示できる動画がありませんでした。少し後に再試行してください"
         },
         {
             "name": "yt_home_load_error",
@@ -4251,6 +4251,58 @@
         {
             "name": "yt_update_upstream_channel_notice",
             "value": "下の AppTest は原版 YourPipe の Huawei AppGallery テストチャネルです。LiteVideo はソースのみの配布で、ストアチャネルを持ちません。"
+        },
+        {
+            "name": "yt_option_afdian",
+            "value": "愛発電（投げ銭）"
+        },
+        {
+            "name": "yt_option_afdian_subtitle",
+            "value": "開発者を支援"
+        },
+        {
+            "name": "yt_afdian_mine_title",
+            "value": "フォーク作者を支援（da3456）"
+        },
+        {
+            "name": "yt_afdian_mine_desc",
+            "value": "これらの改良が使い良いなら、かかった時間と token を支援できます。"
+        },
+        {
+            "name": "yt_afdian_upstream_title",
+            "value": "原作者を支援（Talon / YourPipe）"
+        },
+        {
+            "name": "yt_afdian_upstream_desc",
+            "value": "原作者を支援したい場合はこちらをタップしてください。"
+        },
+        {
+            "name": "yt_afdian_note",
+            "value": "支援は任意で、機能が解放されるわけではありません。LiteVideo は決済を統合しておらず、両方のリンクはブラウザで開きます。"
+        },
+        {
+            "name": "yt_home_guest_notice",
+            "value": "ゲストとして閲覧中です。視聴と検索はログイン不要ですが、パーソナライズされたおすすめ、後で視聴、登録の同期、「興味なし」のフィードバックにはログインが必要です。"
+        },
+        {
+            "name": "yt_home_guest_notice_action",
+            "value": "ログイン"
+        },
+        {
+            "name": "yt_changelog_fork_7",
+            "value": "一般ページに「愛発電（投げ銭）」入口を追加（フォーク作者・原作者、どちらもブラウザで開く）；ゲスト閲覧時にホームでログインが必要な機能を表示"
+        },
+        {
+            "name": "yt_home_shorts_empty",
+            "value": "ショートの棚と、登録・視聴済みチャンネルの Shorts タブからのみ供給されます。ゲストは登録がないのでログインしてからお試しください。"
+        },
+        {
+            "name": "yt_changelog_fork_8",
+            "value": "ゲストのホームは匿名のおすすめフィードに変更（従来はライブばかり、失敗時のみライブにフォールバック）。ショートのタブが空の理由を表示し、白い画面になりません"
+        },
+        {
+            "name": "yt_changelog_fork_9",
+            "value": "ゲストホームを3段フォールバックに（匿名おすすめ→匿名TVホーム→ライブ）。空応答や読み込み停滞時は白い画面ではなく再試行できるエラー画面を表示"
         }
     ]
 }

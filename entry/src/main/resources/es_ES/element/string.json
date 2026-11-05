@@ -966,7 +966,7 @@
         },
         {
             "name": "yt_home_kiosk_error",
-            "value": "Error en la solicitud Kiosk, inténtalo más tarde"
+            "value": "El inicio no devolvió vídeos para mostrar: inténtalo de nuevo en un momento"
         },
         {
             "name": "yt_home_load_error",
@@ -4251,6 +4251,58 @@
         {
             "name": "yt_update_upstream_channel_notice",
             "value": "El enlace AppTest de abajo es el canal de pruebas del YourPipe original en AppGallery de Huawei. LiteVideo solo distribuye código fuente y no tiene canal de tienda."
+        },
+        {
+            "name": "yt_option_afdian",
+            "value": "Donar (Aifadian)"
+        },
+        {
+            "name": "yt_option_afdian_subtitle",
+            "value": "Apoya a los creadores"
+        },
+        {
+            "name": "yt_afdian_mine_title",
+            "value": "Apoya al autor del fork (da3456)"
+        },
+        {
+            "name": "yt_afdian_mine_desc",
+            "value": "Si estos cambios te resultan útiles, puedes patrocinar el tiempo y los tokens que costaron."
+        },
+        {
+            "name": "yt_afdian_upstream_title",
+            "value": "Apoya al autor original (Talon / YourPipe)"
+        },
+        {
+            "name": "yt_afdian_upstream_desc",
+            "value": "Si quieres patrocinar al autor original, pulsa aquí."
+        },
+        {
+            "name": "yt_afdian_note",
+            "value": "Patrocinar es opcional y no desbloquea nada. LiteVideo no integra pagos; los dos enlaces se abren en el navegador."
+        },
+        {
+            "name": "yt_home_guest_notice",
+            "value": "Estás navegando como invitado: ver y buscar no requieren cuenta, pero las recomendaciones personalizadas, «Ver más tarde», la sincronización de suscripciones y «No me interesa» sí."
+        },
+        {
+            "name": "yt_home_guest_notice_action",
+            "value": "Iniciar sesión"
+        },
+        {
+            "name": "yt_changelog_fork_7",
+            "value": "Nuevo acceso «Donar (Aifadian)» en General (autor del fork y autor original; se abren en el navegador); el inicio explica como invitado qué funciones requieren sesión"
+        },
+        {
+            "name": "yt_home_shorts_empty",
+            "value": "Aquí los Shorts salen del estante Shorts de inicio y de la pestaña Shorts de tus canales. Como invitado no tienes suscripciones: inicia sesión."
+        },
+        {
+            "name": "yt_changelog_fork_8",
+            "value": "El inicio como invitado ahora usa el feed recomendado anónimo (el kiosk en directo queda como respaldo); la pestaña Shorts explica por qué está vacía"
+        },
+        {
+            "name": "yt_changelog_fork_9",
+            "value": "Inicio de invitado con respaldo en tres pasos (recomendados anónimo -> inicio TV anónimo -> pestaña en directo): una respuesta vacía o una carga colgada muestra un error reintentable en vez de pantalla en blanco"
         }
     ]
 }

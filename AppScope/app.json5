@@ -3,8 +3,8 @@
     // LiteVideo = YourPipe 的自用改进 fork，包名独立于上游 com.talon.yourpipe。
     "bundleName": "com.github.da3456.litevideo",
     "vendor": "da3456",
-    "versionCode": 1000225,
-    "versionName": "1.0.25",
+    "versionCode": 1000229,
+    "versionName": "1.0.29",
     "icon": "$media:app_icon",
     "label": "$string:app_name"
   }

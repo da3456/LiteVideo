@@ -966,7 +966,7 @@
         },
         {
             "name": "yt_home_kiosk_error",
-            "value": "Échec de la requête Kiosk, veuillez réessayer plus tard"
+            "value": "L’accueil n’a renvoyé aucune vidéo à afficher — réessayez dans un instant"
         },
         {
             "name": "yt_home_load_error",
@@ -4251,6 +4251,58 @@
         {
             "name": "yt_update_upstream_channel_notice",
             "value": "Le lien AppTest ci-dessous est le canal de test de YourPipe d'origine sur AppGallery de Huawei. LiteVideo ne distribue que du code source, sans canal de store."
+        },
+        {
+            "name": "yt_option_afdian",
+            "value": "Soutenir (Aifadian)"
+        },
+        {
+            "name": "yt_option_afdian_subtitle",
+            "value": "Soutenir les développeurs"
+        },
+        {
+            "name": "yt_afdian_mine_title",
+            "value": "Soutenir l’auteur du fork (da3456)"
+        },
+        {
+            "name": "yt_afdian_mine_desc",
+            "value": "Si ces améliorations te plaisent, tu peux financer le temps et les jetons qu’elles ont coûtés."
+        },
+        {
+            "name": "yt_afdian_upstream_title",
+            "value": "Soutenir l’auteur d’origine (Talon / YourPipe)"
+        },
+        {
+            "name": "yt_afdian_upstream_desc",
+            "value": "Si tu veux soutenir l’auteur d’origine, touche ici."
+        },
+        {
+            "name": "yt_afdian_note",
+            "value": "Le soutien est facultatif et ne débloque rien. LiteVideo n’intègre aucun paiement ; les deux liens s’ouvrent dans le navigateur."
+        },
+        {
+            "name": "yt_home_guest_notice",
+            "value": "Navigation en invité : regarder et chercher ne demandent pas de connexion, mais les recommandations personnalisées, « Regarder plus tard », la synchronisation des abonnements et « Non pertinent » si."
+        },
+        {
+            "name": "yt_home_guest_notice_action",
+            "value": "Se connecter"
+        },
+        {
+            "name": "yt_changelog_fork_7",
+            "value": "Ajout d’une entrée « Soutenir (Aifadian) » dans Général (auteur du fork et auteur d’origine, ouverture dans le navigateur) ; l’accueil indique en invité les fonctions qui exigent une connexion"
+        },
+        {
+            "name": "yt_home_shorts_empty",
+            "value": "Ici les Shorts viennent du rayon Shorts de l’accueil et de l’onglet Shorts de vos chaînes. Un invité n’a aucun abonnement : connectez-vous."
+        },
+        {
+            "name": "yt_changelog_fork_8",
+            "value": "L’accueil invité charge désormais le flux recommandé anonyme (le kiosk live reste la solution de repli) ; l’onglet Shorts explique pourquoi il est vide"
+        },
+        {
+            "name": "yt_changelog_fork_9",
+            "value": "Accueil invité avec repli en trois étapes (recommandés anonyme -> accueil TV anonyme -> onglet live) : une réponse vide ou un chargement bloqué affiche une page d’erreur réessayable au lieu d’un écran vide"
         }
     ]
 }

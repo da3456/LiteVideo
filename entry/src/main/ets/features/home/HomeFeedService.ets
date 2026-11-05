@@ -95,6 +95,49 @@ export class HomeFeedService {
       logger.warn('[HomeFeed] recommended requested but no WEB/TV credential — using live kiosk');
     }
 
+    // 游客默认拿匿名 WEB 首页（普通视频流，可能带 Shorts 货架）；
+    // 直播 kiosk 只是兜底，否则首页会是一整屏直播、短视频维度直接空。
+    if (rail === 'none' && style === 'recommended') {
+      try {
+        const guestHome = await this.fetchWebBrowseSource(
+          this.RECOMMENDED_BROWSE_ID,
+          '',
+          false,
+          startId,
+          'guest-home'
+        );
+        if (guestHome.items.length > 0) {
+          logger.info(`[HomeFeed] stage=initial_done source=guest-home items=${guestHome.items.length} `
+            + `elapsed=${Date.now() - startedAt}ms hasNext=${!!guestHome.nextPageToken}`);
+          return guestHome;
+        }
+        logger.warn(`[HomeFeed] stage=initial_empty source=guest-home `
+          + `elapsed=${Date.now() - startedAt}ms — trying anonymous TV home`);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        logger.warn(`[HomeFeed] stage=initial_failed source=guest-home `
+          + `elapsed=${Date.now() - startedAt}ms message=${msg} — trying anonymous TV home`);
+      }
+
+      // ② 匿名 TV 首页：游客没有 WEB 推荐流时，SmartTube 那一套仍能给出普通视频。
+      try {
+        const tvGuest = await this.fetchTvHomeSource(startId, false, 'guest-tv');
+        if (tvGuest.items.length > 0) {
+          logger.info(`[HomeFeed] stage=initial_done source=guest-tv items=${tvGuest.items.length} `
+            + `elapsed=${Date.now() - startedAt}ms hasNext=${!!tvGuest.nextPageToken}`);
+          return tvGuest;
+        }
+        logger.warn(`[HomeFeed] stage=initial_empty source=guest-tv `
+          + `elapsed=${Date.now() - startedAt}ms — falling back to live kiosk`);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        logger.warn(`[HomeFeed] stage=initial_failed source=guest-tv `
+          + `elapsed=${Date.now() - startedAt}ms message=${msg} — falling back to live kiosk`);
+      }
+    }
+
+    // ③ 直播 kiosk（上游原有的游客源）。空列表必须报错：
+    // 静默返回空会让首页变成一片空白，用户既不知道失败了也没法重试。
     try {
       const kiosk = await this.fetchWebBrowseSource(
         this.KIOSK_BROWSE_ID,
@@ -103,6 +146,9 @@ export class HomeFeedService {
         startId,
         'kiosk'
       );
+      if (kiosk.items.length === 0) {
+        throw new Error('Empty live kiosk feed (browse returned no video items)');
+      }
       logger.info(`[HomeFeed] stage=initial_done source=kiosk items=${kiosk.items.length} `
         + `elapsed=${Date.now() - startedAt}ms hasNext=${!!kiosk.nextPageToken}`);
       return kiosk;
@@ -129,7 +175,7 @@ export class HomeFeedService {
     const session = AuthSessionManager.getInstance();
     const startedAt = Date.now();
     const sourceHint = previousSource.length > 0 ? previousSource : '';
-    const useTv = sourceHint === 'recommended-tv'
+    const useTv = sourceHint === 'recommended-tv' || sourceHint === 'guest-tv'
       || (withAuth && session?.hasTvAuthForUserData() === true
         && session?.hasCookieAuthForUserData() !== true);
     const useWebAuth = withAuth
@@ -147,7 +193,7 @@ export class HomeFeedService {
           this.contentCountry,
           nextPageToken,
           visitorData,
-          true
+          sourceHint !== 'guest-tv'
         );
         if (!response) {
           throw new Error('Empty TV browse continuation response');
@@ -157,9 +203,9 @@ export class HomeFeedService {
           items: built.items,
           nextPageToken: built.nextPageToken,
           visitorData: getTvVisitorData(response as Record<string, Object>) || visitorData,
-          source: 'recommended-tv'
+          source: sourceHint === 'guest-tv' ? 'guest-tv' : 'recommended-tv'
         };
-        logger.info(`[HomeFeed] stage=next_done source=recommended-tv items=${result.items.length} `
+        logger.info(`[HomeFeed] stage=next_done source=${result.source} items=${result.items.length} `
           + `elapsed=${Date.now() - startedAt}ms hasNext=${!!result.nextPageToken}`);
         return result;
       }
@@ -179,7 +225,8 @@ export class HomeFeedService {
         visitorData,
         startId
       );
-      parsed.source = useWebAuth ? 'recommended-web' : 'kiosk';
+      parsed.source = useWebAuth ? 'recommended-web'
+        : (sourceHint === 'guest-home' ? 'guest-home' : 'kiosk');
       logger.info(`[HomeFeed] stage=next_done source=${parsed.source} items=${parsed.items.length} `
         + `elapsed=${Date.now() - startedAt}ms hasNext=${!!parsed.nextPageToken}`);
       return parsed;
@@ -191,19 +238,21 @@ export class HomeFeedService {
     }
   }
 
-  private async fetchTvHomeSource(startId: number): Promise<KioskPageResult> {
+  private async fetchTvHomeSource(startId: number, withAuth: boolean = true,
+    source: string = 'recommended-tv'): Promise<KioskPageResult> {
     const startedAt = Date.now();
-    logger.info(`[HomeFeed] stage=browse_start source=recommended-tv browseId=${this.TV_HOME_BROWSE_ID}`);
+    logger.info(`[HomeFeed] stage=browse_start source=${source} browseId=${this.TV_HOME_BROWSE_ID} `
+      + `withAuth=${withAuth}`);
     const response = await fetchTvBrowsePage(
       this.localization,
       this.contentCountry,
       this.TV_HOME_BROWSE_ID,
       '',
       undefined,
-      true
+      withAuth
     );
     if (!response) {
-      throw new Error('Empty TV browse response browseId=default');
+      throw new Error(`Empty TV browse response browseId=default withAuth=${withAuth}`);
     }
     const resp = response as Record<string, Object>;
     const error = resp['error'] as Record<string, Object>;
@@ -219,16 +268,16 @@ export class HomeFeedService {
       const tvContent = tvBrowse ? (tvBrowse['content'] as Record<string, Object>) : undefined;
       const tvContentKeys = tvContent ? Object.keys(tvContent).join(',') : '(none)';
       const err = resp['error'] as Record<string, Object>;
-      logger.warn(`[HomeFeed] stage=browse_empty source=recommended-tv topKeys=${keys} `
+      logger.warn(`[HomeFeed] stage=browse_empty source=${source} topKeys=${keys} `
         + `contentsKeys=${contentKeys} tvContentKeys=${tvContentKeys} hasError=${!!err}`);
     }
-    logger.info(`[HomeFeed] stage=browse_parsed source=recommended-tv items=${built.items.length} `
+    logger.info(`[HomeFeed] stage=browse_parsed source=${source} items=${built.items.length} `
       + `elapsed=${Date.now() - startedAt}ms`);
     return {
       items: built.items,
       nextPageToken: built.nextPageToken,
       visitorData: getTvVisitorData(resp),
-      source: 'recommended-tv'
+      source
     };
   }
 
@@ -254,9 +303,30 @@ export class HomeFeedService {
     }
     const parsed = this.parseHomeBrowseInitialResponse(response as Record<string, Object>, startId);
     parsed.source = source;
+    if (parsed.items.length === 0) {
+      // 结构诊断：游客拿到 200 但解析不出条目时（登录墙 / 机器人校验 / 结构改版），
+      // 只靠 items=0 无法定位，这里把响应形状打进日志。
+      const resp = response as Record<string, Object>;
+      const contents = resp['contents'] as Record<string, Object>;
+      const alerts = resp['alerts'] as Array<Object>;
+      const err = resp['error'] as Record<string, Object>;
+      logger.warn(`[HomeFeed] stage=browse_empty source=${source} `
+        + `topKeys=${Object.keys(resp).join(',')} contentsKeys=${contents ? Object.keys(contents).join(',') : '(none)'} `
+        + `alerts=${alerts ? alerts.length : 0} hasError=${!!err} `
+        + `responseKeys=${contents ? this.describeFirstContentKeys(contents) : '(none)'}`);
+    }
     logger.info(`[HomeFeed] stage=browse_parsed source=${source} items=${parsed.items.length} `
       + `elapsed=${Date.now() - startedAt}ms`);
     return parsed;
+  }
+
+  private describeFirstContentKeys(contents: Record<string, Object>): string {
+    const twoColumn = contents['twoColumnBrowseResultsRenderer'] as Record<string, Object>;
+    const tabs = twoColumn ? (twoColumn['tabs'] as Array<Record<string, Object>>) : undefined;
+    const tab0 = tabs && tabs.length > 0 ? tabs[0] : undefined;
+    const tabRenderer = tab0 ? (tab0['tabRenderer'] as Record<string, Object>) : undefined;
+    const tabContent = tabRenderer ? (tabRenderer['content'] as Record<string, Object>) : undefined;
+    return tabContent ? Object.keys(tabContent).join(',') : '(no tabRenderer)';
   }
 
   private parseHomeBrowseInitialResponse(response: Record<string, Object>, startId: number): KioskPageResult {

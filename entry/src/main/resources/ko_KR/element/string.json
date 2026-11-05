@@ -1014,7 +1014,7 @@
         },
         {
             "name": "yt_home_kiosk_error",
-            "value": "Kiosk 요청 실패. 잠시 후 다시 시도하세요"
+            "value": "홈에서 표시할 동영상을 받지 못했습니다. 잠시 후 다시 시도하세요"
         },
         {
             "name": "yt_home_load_error",
@@ -4251,6 +4251,58 @@
         {
             "name": "yt_update_upstream_channel_notice",
             "value": "아래 AppTest는 원본 YourPipe의 화웨이 AppGallery 테스트 채널입니다. LiteVideo는 소스만 배포하며 스토어 채널이 없습니다."
+        },
+        {
+            "name": "yt_option_afdian",
+            "value": "Aifadian (후원)"
+        },
+        {
+            "name": "yt_option_afdian_subtitle",
+            "value": "개발자 후원"
+        },
+        {
+            "name": "yt_afdian_mine_title",
+            "value": "포크 제작자 후원 (da3456)"
+        },
+        {
+            "name": "yt_afdian_mine_desc",
+            "value": "이 개선이 쓸 만하다면 들어간 시간과 token을 후원할 수 있습니다."
+        },
+        {
+            "name": "yt_afdian_upstream_title",
+            "value": "원작자 후원 (Talon / YourPipe)"
+        },
+        {
+            "name": "yt_afdian_upstream_desc",
+            "value": "원작자를 후원하려면 여기를 누르세요."
+        },
+        {
+            "name": "yt_afdian_note",
+            "value": "후원은 자발적이며 어떤 기능도 해제하지 않습니다. LiteVideo는 결제를 연동하지 않고 두 링크 모두 브라우저에서 열립니다."
+        },
+        {
+            "name": "yt_home_guest_notice",
+            "value": "게스트로 보는 중입니다. 시청과 검색은 로그인 없이 이용할 수 있지만 맞춤 추천, 나중에 보기, 구독 동기화, '흥미 없음' 피드백은 로그인해야 합니다."
+        },
+        {
+            "name": "yt_home_guest_notice_action",
+            "value": "로그인"
+        },
+        {
+            "name": "yt_changelog_fork_7",
+            "value": "일반 탭에 '후원(Aifadian)' 항목 추가(포크 제작자·원작자, 모두 브라우저에서 열림); 게스트로 볼 때 로그인 기능이 필요한 항목을 홈에 표시"
+        },
+        {
+            "name": "yt_home_shorts_empty",
+            "value": "Shorts는 홈 피드의 Shorts 선반과 구독·시청 채널의 Shorts 탭에서만 옵니다. 게스트는 구독이 없으니 로그인 후 다시 시도하세요."
+        },
+        {
+            "name": "yt_changelog_fork_8",
+            "value": "게스트 홈을 익명 추천 피드로 변경(실패 시에만 라이브로 폴백). Shorts 탭이 비어 있는 이유를 안내해 빈 화면을 없앴습니다"
+        },
+        {
+            "name": "yt_changelog_fork_9",
+            "value": "게스트 홈을 3단계 폴백으로 변경(익명 추천→익명 TV 홈→라이브). 응답이 비거나 로딩이 멈추면 빈 화면 대신 재시도 오류 화면을 표시"
         }
     ]
 }

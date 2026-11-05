@@ -24,6 +24,7 @@ import { OptionsDeArrowPage } from './OptionsDeArrowPage';
 import { OptionsAiListPage } from './OptionsAiListPage';
 import { OptionsUpdatePage } from './OptionsUpdatePage';
 import { OptionsNetworkPage } from './OptionsNetworkPage';
+import { OptionsAfdianPage } from './OptionsAfdianPage';
 // [DISABLED] P3：import { OptionsAiTranslatePage } from './OptionsAiTranslatePage';
 import { HelpGuidePage } from '../help/HelpGuidePage';
 import { WebViewLoginPage } from '../auth/WebViewLoginPage';
@@ -49,6 +50,8 @@ export class OptionsSheetActions {
 /** OptionsSheetHost 入参（单对象 @Prop，与 OptionsMainPageParams 同模式）。 */
 export interface OptionsSheetHostParams {
   actions: OptionsSheetActions;
+  /** sheet 挂载后要直接打开的子页 destination 名（空 = 停在一级菜单）。 */
+  initialRoute?: string;
   appLangItems: LanguagePickerItem[];
   contentLangItems: LanguagePickerItem[];
   contentCountryItems: LanguagePickerItem[];
@@ -76,8 +79,9 @@ export interface OptionsSheetHostParams {
  */
 @Component
 export struct OptionsSheetHost {
-  @Prop params: OptionsSheetHostParams = {
+  @Prop @Watch('onOptionsParamsChange') params: OptionsSheetHostParams = {
     actions: new OptionsSheetActions(),
+    initialRoute: '',
     appLangItems: [] as LanguagePickerItem[],
     contentLangItems: [] as LanguagePickerItem[],
     contentCountryItems: [] as LanguagePickerItem[],
@@ -100,11 +104,29 @@ export struct OptionsSheetHost {
   @State optionsNavStack: NavPathStack = new NavPathStack();
   @State optionsDepth: number = 0;
   private webViewLoginBackHandler: (() => boolean) | null = null;
+  /** initialRoute 只消费一次：sheet 复用不重建时靠 @Watch 补跳，重复触发会叠两层栈。 */
+  private initialRouteConsumed: boolean = false;
 
   aboutToAppear() {
     this.params.actions.clearPath = () => {
       this.clearOptionsPath();
     };
+    // 首页「去登录」之类的外部入口：sheet 一挂载就直接落到指定子页。
+    this.applyInitialRoute();
+  }
+
+  onOptionsParamsChange(): void {
+    this.applyInitialRoute();
+  }
+
+  private applyInitialRoute(): void {
+    const route: string = this.params.initialRoute || '';
+    if (route.length === 0 || this.initialRouteConsumed) {
+      return;
+    }
+    this.initialRouteConsumed = true;
+    logger.info(`options sheet open initial route=${route}`);
+    this.pushOptionsPath(route);
   }
 
   private pushOptionsPath(name: string): void {
@@ -120,6 +142,8 @@ export struct OptionsSheetHost {
   private clearOptionsPath(): void {
     this.optionsNavStack.clear();
     this.optionsDepth = 0;
+    // 关 sheet 后允许下一次外部入口重新消费 initialRoute。
+    this.initialRouteConsumed = false;
   }
 
   private getQualityDisplay(quality: VideoQualityCap): ResourceStr {
@@ -150,6 +174,7 @@ export struct OptionsSheetHost {
               onPerformanceClick: () => { this.pushOptionsPath('performance'); },
               onExperimentalClick: () => { this.pushOptionsPath('experimental'); },
               onNetworkClick: () => { this.pushOptionsPath('network'); },
+              onAfdianClick: () => { this.pushOptionsPath('afdian'); },
               // [DISABLED] P3：onAiTranslateClick: () => { this.pushOptionsPath('ai_translate'); },
               onAppearanceClick: () => { this.pushOptionsPath('appearance'); },
               onLogClick: () => { this.pushOptionsPath('log_page'); },
@@ -350,6 +375,13 @@ export struct OptionsSheetHost {
             }
           }
         })
+      }
+    } else if (name === 'afdian') {
+      OptionsNavScaffold({
+        title: $r('app.string.yt_option_afdian'),
+        onBack: () => { this.popOptionsPath(); }
+      }) {
+        OptionsAfdianPage()
       }
     } else if (name === 'log_page') {
       OptionsNavScaffold({

@@ -25,6 +25,7 @@ interface OptionsMainPageParams {
   onPerformanceClick: () => void;
   onExperimentalClick: () => void;
   onNetworkClick: () => void;
+  onAfdianClick: () => void;
   onAppearanceClick: () => void;
   // [DISABLED] P3：onAiTranslateClick: () => void;
   onLogClick: () => void;
@@ -54,6 +55,7 @@ export struct OptionsMainPage {
     onPerformanceClick: () => {},
     onExperimentalClick: () => {},
     onNetworkClick: () => {},
+    onAfdianClick: () => {},
     onAppearanceClick: () => {},
     // [DISABLED] P3：onAiTranslateClick: () => {},
     onLogClick: () => {},
@@ -148,6 +150,18 @@ export struct OptionsMainPage {
             iconColor: this.themePrimary,
             clickEffectEnabled: this.params.clickEffectEnabled,
             onClickAction: this.params.onNetworkClick
+          })
+        }
+        .padding({ left: 0, right: 0 })
+
+        ListItem() {
+          OptionItem({
+            icon: $r('sys.symbol.heart_fill'),
+            title: $r('app.string.yt_option_afdian'),
+            subtitle: $r('app.string.yt_option_afdian_subtitle'),
+            iconColor: this.themePrimary,
+            clickEffectEnabled: this.params.clickEffectEnabled,
+            onClickAction: this.params.onAfdianClick
           })
         }
         .padding({ left: 0, right: 0 })

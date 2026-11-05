@@ -1014,7 +1014,7 @@
         },
         {
             "name": "yt_home_kiosk_error",
-            "value": "Falha na solicitação do Kiosk, tente novamente mais tarde"
+            "value": "A inicial não trouxe vídeos para exibir — tente novamente em instantes"
         },
         {
             "name": "yt_home_load_error",
@@ -4251,6 +4251,58 @@
         {
             "name": "yt_update_upstream_channel_notice",
             "value": "O link AppTest abaixo é o canal de testes do YourPipe original na AppGallery da Huawei. O LiteVideo distribui apenas código-fonte e não tem canal de loja."
+        },
+        {
+            "name": "yt_option_afdian",
+            "value": "Apoiar (Aifadian)"
+        },
+        {
+            "name": "yt_option_afdian_subtitle",
+            "value": "Apoie os criadores"
+        },
+        {
+            "name": "yt_afdian_mine_title",
+            "value": "Apoie o autor do fork (da3456)"
+        },
+        {
+            "name": "yt_afdian_mine_desc",
+            "value": "Se essas melhorias são úteis para você, pode patrocinar o tempo e os tokens que elas custaram."
+        },
+        {
+            "name": "yt_afdian_upstream_title",
+            "value": "Apoie o autor original (Talon / YourPipe)"
+        },
+        {
+            "name": "yt_afdian_upstream_desc",
+            "value": "Se quiser patrocinar o autor original, toque aqui."
+        },
+        {
+            "name": "yt_afdian_note",
+            "value": "Patrocinar é opcional e não libera nada. O LiteVideo não integra pagamentos; os dois links abrem no navegador."
+        },
+        {
+            "name": "yt_home_guest_notice",
+            "value": "Você está navegando como convidado: assistir e pesquisar não exigem login, mas recomendações personalizadas, “Assistir mais tarde”, sincronização de inscrições e “Não tenho interesse” exigem."
+        },
+        {
+            "name": "yt_home_guest_notice_action",
+            "value": "Entrar"
+        },
+        {
+            "name": "yt_changelog_fork_7",
+            "value": "Novo item «Apoiar (Aifadian)» em Geral (autor do fork e autor original; abrem no navegador); a tela inicial mostra, como convidado, quais recursos exigem login"
+        },
+        {
+            "name": "yt_home_shorts_empty",
+            "value": "Aqui os Shorts vêm da prateleira Shorts da home e da aba Shorts dos seus canais. Como convidado, você não tem inscrições — faça login e tente de novo."
+        },
+        {
+            "name": "yt_changelog_fork_8",
+            "value": "A home de convidado agora usa o feed recomendado anônimo (o kiosk ao vivo fica como recurso alternativo); a aba Shorts explica por que está vazia"
+        },
+        {
+            "name": "yt_changelog_fork_9",
+            "value": "Home de convidado com alternativa em três etapas (recomendados anônimo -> home TV anônima -> aba ao vivo): resposta vazia ou carregamento travado mostra um erro com repetir, não mais tela em branco"
         }
     ]
 }

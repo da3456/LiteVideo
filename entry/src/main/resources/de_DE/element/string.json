@@ -950,7 +950,7 @@
         },
         {
             "name": "yt_home_kiosk_error",
-            "value": "Kiosk-Anfrage fehlgeschlagen, bitte später erneut versuchen"
+            "value": "Die Startseite hat keine Videos geliefert — bitte gleich erneut versuchen"
         },
         {
             "name": "yt_home_load_error",
@@ -4251,6 +4251,58 @@
         {
             "name": "yt_update_upstream_channel_notice",
             "value": "Der AppTest-Link unten ist der Testkanal des ursprünglichen YourPipe in Huaweis AppGallery. LiteVideo verteilt nur Quellcode und hat keinen Store-Kanal."
+        },
+        {
+            "name": "yt_option_afdian",
+            "value": "Spenden (Aifadian)"
+        },
+        {
+            "name": "yt_option_afdian_subtitle",
+            "value": "Unterstütze die Entwickler"
+        },
+        {
+            "name": "yt_afdian_mine_title",
+            "value": "Fork-Autor unterstützen (da3456)"
+        },
+        {
+            "name": "yt_afdian_mine_desc",
+            "value": "Wenn dir diese Verbesserungen gefallen, kannst du die Zeit und Tokens unterstützen, die sie gekostet haben."
+        },
+        {
+            "name": "yt_afdian_upstream_title",
+            "value": "Original-Autor unterstützen (Talon / YourPipe)"
+        },
+        {
+            "name": "yt_afdian_upstream_desc",
+            "value": "Wenn du den Autor des Originals unterstützen möchtest, tippe hier."
+        },
+        {
+            "name": "yt_afdian_note",
+            "value": "Unterstützung ist freiwillig und schaltet nichts frei. LiteVideo hat keine Zahlungsintegration — beide Links öffnen im Browser."
+        },
+        {
+            "name": "yt_home_guest_notice",
+            "value": "Du surfst als Gast: Anschauen und Suchen gehen ohne Login, personalisierte Empfehlungen, „Später ansehen“, Abo-Synchronisation und „Nicht interessiert“ brauchen einen Login."
+        },
+        {
+            "name": "yt_home_guest_notice_action",
+            "value": "Anmelden"
+        },
+        {
+            "name": "yt_changelog_fork_7",
+            "value": "Eintrag „Spenden (Aifadian)“ unter Allgemein hinzugefügt (Fork-Autor und Original-Autor, öffnen im Browser); Start erklärt als Gast, welche Funktionen einen Login brauchen"
+        },
+        {
+            "name": "yt_home_shorts_empty",
+            "value": "Shorts kommen hier nur aus dem Shorts-Regal und dem Shorts-Tab deiner Kanäle. Als Gast hast du keine Abos — bitte anmelden und erneut versuchen."
+        },
+        {
+            "name": "yt_changelog_fork_8",
+            "value": "Gast-Startseite lädt jetzt den anonymen Empfehlungs-Feed statt lauter Live-Streams (Live bleibt Fallback); der Shorts-Tab erklärt, warum er leer ist, statt leer zu wirken"
+        },
+        {
+            "name": "yt_changelog_fork_9",
+            "value": "Gast-Startseite mit dreistufigem Fallback (anonyme Empfehlungen -> anonymes TV-Home -> Live-Tab); leere Antwort oder Hänger zeigt jetzt eine Fehlerseite mit erneuter Versuch statt eines leeren Bildschirms"
         }
     ]
 }

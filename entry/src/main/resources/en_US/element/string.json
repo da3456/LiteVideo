@@ -966,7 +966,7 @@
         },
         {
             "name": "yt_home_kiosk_error",
-            "value": "Kiosk request failed, please try again later"
+            "value": "Home returned no videos to show — please try again in a moment"
         },
         {
             "name": "yt_home_load_error",
@@ -4251,6 +4251,58 @@
         {
             "name": "yt_update_upstream_channel_notice",
             "value": "The AppTest link below is the original YourPipe's test channel on Huawei AppGallery. LiteVideo distributes source code only and has no store channel."
+        },
+        {
+            "name": "yt_option_afdian",
+            "value": "Donate (Aifadian)"
+        },
+        {
+            "name": "yt_option_afdian_subtitle",
+            "value": "Support the creators"
+        },
+        {
+            "name": "yt_afdian_mine_title",
+            "value": "Support the fork author (da3456)"
+        },
+        {
+            "name": "yt_afdian_mine_desc",
+            "value": "If these tweaks make the app nicer for you, you can sponsor the time and tokens they cost."
+        },
+        {
+            "name": "yt_afdian_upstream_title",
+            "value": "Support the original author (Talon / YourPipe)"
+        },
+        {
+            "name": "yt_afdian_upstream_desc",
+            "value": "If you want to sponsor the original author, tap here."
+        },
+        {
+            "name": "yt_afdian_note",
+            "value": "Sponsoring is entirely optional and unlocks nothing. LiteVideo has no payment integration — both links open in your browser."
+        },
+        {
+            "name": "yt_home_guest_notice",
+            "value": "Browsing as a guest: watching and searching need no sign-in, but personalized recommendations, Watch later, subscription sync and Not-interested feedback do."
+        },
+        {
+            "name": "yt_home_guest_notice_action",
+            "value": "Sign in"
+        },
+        {
+            "name": "yt_changelog_fork_7",
+            "value": "Added a Donate (Aifadian) entry under General — fork author and original author, both open in the browser; Home now explains which features need sign-in when you are browsing as a guest"
+        },
+        {
+            "name": "yt_home_shorts_empty",
+            "value": "Shorts here come only from the home feed Shorts shelf and the Shorts tab of channels you follow or watched. Guests have no subscriptions — sign in and try again."
+        },
+        {
+            "name": "yt_changelog_fork_8",
+            "value": "The guest home now loads the anonymous recommended feed instead of a wall of live streams (live kiosk stays as fallback); the Shorts tab shows why it is empty instead of a blank screen"
+        },
+        {
+            "name": "yt_changelog_fork_9",
+            "value": "Guest home now falls back in three steps: anonymous recommended feed -> anonymous TV home -> live tab; an empty response or a stuck load shows a retryable error page instead of a blank screen"
         }
     ]
 }

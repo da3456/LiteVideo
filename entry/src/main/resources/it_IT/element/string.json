@@ -1014,7 +1014,7 @@
         },
         {
             "name": "yt_home_kiosk_error",
-            "value": "Richiesta Kiosk non riuscita, riprova più tardi"
+            "value": "La home non ha restituito video da mostrare: riprova tra un momento"
         },
         {
             "name": "yt_home_load_error",
@@ -4251,6 +4251,58 @@
         {
             "name": "yt_update_upstream_channel_notice",
             "value": "Il collegamento AppTest qui sotto è il canale di prova di YourPipe originale su AppGallery di Huawei. LiteVideo distribuisce solo codice sorgente e non ha un canale store."
+        },
+        {
+            "name": "yt_option_afdian",
+            "value": "Sostieni (Aifadian)"
+        },
+        {
+            "name": "yt_option_afdian_subtitle",
+            "value": "Sostieni gli sviluppatori"
+        },
+        {
+            "name": "yt_afdian_mine_title",
+            "value": "Sostieni l’autore del fork (da3456)"
+        },
+        {
+            "name": "yt_afdian_mine_desc",
+            "value": "Se queste modifiche ti tornano utili, puoi sostenere il tempo e i token che sono costati."
+        },
+        {
+            "name": "yt_afdian_upstream_title",
+            "value": "Sostieni l’autore originale (Talon / YourPipe)"
+        },
+        {
+            "name": "yt_afdian_upstream_desc",
+            "value": "Se vuoi sostenere l’autore originale, tocca qui."
+        },
+        {
+            "name": "yt_afdian_note",
+            "value": "Sostenere è facoltativo e non sblocca nulla. LiteVideo non integra pagamenti; entrambi i link si aprono nel browser."
+        },
+        {
+            "name": "yt_home_guest_notice",
+            "value": "Stai navigando come ospite: guardare e cercare non richiedono l’accesso, mentre consigli personalizzati, «Guarda più tardi», sincronizzazione delle iscrizioni e «Non mi interessa» sì."
+        },
+        {
+            "name": "yt_home_guest_notice_action",
+            "value": "Accedi"
+        },
+        {
+            "name": "yt_changelog_fork_7",
+            "value": "Aggiunta la voce «Sostieni (Aifadian)» in Generale (autore del fork e autore originale; si aprono nel browser); la home spiega in modalità ospite quali funzioni richiedono l’accesso"
+        },
+        {
+            "name": "yt_home_shorts_empty",
+            "value": "Qui gli Shorts arrivano dallo scaffale Shorts della home e dalla scheda Shorts dei tuoi canali. Come ospite non hai iscrizioni: accedi."
+        },
+        {
+            "name": "yt_changelog_fork_8",
+            "value": "La home ospite ora usa il feed consigliato anonimo (il kiosk live resta come ripiego); la scheda Shorts spiega perché è vuota"
+        },
+        {
+            "name": "yt_changelog_fork_9",
+            "value": "Home ospite con ripiego in tre passaggi (consigliati anonimo -> home TV anonima -> scheda live): risposta vuota o caricamento bloccato mostrano un errore riprovabile invece di uno schermo vuoto"
         }
     ]
 }

@@ -182,7 +182,7 @@ const AI_PROVIDER_ITEMS: AiProviderItem[] = [
 const CHANGELOG: ChangelogEntry[] = [
   {
     // fork 自己的改动记在第一条，上游历史条目原样保留在下面。
-    version: 'LiteVideo 1.0.25', date: '2026-11-05',
+    version: 'LiteVideo 1.0.29', date: '2026-11-06',
     changes: [
       $r('app.string.yt_changelog_fork_1'),
       $r('app.string.yt_changelog_fork_2'),
@@ -190,6 +190,9 @@ const CHANGELOG: ChangelogEntry[] = [
       $r('app.string.yt_changelog_fork_4'),
       $r('app.string.yt_changelog_fork_5'),
       $r('app.string.yt_changelog_fork_6'),
+      $r('app.string.yt_changelog_fork_7'),
+      $r('app.string.yt_changelog_fork_8'),
+      $r('app.string.yt_changelog_fork_9'),
     ],
   },
   {

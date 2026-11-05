@@ -966,7 +966,7 @@
         },
         {
             "name": "yt_home_kiosk_error",
-            "value": "Kiosk 請求失敗，請稍後重試"
+            "value": "首頁沒有取得可顯示的影片，請稍後再試"
         },
         {
             "name": "yt_home_load_error",
@@ -4251,6 +4251,58 @@
         {
             "name": "yt_update_upstream_channel_notice",
             "value": "下方的 AppTest 是原版 YourPipe 在華為應用市場的測試管道；LiteVideo 僅分發原始碼，沒有商店管道。"
+        },
+        {
+            "name": "yt_option_afdian",
+            "value": "愛發電"
+        },
+        {
+            "name": "yt_option_afdian_subtitle",
+            "value": "捐贈創作者"
+        },
+        {
+            "name": "yt_afdian_mine_title",
+            "value": "贊助 fork 作者（da3456）"
+        },
+        {
+            "name": "yt_afdian_mine_desc",
+            "value": "如果你覺得這些小改進用著還行，可以贊助我改這些所花的時間與 token。"
+        },
+        {
+            "name": "yt_afdian_upstream_title",
+            "value": "贊助原作者（Talon / YourPipe）"
+        },
+        {
+            "name": "yt_afdian_upstream_desc",
+            "value": "如果你想贊助原作者，可以點這裡。"
+        },
+        {
+            "name": "yt_afdian_note",
+            "value": "贊助完全自願，不會解鎖任何功能；LiteVideo 沒有接入任何支付，兩個連結都會在瀏覽器開啟。"
+        },
+        {
+            "name": "yt_home_guest_notice",
+            "value": "目前以訪客身分瀏覽：看影片、搜尋不需要登入，但個人化推薦、稍後觀看、訂閱同步和「不感興趣」回饋需要登入。"
+        },
+        {
+            "name": "yt_home_guest_notice_action",
+            "value": "去登入"
+        },
+        {
+            "name": "yt_changelog_fork_7",
+            "value": "一般頁新增「愛發電」入口（贊助本 fork 作者／原版作者，僅於瀏覽器開啟）；首頁於訪客身分下說明哪些功能需要登入"
+        },
+        {
+            "name": "yt_home_shorts_empty",
+            "value": "短影片只來自首頁 feed 中的 Shorts 架，以及訂閱或看過頻道的 Shorts 分頁；訪客沒有訂閱頻道，登入後再切過來。"
+        },
+        {
+            "name": "yt_changelog_fork_8",
+            "value": "訪客首頁改為匿名推薦串流（不再是整螢幕直播），失敗才回落直播；短影片維度清單為空時顯示來源說明，不再一片空白"
+        },
+        {
+            "name": "yt_changelog_fork_9",
+            "value": "訪客首頁改為三級退回：匿名推薦串流 → 匿名 TV 首頁 → 直播分頁；回應為空或載入卡住時不再白屏，改顯示可重試的錯誤頁"
         }
     ]
 }
