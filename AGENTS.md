@@ -1,4 +1,4 @@
-# AGENTS.md — YourPipe
+# AGENTS.md — LiteVideo (fork of YourPipe)
 
 > AI agent context file. Read this first. Tracked in git — keep it free of
 > machine-specific absolute paths and secrets.
@@ -12,8 +12,13 @@
 > write changelogs, commit history, or “recent change” bullet lists.
 
 ## 1. Project
-- **Name / package**: YourPipe (`com.talon.yourpipe`, vendor `talon`, v0.7.0,
-  versionCode 1000031).
+- **Name / package**: LiteVideo (`com.github.da3456.litevideo`, vendor `da3456`).
+  This repository is a **self-use fork of YourPipe**
+  (`https://github.com/Ember5843/YourPipe`, `com.talon.yourpipe`), and the fork's
+  version line is deliberately decoupled from upstream's `0.x` numbering. The
+  architecture described below is upstream's; the fork's divergence and the
+  reasons for the separate identity are in `README.md`, and third-party terms
+  are in `LICENSES/THIRD-PARTY-NOTICES.md`.
 - **What it is**: YouTube client for OpenHarmony / HarmonyOS. Plays YouTube
   content through a native **MPV** pipeline (vendored `libmpv.so` + static
   `libav*` for mux/remux). Product VOD path is **direct-link DASH** for guest
@@ -34,10 +39,12 @@
   compatible `6.1.0(23)`), runtimeOS
   `HarmonyOS`. Native compiler: `BiSheng`.
 - **Devices**: phone / tablet / 2in1 / tv / car.
-- **Distribution / updates**: AppGallery test channel plus GitHub Releases
-  (`https://github.com/Ember5843/YourPipe`); in-app update check from
-  Options/About reads the latest release (with a `version.json` asset) and
-  opens the repo / AppGallery page.
+- **Distribution / updates**: GitHub Releases of the fork
+  (`https://github.com/da3456/LiteVideo`); in-app update check from Options/About
+  reads the latest release (with a `version.json` asset) and opens the repo page.
+  The fork has no AppGallery test channel and publishes no Release yet, so the
+  update check silently finds nothing — the upstream store entry was removed
+  rather than left pointing at the original app.
 
 ### Reference projects
 

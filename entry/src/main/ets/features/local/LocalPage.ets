@@ -20,8 +20,8 @@ import {
   MEDIA_META_SIZE,
   MEDIA_THUMB_RADIUS,
   MEDIA_TITLE_LINE_HEIGHT,
-  MEDIA_TITLE_SIZE,
-  TITLE_BAR_HEIGHT
+  MEDIA_TITLE_SIZE,
+  TITLE_BAR_HEIGHT
 } from '../../common/components/MediaCardTokens';
 import { FeedServiceProvider } from '../../common/FeedServiceProvider';
 import { getWideListColumnCount } from '../../common/utils/ListLayoutUtils';
@@ -114,7 +114,6 @@ struct HistoryCard {
     VideoItemContextMenu({
       video: this.toVideoItem(),
       showInfo: !this.isPlaylistEntry(),
-      showFavorite: !this.isPlaylistEntry(),
       showAudioOnly: !this.isPlaylistEntry(),
       showDownload: !this.isPlaylistEntry(),
       showShare: !this.isPlaylistEntry(),

@@ -1,16 +1,13 @@
 import { AppLog } from '../../common/AppLog';
 import { TITLE_BAR_HEIGHT } from '../../common/components/MediaCardTokens';
-import { AuthAccountStatus, VideoItem } from 'youtube_core';
+import { AuthAccountStatus } from 'youtube_core';
 import { PlaylistItem, StoredLocalQueue } from '../../common/PlaylistModel';
 import { SearchPlaylistItem } from 'youtube_core';
-import { VideoCard } from '../../common/components/VideoCard';
-import { VideoCardGrid } from '../../common/components/VideoCardGrid';
 import { PlaylistCard } from '../../features/playlist/components/PlaylistCard';
 import { SearchLocaleManager } from '../../common/SearchLocaleManager';
 import { FeedServiceProvider } from '../../common/FeedServiceProvider';
 import { UIConfig } from '../../common/AppState';
 import { customAnimationUtil } from '../../common/AnimationUtil';
-import { getFeedContentWidthVp, getVideoGridColumnCount, getWideListColumnCount } from '../../common/utils/ListLayoutUtils';
 import { ActionHub } from '../../common/ActionHub';
 import { SubscriptionUser } from '../../common/SubscriptionModel';
 import { SubscriptionFeedItem } from '../../common/SubscriptionFeedStore';
@@ -32,11 +29,9 @@ class MergedPlaylistEntry {
 @Component
 export struct FavoritesPage {
   @StorageProp('themePrimaryColor') themePrimary: string = '#E53935';
-  @StorageLink('favorites') favorites: VideoItem[] = [];
   @StorageLink('playlists') playlists: PlaylistItem[] = [];
   @StorageLink('localQueues') localQueues: StoredLocalQueue[] = [];
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig();
-  @StorageLink('deviceWidth') deviceWidth: number = 0;
   @StorageLink('subscriptions') subscriptions: SubscriptionUser[] = [];
   @StorageLink('subscriptionFeed') feedItems: SubscriptionFeedItem[] = [];
   @StorageLink('authStatus') authStatus: AuthAccountStatus = new AuthAccountStatus();
@@ -226,11 +221,6 @@ export struct FavoritesPage {
     return merged;
   }
 
-  /** 条式列表在宽屏（平板展开/2in1/电视）下的列数 */
-  private getWideListColumns(): number {
-    return getWideListColumnCount(getFeedContentWidthVp(this.getUIContext(), this.deviceWidth));
-  }
-
   private getFeedCoverUrls(): string[] {
     const urls: string[] = [];
     for (const item of this.feedItems) {
@@ -312,89 +302,6 @@ export struct FavoritesPage {
     Column() {
       List({ space: 4, scroller: FavoritesScrollCoordinator.scroller }) {
       this.SubscriptionFeedEntry()
-
-      // 收藏的视频部分
-      ListItem() {
-        Text($r('app.string.yt_fav_videos_title'))
-          .fontSize(20)
-          .fontColor($r('app.color.yourtube_text_primary'))
-          .fontWeight(FontWeight.Medium)
-          .margin({ top: 16, bottom: 12 })
-          .padding({ left: 16, right: 16 })
-          .width('100%')
-      }
-
-      if (!this.favorites || this.favorites.length === 0) {
-        ListItem() {
-          Column() {
-            Text($r('app.string.yt_empty_no_fav_videos'))
-              .fontSize(14)
-              .fontColor($r('app.color.yourtube_text_secondary'))
-              .margin({ top: 20 })
-          }
-          .width('100%')
-          .alignItems(HorizontalAlign.Center)
-          .padding({ bottom: 24 })
-        }
-      } else {
-        if (this.uiConfig.homeLayoutMode === 'grid') {
-          ListItem() {
-            GridRow({
-              columns: getVideoGridColumnCount(getFeedContentWidthVp(this.getUIContext(), this.deviceWidth),
-                UIConfig.gridDensityOffset(this.uiConfig.homeGridDensity)),
-              gutter: { x: 8, y: 8 }
-            }) {
-              ForEach(this.favorites, (item: VideoItem) => {
-                GridCol({ span: 1 }) {
-                  VideoCardGrid({
-                    video: item,
-                    actionLabel: $r('app.string.yt_action_unfavorite'),
-                    actionType: 'remove',
-                    showViewCount: false,
-                    showLiveTag: false
-                  })
-                }
-                .transition(customAnimationUtil.isScaleTran(item.videoId || item.id.toString(), this.uiConfig))
-              }, (item: VideoItem) => item.videoId || item.id.toString())
-            }
-            .width('100%')
-          }
-        } else if (this.getWideListColumns() > 1) {
-          ListItem() {
-            GridRow({
-              columns: this.getWideListColumns(),
-              gutter: { x: 8, y: 4 }
-            }) {
-              ForEach(this.favorites, (item: VideoItem) => {
-                GridCol({ span: 1 }) {
-                  VideoCard({
-                    video: item,
-                    actionLabel: $r('app.string.yt_action_unfavorite'),
-                    actionType: 'remove',
-                    showViewCount: false,
-                    showLiveTag: false
-                  })
-                }
-                .transition(customAnimationUtil.isScaleTran(item.videoId || item.id.toString(), this.uiConfig))
-              }, (item: VideoItem) => item.videoId || item.id.toString())
-            }
-            .width('100%')
-          }
-        } else {
-          ForEach(this.favorites, (item: VideoItem) => {
-            ListItem() {
-              VideoCard({
-                video: item,
-                actionLabel: $r('app.string.yt_action_unfavorite'),
-                actionType: 'remove',
-                showViewCount: false,
-                showLiveTag: false
-              })
-            }
-            .transition(customAnimationUtil.isScaleTran(item.videoId || item.id.toString(), this.uiConfig))
-          }, (item: VideoItem) => item.videoId || item.id.toString())
-        }
-      }
 
       // 播放列表部分（账号库 + 收藏 + 本地，去重合并）
       ListItem() {

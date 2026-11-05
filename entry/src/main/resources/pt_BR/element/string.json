@@ -489,6 +489,46 @@
             "value": "Compartilhar"
         },
         {
+            "name": "yt_action_open_channel",
+            "value": "Abrir canal"
+        },
+        {
+            "name": "yt_action_save_to_watch_later",
+            "value": "Salvar em \"Assistir mais tarde\""
+        },
+        {
+            "name": "yt_action_not_interested",
+            "value": "Não tenho interesse"
+        },
+        {
+            "name": "yt_action_dont_recommend_channel",
+            "value": "Não recomendar o canal"
+        },
+        {
+            "name": "yt_watch_later_needs_login",
+            "value": "Faça login na sua conta do YouTube para salvar em \"Assistir mais tarde\""
+        },
+        {
+            "name": "yt_watch_later_saved",
+            "value": "Adicionado a \"Assistir mais tarde\""
+        },
+        {
+            "name": "yt_watch_later_failed",
+            "value": "Não foi possível salvar em \"Assistir mais tarde\""
+        },
+        {
+            "name": "yt_dismiss_video_notice",
+            "value": "Este vídeo não será mais recomendado"
+        },
+        {
+            "name": "yt_feed_feedback_needs_login",
+            "value": "Faça login na sua conta do YouTube para enviar esse feedback"
+        },
+        {
+            "name": "yt_feed_feedback_failed",
+            "value": "Não foi possível enviar o feedback"
+        },
+        {
             "name": "yt_action_retry",
             "value": "Tentar novamente"
         },
@@ -981,6 +1021,14 @@
             "value": "Falha ao carregar a página inicial, tente novamente mais tarde"
         },
         {
+            "name": "yt_home_batch_end",
+            "value": "Você já viu este lote. Puxe para baixo ou toque em Início outra vez para o próximo."
+        },
+        {
+            "name": "yt_home_no_new_videos",
+            "value": "Nenhum vídeo novo no momento"
+        },
+        {
             "name": "yt_player_mode_progressive",
             "value": "Progressivo (Progressive)"
         },
@@ -1146,7 +1194,7 @@
         },
         {
             "name": "new_app_name",
-            "value": "YourPipe"
+            "value": "LiteVideo"
         },
         {
             "name": "yt_empty_no_playlists",
@@ -1440,154 +1488,154 @@
             "name": "yt_player_subtitle_off",
             "value": "Desativar legendas"
         },
-{
-    "name": "yt_player_subtitle_auto_translated",
-    "value": "Tradução automática"
-},
-{
-    "name": "yt_option_ai_translate",
-    "value": "Tradução de legendas por IA"
-},
-{
-    "name": "yt_option_ai_subtitle",
-    "value": "Legendas de IA"
-},
-{
-    "name": "yt_ai_translate_engine",
-    "value": "Motor de tradução"
-},
-{
-    "name": "yt_ai_translate_engine_gtx",
-    "value": "Google Tradutor (gratuito)"
-},
-{
-    "name": "yt_ai_translate_engine_llm",
-    "value": "LLM personalizado (compatível com OpenAI)"
-},
-{
-    "name": "yt_ai_translate_llm_section",
-    "value": "Configurações de LLM"
-},
-{
-    "name": "yt_ai_translate_base_url",
-    "value": "URL base"
-},
-{
-    "name": "yt_ai_translate_model",
-    "value": "Nome do modelo"
-},
-{
-    "name": "yt_ai_translate_api_key",
-    "value": "API Key"
-},
-{
-    "name": "yt_ai_translate_test",
-    "value": "Testar conexão"
-},
-{
-    "name": "yt_ai_translate_testing",
-    "value": "Testando…"
-},
-{
-    "name": "yt_ai_translate_test_ok",
-    "value": "Conexão bem-sucedida"
-},
-{
-    "name": "yt_ai_translate_test_fail",
-    "value": "Falha na conexão; verifique as configurações"
-},
-{
-    "name": "yt_ai_translate_display_section",
-    "value": "Exibição"
-},
-{
-    "name": "yt_ai_translate_bilingual",
-    "value": "Bilíngue"
-},
-{
-    "name": "yt_ai_translate_bilingual_subtitle",
-    "value": "Mostrar original e tradução"
-},
-{
-    "name": "yt_ai_translate_note",
-    "value": "O texto das legendas é enviado ao serviço de tradução selecionado. O idioma de destino segue \"Idioma de tradução de conteúdo\"."
-},
-{
-    "name": "yt_ai_translate_menu",
-    "value": "Traduzir com IA"
-},
-{
-    "name": "yt_ai_translate_llm_not_configured",
-    "value": "Configure o LLM nas configurações primeiro"
-},
-{
-    "name": "yt_ai_translate_partial_fail",
-    "value": "Algumas linhas falharam; original mantido"
-},
-{
-    "name": "yt_ai_translate_failed",
-    "value": "Falha na tradução; tente novamente mais tarde"
-},
-{
-    "name": "yt_setting_system_ai_caption",
-    "value": "Legendas IA do sistema"
-},
-{
-    "name": "yt_setting_system_ai_caption_subtitle",
-    "value": "O sistema transcreve o áudio em reprodução em tempo real (apenas dispositivos compatíveis, chinês/inglês)"
-},
-{
-    "name": "yt_setting_system_ai_caption_source",
-    "value": "Idioma de origem das legendas IA"
-},
-{
-    "name": "yt_setting_system_ai_caption_source_zh",
-    "value": "Chinês"
-},
-{
-    "name": "yt_asr_menu",
-    "value": "Gerar legendas por IA"
-},
-{
-    "name": "yt_asr_phase_model",
-    "value": "Baixando modelo"
-},
-{
-    "name": "yt_asr_live_progress",
-    "value": "Reconhecimento ao vivo…"
-},
-{
-    "name": "yt_asr_failed",
-    "value": "Falha ao gerar legendas; tente mais tarde"
-},
-{
-    "name": "yt_asr_model_section",
-    "value": "Modelo de reconhecimento no dispositivo"
-},
-{
-    "name": "yt_asr_model_status_ready",
-    "value": "Pronto (reconhecimento streaming zh/en)"
-},
-{
-    "name": "yt_asr_model_status_none",
-    "value": "Não baixado (~190 MB; Wi-Fi recomendado)"
-},
-{
-    "name": "yt_asr_model_downloading",
-    "value": "Baixando"
-},
-{
-    "name": "yt_asr_model_download",
-    "value": "Baixar modelo"
-},
-{
-    "name": "yt_asr_model_delete",
-    "value": "Excluir modelo"
-},
-{
-    "name": "yt_ai_action_cancel",
-    "value": "Cancelar"
-},
+        {
+            "name": "yt_player_subtitle_auto_translated",
+            "value": "Tradução automática"
+        },
+        {
+            "name": "yt_option_ai_translate",
+            "value": "Tradução de legendas por IA"
+        },
+        {
+            "name": "yt_option_ai_subtitle",
+            "value": "Legendas de IA"
+        },
+        {
+            "name": "yt_ai_translate_engine",
+            "value": "Motor de tradução"
+        },
+        {
+            "name": "yt_ai_translate_engine_gtx",
+            "value": "Google Tradutor (gratuito)"
+        },
+        {
+            "name": "yt_ai_translate_engine_llm",
+            "value": "LLM personalizado (compatível com OpenAI)"
+        },
+        {
+            "name": "yt_ai_translate_llm_section",
+            "value": "Configurações de LLM"
+        },
+        {
+            "name": "yt_ai_translate_base_url",
+            "value": "URL base"
+        },
+        {
+            "name": "yt_ai_translate_model",
+            "value": "Nome do modelo"
+        },
+        {
+            "name": "yt_ai_translate_api_key",
+            "value": "API Key"
+        },
+        {
+            "name": "yt_ai_translate_test",
+            "value": "Testar conexão"
+        },
+        {
+            "name": "yt_ai_translate_testing",
+            "value": "Testando…"
+        },
+        {
+            "name": "yt_ai_translate_test_ok",
+            "value": "Conexão bem-sucedida"
+        },
+        {
+            "name": "yt_ai_translate_test_fail",
+            "value": "Falha na conexão; verifique as configurações"
+        },
+        {
+            "name": "yt_ai_translate_display_section",
+            "value": "Exibição"
+        },
+        {
+            "name": "yt_ai_translate_bilingual",
+            "value": "Bilíngue"
+        },
+        {
+            "name": "yt_ai_translate_bilingual_subtitle",
+            "value": "Mostrar original e tradução"
+        },
+        {
+            "name": "yt_ai_translate_note",
+            "value": "O texto das legendas é enviado ao serviço de tradução selecionado. O idioma de destino segue \"Idioma de tradução de conteúdo\"."
+        },
+        {
+            "name": "yt_ai_translate_menu",
+            "value": "Traduzir com IA"
+        },
+        {
+            "name": "yt_ai_translate_llm_not_configured",
+            "value": "Configure o LLM nas configurações primeiro"
+        },
+        {
+            "name": "yt_ai_translate_partial_fail",
+            "value": "Algumas linhas falharam; original mantido"
+        },
+        {
+            "name": "yt_ai_translate_failed",
+            "value": "Falha na tradução; tente novamente mais tarde"
+        },
+        {
+            "name": "yt_setting_system_ai_caption",
+            "value": "Legendas IA do sistema"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_subtitle",
+            "value": "O sistema transcreve o áudio em reprodução em tempo real (apenas dispositivos compatíveis, chinês/inglês)"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source",
+            "value": "Idioma de origem das legendas IA"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source_zh",
+            "value": "Chinês"
+        },
+        {
+            "name": "yt_asr_menu",
+            "value": "Gerar legendas por IA"
+        },
+        {
+            "name": "yt_asr_phase_model",
+            "value": "Baixando modelo"
+        },
+        {
+            "name": "yt_asr_live_progress",
+            "value": "Reconhecimento ao vivo…"
+        },
+        {
+            "name": "yt_asr_failed",
+            "value": "Falha ao gerar legendas; tente mais tarde"
+        },
+        {
+            "name": "yt_asr_model_section",
+            "value": "Modelo de reconhecimento no dispositivo"
+        },
+        {
+            "name": "yt_asr_model_status_ready",
+            "value": "Pronto (reconhecimento streaming zh/en)"
+        },
+        {
+            "name": "yt_asr_model_status_none",
+            "value": "Não baixado (~190 MB; Wi-Fi recomendado)"
+        },
+        {
+            "name": "yt_asr_model_downloading",
+            "value": "Baixando"
+        },
+        {
+            "name": "yt_asr_model_download",
+            "value": "Baixar modelo"
+        },
+        {
+            "name": "yt_asr_model_delete",
+            "value": "Excluir modelo"
+        },
+        {
+            "name": "yt_ai_action_cancel",
+            "value": "Cancelar"
+        },
         {
             "name": "yt_player_chapters",
             "value": "Capítulos"
@@ -1747,6 +1795,10 @@
         {
             "name": "yt_sub_sync_failed",
             "value": "Falha ao sincronizar inscrições"
+        },
+        {
+            "name": "yt_sub_write_failed",
+            "value": "Alteração de inscrição não sincronizada com o YouTube; desfeita"
         },
         {
             "name": "yt_refresh_failed",
@@ -3488,7 +3540,6 @@
             "name": "yt_option_clear_history_subtitle",
             "value": "Exclui todo o histórico local e o progresso"
         },
-
         {
             "name": "yt_toast_history_cleared",
             "value": "Histórico limpo"
@@ -3604,8 +3655,7 @@
         {
             "name": "yt_home_mode_long",
             "value": "Vídeos longos"
-        }
-    ,
+        },
         {
             "name": "yt_download_pause",
             "value": "Pausar"
@@ -3845,7 +3895,7 @@
         {
             "name": "yt_translation_region",
             "value": "Região"
-        },
+        },
         {
             "name": "yt_exp_title",
             "value": "Recursos experimentais"
@@ -4145,6 +4195,46 @@
         {
             "name": "yt_update_later",
             "value": "Mais tarde"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_channel",
+            "value": "Cancelar a inscrição em \"%s\"?"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_generic",
+            "value": "Cancelar a inscrição neste canal?"
+        },
+        {
+            "name": "yt_about_fork_notice",
+            "value": "Esta versão é um fork pessoal do YourPipe, distribuído sob a licença GPLv3"
+        },
+        {
+            "name": "yt_about_upstream",
+            "value": "Projeto original"
+        },
+        {
+            "name": "yt_changelog_fork_1",
+            "value": "Identidade própria: pacote com.github.da3456.litevideo, nome LiteVideo, coexiste com o original"
+        },
+        {
+            "name": "yt_changelog_fork_2",
+            "value": "Alterações de inscrição são gravadas na conta do YouTube e conferidas com a lista na nuvem; cancelar pede confirmação"
+        },
+        {
+            "name": "yt_changelog_fork_3",
+            "value": "Pressione longamente um cartão inicial e abre uma folha inferior; arraste a alça ou toque fora para fechar"
+        },
+        {
+            "name": "yt_changelog_fork_4",
+            "value": "“Não tenho interesse / Não recomende este canal / Salvar para assistir depois” agora envia feedback ao servidor"
+        },
+        {
+            "name": "yt_changelog_fork_5",
+            "value": "Botões e itens de menu de favoritos removidos; a terceira aba agora é Playlists"
+        },
+        {
+            "name": "yt_changelog_fork_6",
+            "value": "O feed inicial é servido em lotes (3 páginas por lote, toque em Início de novo para o próximo); a verificação de atualizações aponta para este repositório"
         }
     ]
 }

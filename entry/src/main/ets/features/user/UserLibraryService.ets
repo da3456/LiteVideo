@@ -1,4 +1,5 @@
 import {
+  addVideoToPlaylist,
   AuthSessionManager,
   ContentCountry,
   Localization,
@@ -7,7 +8,10 @@ import {
   fetchBrowseContinuation,
   fetchBrowsePage,
   fetchTvBrowseContinuation,
-  fetchTvBrowsePage
+  fetchTvBrowsePage,
+  postFeedFeedback,
+  subscribeChannels,
+  unsubscribeChannels
 } from 'youtube_core';
 import { util } from '@kit.ArkTS';
 import { AppLog } from '../../common/AppLog';
@@ -42,6 +46,23 @@ export interface UserPlaylistPageResult {
   nextPageToken: string | null;
   visitorData: string;
 }
+
+export interface SubscribedChannelsSnapshot {
+  channels: Array<SubscriptionUser>;
+  /**
+   * false = 这份云端名单不可当作全集（翻页没跑完、或只是兜底扫描）。
+   * 调用方只有 complete 为真时才允许据此删除本地订阅。
+   */
+  complete: boolean;
+}
+
+interface ChannelScanResult {
+  tokens: Array<string>;
+  truncated: boolean;
+}
+
+/** FEchannels 续页抓取上限：再多就不是「差一页」而是账号异常，宁可标 incomplete。 */
+const CHANNELS_MAX_PAGES: number = 6;
 
 export class UserLibraryService {
   private localization: Localization;
@@ -318,6 +339,15 @@ export class UserLibraryService {
   }
 
   async fetchSubscribedChannels(): Promise<Array<SubscriptionUser>> {
+    const snapshot = await this.fetchSubscribedChannelsSnapshot();
+    return snapshot.channels;
+  }
+
+  /**
+   * 云端订阅名单快照。WEB 走 FEchannels 并把续页翻完（≤ CHANNELS_MAX_PAGES），
+   * 翻不完就 complete=false —— 订阅核对靠这个标志决定能不能删本地条目。
+   */
+  async fetchSubscribedChannelsSnapshot(): Promise<SubscribedChannelsSnapshot> {
     this.requireSignedIn();
     if (this.useTvRail()) {
       // TV has no clean FEchannels WEB tree; channel list lives on FEsubscriptions nav tabs.
@@ -335,11 +365,13 @@ export class UserLibraryService {
       }
       const tvChannels = this.parseTvSubscribedChannels(response as Record<string, Object>);
       if (tvChannels.length > 0) {
-        return tvChannels;
+        // 导航标签页就是这条频道的全集（无分页概念）。
+        return { channels: tvChannels, complete: true };
       }
       // Fallback: generic UC scan (may be empty for pure TV payloads)
-      return this.parseSubscribedChannels(response as Record<string, Object>);
+      return { channels: this.parseSubscribedChannels(response as Record<string, Object>), complete: false };
     }
+    const startedAt = Date.now();
     const response = await fetchBrowsePage(
       this.localization,
       this.contentCountry,
@@ -351,7 +383,147 @@ export class UserLibraryService {
     if (!response) {
       throw new Error('Empty channels browse response');
     }
-    return this.parseSubscribedChannels(response as Record<string, Object>);
+    const root = response as Record<string, Object>;
+    const responseContext = root['responseContext'] as Record<string, Object>;
+    const visitorData = (responseContext ? (responseContext['visitorData'] as string) : '') || '';
+    const channels: Array<SubscriptionUser> = [];
+    const seen: Record<string, boolean> = {};
+    const pushChannel = (
+      channelId: string,
+      displayName: string,
+      avatarUrl: string,
+      subscriberText: string
+    ): void => {
+      const id = (channelId || '').trim();
+      if (!id || !id.startsWith('UC') || seen[id]) {
+        return;
+      }
+      seen[id] = true;
+      channels.push(new SubscriptionUser(
+        id,
+        displayName || id,
+        avatarUrl || '',
+        subscriberText || '',
+        '',
+        '',
+        ThumbnailPlaceholder.pickColor(id, channels.length + 1),
+        true
+      ));
+    };
+
+    const firstScan = this.scanChannelsIterative(root, pushChannel);
+    let tokens = firstScan.tokens;
+    let pages = 1;
+    let complete = !firstScan.truncated;
+    while (tokens.length > 0 && pages < CHANNELS_MAX_PAGES) {
+      const token = tokens[tokens.length - 1];
+      const nextPage = await fetchBrowseContinuation(
+        this.localization,
+        this.contentCountry,
+        token,
+        visitorData,
+        true
+      );
+      if (!nextPage) {
+        complete = false;
+        break;
+      }
+      const items = this.extractContinuationItems(nextPage as Record<string, Object>);
+      if (items.length === 0) {
+        break;
+      }
+      const pageScan = this.scanChannelsIterative(items, pushChannel);
+      pages += 1;
+      tokens = pageScan.tokens;
+      if (pageScan.truncated) {
+        complete = false;
+        break;
+      }
+    }
+    if (tokens.length > 0) {
+      // 页数用尽仍有续页 → 名单不全，禁止删除本地条目。
+      complete = false;
+    }
+    logger.info(`[SubSync] stage=cloud_snapshot channels=${channels.length} pages=${pages} complete=${complete} elapsed=${Date.now() - startedAt}ms`);
+    return { channels, complete };
+  }
+
+  private extractContinuationItems(response: Record<string, Object>): Array<Record<string, Object>> {
+    const items: Array<Record<string, Object>> = [];
+    const actions = response['onResponseReceivedActions'] as Array<Record<string, Object>>;
+    if (!actions) {
+      return items;
+    }
+    actions.forEach((action) => {
+      const append = action['appendContinuationItemsAction'] as Record<string, Object>;
+      const continuationItems = append ? (append['continuationItems'] as Array<Record<string, Object>>) : undefined;
+      if (continuationItems) {
+        continuationItems.forEach((entry) => {
+          if (entry) {
+            items.push(entry);
+          }
+        });
+      }
+    });
+    return items;
+  }
+
+  /**
+   * 订阅写回服务端（Innertube subscription/subscribe）。
+   * 调用方负责本地状态：这里只在失败时抛错，由 UI 回滚。
+   */
+  async subscribeChannel(channelId: string): Promise<void> {
+    this.requireSignedIn();
+    const tv = this.useTvRail();
+    logger.info(`[SubSync] stage=subscribe_cloud rail=${tv ? 'tv' : 'web'} channelId=${channelId}`);
+    await subscribeChannels(this.localization, this.contentCountry, [channelId], tv);
+  }
+
+  async unsubscribeChannel(channelId: string): Promise<void> {
+    this.requireSignedIn();
+    const tv = this.useTvRail();
+    logger.info(`[SubSync] stage=unsubscribe_cloud rail=${tv ? 'tv' : 'web'} channelId=${channelId}`);
+    await unsubscribeChannels(this.localization, this.contentCountry, [channelId], tv);
+  }
+
+  /**
+   * 卡片长按菜单「保存到稍后观看」：写回账号的 Watch later 系统列表（Innertube 列表 id 就是 `WL`）。
+   * 未登录直接抛错，由调用方提示；这里不动本地状态。
+   */
+  async saveToWatchLater(videoId: string): Promise<void> {
+    this.requireSignedIn();
+    const tv = this.useTvRail();
+    logger.info(`[PlaylistWrite] stage=watch_later rail=${tv ? 'tv' : 'web'} videoId=${videoId}`);
+    await addVideoToPlaylist('WL', videoId, this.localization, this.contentCountry, tv);
+  }
+
+  /**
+   * 卡片长按菜单「不感兴趣 / 不推荐该频道」：把 feed 响应自带的 `feedbackEndpoint.token`
+   * 原样回传给 Innertube `feedback`（服务端记录推荐反馈），和网页同一接口。
+   * token 只在登录态的 feed 响应里出现，因此同样要求登录。
+   */
+  async sendFeedFeedback(feedbackToken: string): Promise<void> {
+    this.requireSignedIn();
+    const tv = this.useTvRail();
+    await postFeedFeedback(feedbackToken, this.localization, this.contentCountry, tv);
+  }
+
+  async syncSubscribeChannels(channelIds: string[]): Promise<number> {
+    this.requireSignedIn();
+    const tv = this.useTvRail();
+    const ids: string[] = [];
+    channelIds.forEach((id) => {
+      const trimmed = (id || '').trim();
+      if (trimmed.length > 0 && ids.indexOf(trimmed) < 0) {
+        ids.push(trimmed);
+      }
+    });
+    if (ids.length === 0) {
+      return 0;
+    }
+    logger.info(`[SubSync] stage=push_subscribe rail=${tv ? 'tv' : 'web'} count=${ids.length}`);
+    await subscribeChannels(this.localization, this.contentCountry, ids, tv);
+    return ids.length;
   }
 
   /**
@@ -527,7 +699,8 @@ export class UserLibraryService {
         subscriberText || '',
         '',
         '',
-        ThumbnailPlaceholder.pickColor(id, result.length + 1)
+        ThumbnailPlaceholder.pickColor(id, result.length + 1),
+        true
       ));
     };
 
@@ -585,7 +758,8 @@ export class UserLibraryService {
         '',
         '',
         '',
-        ThumbnailPlaceholder.pickColor(channelId, result.length + 1)
+        ThumbnailPlaceholder.pickColor(channelId, result.length + 1),
+        true
       ));
     }
     logger.info(`parseTvSubscribedChannels count=${result.length}`);
@@ -727,9 +901,10 @@ export class UserLibraryService {
   private scanChannelsIterative(
     root: Object,
     pushChannel: (channelId: string, displayName: string, avatarUrl: string, subscriberText: string) => void
-  ): void {
+  ): ChannelScanResult {
+    const scanResult: ChannelScanResult = { tokens: [], truncated: false };
     if (!root) {
-      return;
+      return scanResult;
     }
     const maxDepth = 24;
     const maxNodes = 8000;
@@ -761,6 +936,10 @@ export class UserLibraryService {
       }
 
       const obj = node as Record<string, Object>;
+      const pendingToken = this.extractChannelScanToken(obj);
+      if (pendingToken) {
+        scanResult.tokens.push(pendingToken);
+      }
       if (this.tryPushChannelNode(obj, pushChannel)) {
         // Channel leaf — still allow siblings via queue, but do not descend into this leaf.
         continue;
@@ -802,6 +981,21 @@ export class UserLibraryService {
         }
       }
     }
+    // 队列非空却退出循环 = 撞上节点上限，这份名单不可信为全集。
+    if (queue.length > 0) {
+      scanResult.truncated = true;
+    }
+    return scanResult;
+  }
+
+  private extractChannelScanToken(obj: Record<string, Object>): string | null {
+    const rawRenderer = obj['continuationItemRenderer'];
+    const rawViewModel = obj['continuationItemViewModel'];
+    const renderer = rawRenderer ? (rawRenderer as Record<string, Object>) : undefined;
+    const viewModel = rawViewModel ? (rawViewModel as Record<string, Object>) : undefined;
+    return getPlaylistContinuationToken(renderer)
+      || getPlaylistContinuationToken(viewModel)
+      || getPlaylistContinuationToken(obj);
   }
 
   private tryPushChannelNode(

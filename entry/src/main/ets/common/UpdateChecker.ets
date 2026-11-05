@@ -11,11 +11,13 @@ const logger = AppLog.getInstance('UpdateChecker');
  * api.github.com 对匿名请求按出口 IP 限流（60 次/小时），触发后固定 403，
  * 而 releases.atom 是普通网页资源，不受这套限流影响。
  */
-const RELEASES_ATOM_URL = 'https://github.com/Ember5843/YourPipe/releases.atom';
-const LATEST_VERSION_JSON_URL = 'https://github.com/Ember5843/YourPipe/releases/latest/download/version.json';
+const RELEASES_ATOM_URL = 'https://github.com/da3456/LiteVideo/releases.atom';
+const LATEST_VERSION_JSON_URL = 'https://github.com/da3456/LiteVideo/releases/latest/download/version.json';
 
-export const APPGALLERY_TEST_URL = 'https://appgallery.huawei.com/apptest/AOd7gmH8iD5';
-export const GITHUB_REPO_URL = 'https://github.com/Ember5843/YourPipe';
+/** 更新检查与「打开仓库」都指向本 fork；没有 Release 时检查静默失败。 */
+export const GITHUB_REPO_URL = 'https://github.com/da3456/LiteVideo';
+/** 上游原项目：AppGallery 测试渠道是原版的，本 fork 不自带商店入口，只保留来源链接。 */
+export const UPSTREAM_REPO_URL = 'https://github.com/Ember5843/YourPipe';
 
 export type UpdateCheckStatus = 'upToDate' | 'updateAvailable' | 'failed';
 export type UpdateCheckSource = 'startup' | 'manual';

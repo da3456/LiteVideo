@@ -9,7 +9,10 @@ import { ThemeColorUtil } from '../ThemeColorUtil';
 import { openExternalUrl } from '../utils/ExternalLinkUtil';
 import { SECTION_CARD_RADIUS } from './MediaCardTokens';
 
-const GITHUB_REPO_URL = 'https://github.com/Ember5843/YourPipe';
+/** 本 fork 的仓库（更新检查 / 源码入口都指这里）。 */
+const GITHUB_REPO_URL = 'https://github.com/da3456/LiteVideo';
+/** 上游原始项目，保留入口是 GPLv3 的署名要求，也方便回看原版改动。 */
+const UPSTREAM_REPO_URL = 'https://github.com/Ember5843/YourPipe';
 const logger = AppLog.getInstance('AboutPage');
 
 // ─── 数据 ──────────────────────────────────────────────────────────────────────
@@ -178,6 +181,18 @@ const AI_PROVIDER_ITEMS: AiProviderItem[] = [
 ];
 
 const CHANGELOG: ChangelogEntry[] = [
+  {
+    // fork 自己的改动记在第一条，上游历史条目原样保留在下面。
+    version: 'LiteVideo 1.0.23', date: '2026-11-05',
+    changes: [
+      $r('app.string.yt_changelog_fork_1'),
+      $r('app.string.yt_changelog_fork_2'),
+      $r('app.string.yt_changelog_fork_3'),
+      $r('app.string.yt_changelog_fork_4'),
+      $r('app.string.yt_changelog_fork_5'),
+      $r('app.string.yt_changelog_fork_6'),
+    ],
+  },
   {
     version: '0.7.0', date: '2026-10-21',
     changes: [
@@ -666,7 +681,7 @@ export struct AboutPage {
               .shadow({ radius: 12, color: '#22000000', offsetX: 0, offsetY: 4 })
 
             Column({ space: 4 }) {
-              Text('YourPipe')
+              Text('LitePipe')
                 .fontSize(26).fontWeight(FontWeight.Bold)
                 .fontColor($r('app.color.yourtube_text_primary'))
               Text(`${getContext().resourceManager.getStringSync($r('app.string.yt_label_version_format').id)} ${getAppVersion().versionName}`)
@@ -680,38 +695,40 @@ export struct AboutPage {
               .textAlign(TextAlign.Center)
               .lineHeight(21)
 
-            // ── 社群 / 标识 ──
+            Text($r('app.string.yt_about_fork_notice'))
+              .fontSize(12)
+              .fontColor($r('app.color.yourtube_text_hint'))
+              .textAlign(TextAlign.Center)
+              .lineHeight(19)
+              .margin({ top: 6 })
+
+            // ── 标识 / 来源 ──
+            // 上游作者的 QQ / Telegram 社群入口已移除：那是原版 YourPipe 的群，
+            // 留在这个 fork 里只会把用户引到别人那里去。
             Column({ space: 0 }) {
               OptionItem({
                 imageIcon: $r('app.media.app_icon'),
                 title: $r('app.string.yt_about_package_name'),
-                subtitle: 'com.talon.yourpipe',
+                subtitle: 'com.github.da3456.litevideo',
                 transparentBackground: true,
-                onClickAction: () => this.copyToClipboard('com.talon.yourpipe'),
-              })
-              Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
-              OptionItem({
-                imageIcon: $r('app.media.about_logo_qq'),
-                title: $r('app.string.yt_about_qq_group'),
-                subtitle: '2167068947',
-                transparentBackground: true,
-                onClickAction: () => this.copyToClipboard('2167068947'),
-              })
-              Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
-              OptionItem({
-                imageIcon: $r('app.media.about_logo_telegram'),
-                title: $r('app.string.yt_about_tg_group'),
-                subtitle: 't.me/yourpipegroup',
-                transparentBackground: true,
-                onClickAction: () => this.copyToClipboard('t.me/yourpipegroup'),
+                onClickAction: () => this.copyToClipboard('com.github.da3456.litevideo'),
               })
               Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
               OptionItem({
                 imageIcon: $r('app.media.about_logo_github'),
                 title: $r('app.string.yt_about_github_repo'),
-                subtitle: 'github.com/Ember5843/YourPipe',
+                subtitle: 'github.com/da3456/LiteVideo',
                 transparentBackground: true,
                 onClickAction: () => this.openExternalLink(GITHUB_REPO_URL),
+              })
+              Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
+              OptionItem({
+                icon: $r('sys.symbol.arrow_counterclockwise'),
+                iconColor: this.themePrimary,
+                title: $r('app.string.yt_about_upstream'),
+                subtitle: 'github.com/Ember5843/YourPipe',
+                transparentBackground: true,
+                onClickAction: () => this.openExternalLink(UPSTREAM_REPO_URL),
               })
             }
             .width('100%')
@@ -763,10 +780,15 @@ export struct AboutPage {
           .width('100%').padding({ left: 16, right: 16 })
 
           // ── 底部版权 ──
+          // 上游版权行原样保留（GPLv3 要求保留全部既有版权声明），
+          // fork 的改动只在其下追加自己的一行。
           Column() {
-            Text(`YourPipe v${getAppVersion().versionName}  ·  GPL-3.0`)
+            Text(`LiteVideo v${getAppVersion().versionName}  ·  GPL-3.0`)
               .fontSize(11).fontColor($r('app.color.yourtube_text_disabled'))
             Text('© 2025 Talon')
+              .fontSize(11).fontColor($r('app.color.yourtube_text_disabled'))
+              .margin({ top: 2 })
+            Text('Fork © 2026 da3456')
               .fontSize(11).fontColor($r('app.color.yourtube_text_disabled'))
               .margin({ top: 2 })
           }

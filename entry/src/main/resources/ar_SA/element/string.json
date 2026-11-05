@@ -457,6 +457,46 @@
             "value": "مشاركة"
         },
         {
+            "name": "yt_action_open_channel",
+            "value": "فتح القناة"
+        },
+        {
+            "name": "yt_action_save_to_watch_later",
+            "value": "حفظ في \"مشاهدة لاحقًا\""
+        },
+        {
+            "name": "yt_action_not_interested",
+            "value": "غير مهتم"
+        },
+        {
+            "name": "yt_action_dont_recommend_channel",
+            "value": "عدم توصية القناة"
+        },
+        {
+            "name": "yt_watch_later_needs_login",
+            "value": "يجب تسجيل الدخول إلى حساب YouTube للحفظ في \"مشاهدة لاحقًا\""
+        },
+        {
+            "name": "yt_watch_later_saved",
+            "value": "تمت الإضافة إلى \"مشاهدة لاحقًا\""
+        },
+        {
+            "name": "yt_watch_later_failed",
+            "value": "تعذّر الحفظ في \"مشاهدة لاحقًا\""
+        },
+        {
+            "name": "yt_dismiss_video_notice",
+            "value": "لن يتم اقتراح هذا الفيديو بعد الآن"
+        },
+        {
+            "name": "yt_feed_feedback_needs_login",
+            "value": "يجب تسجيل الدخول إلى حساب YouTube لإرسال هذا الرأي"
+        },
+        {
+            "name": "yt_feed_feedback_failed",
+            "value": "تعذّر إرسال الرأي"
+        },
+        {
             "name": "yt_action_retry",
             "value": "إعادة المحاولة"
         },
@@ -933,6 +973,14 @@
             "value": "فشل تحميل الصفحة الرئيسية، يرجى المحاولة لاحقًا"
         },
         {
+            "name": "yt_home_batch_end",
+            "value": "لقد اطلعت على هذه الدفعة. اسحب للأسفل أو اضغط على الرئيسية مرة أخرى للدفعة التالية."
+        },
+        {
+            "name": "yt_home_no_new_videos",
+            "value": "لا توجد مقاطع فيديو جديدة الآن"
+        },
+        {
             "name": "yt_player_mode_progressive",
             "value": "تدريجي"
         },
@@ -990,7 +1038,7 @@
         },
         {
             "name": "new_app_name",
-            "value": "YourPipe"
+            "value": "LiteVideo"
         },
         {
             "name": "yt_empty_no_playlists",
@@ -1060,154 +1108,154 @@
             "name": "yt_player_subtitle_off",
             "value": "إيقاف الترجمة"
         },
-{
-    "name": "yt_player_subtitle_auto_translated",
-    "value": "ترجمة تلقائية"
-},
-{
-    "name": "yt_option_ai_translate",
-    "value": "ترجمة الترجمة بالذكاء الاصطناعي"
-},
-{
-    "name": "yt_option_ai_subtitle",
-    "value": "الترجمة بالذكاء الاصطناعي"
-},
-{
-    "name": "yt_ai_translate_engine",
-    "value": "محرك الترجمة"
-},
-{
-    "name": "yt_ai_translate_engine_gtx",
-    "value": "ترجمة Google المجانية"
-},
-{
-    "name": "yt_ai_translate_engine_llm",
-    "value": "نموذج LLM مخصص (متوافق مع OpenAI)"
-},
-{
-    "name": "yt_ai_translate_llm_section",
-    "value": "إعدادات LLM"
-},
-{
-    "name": "yt_ai_translate_base_url",
-    "value": "عنوان الواجهة (Base URL)"
-},
-{
-    "name": "yt_ai_translate_model",
-    "value": "اسم النموذج"
-},
-{
-    "name": "yt_ai_translate_api_key",
-    "value": "API Key"
-},
-{
-    "name": "yt_ai_translate_test",
-    "value": "اختبار الاتصال"
-},
-{
-    "name": "yt_ai_translate_testing",
-    "value": "جارٍ الاختبار…"
-},
-{
-    "name": "yt_ai_translate_test_ok",
-    "value": "تم الاتصال بنجاح"
-},
-{
-    "name": "yt_ai_translate_test_fail",
-    "value": "فشل الاتصال؛ تحقق من الإعدادات"
-},
-{
-    "name": "yt_ai_translate_display_section",
-    "value": "العرض"
-},
-{
-    "name": "yt_ai_translate_bilingual",
-    "value": "ثنائي اللغة"
-},
-{
-    "name": "yt_ai_translate_bilingual_subtitle",
-    "value": "إظهار النص الأصلي والترجمة معًا"
-},
-{
-    "name": "yt_ai_translate_note",
-    "value": "يُرسَل نص الترجمة إلى خدمة الترجمة المحددة. تتبع اللغة المستهدفة \"لغة ترجمة المحتوى\"."
-},
-{
-    "name": "yt_ai_translate_menu",
-    "value": "ترجمة ذكية"
-},
-{
-    "name": "yt_ai_translate_llm_not_configured",
-    "value": "يرجى إعداد LLM في الإعدادات أولًا"
-},
-{
-    "name": "yt_ai_translate_partial_fail",
-    "value": "فشلت ترجمة بعض الأسطر؛ تم الاحتفاظ بالنص الأصلي"
-},
-{
-    "name": "yt_ai_translate_failed",
-    "value": "فشلت ترجمة الترجمة؛ حاول لاحقًا"
-},
-{
-    "name": "yt_setting_system_ai_caption",
-    "value": "الترجمة الذكية للنظام"
-},
-{
-    "name": "yt_setting_system_ai_caption_subtitle",
-    "value": "يتعرف النظام على الصوت الجاري تشغيله في الوقت الفعلي (أجهزة مدعومة فقط، صيني/إنجليزي)"
-},
-{
-    "name": "yt_setting_system_ai_caption_source",
-    "value": "لغة مصدر الترجمة الذكية"
-},
-{
-    "name": "yt_setting_system_ai_caption_source_zh",
-    "value": "الصينية"
-},
-{
-    "name": "yt_asr_menu",
-    "value": "توليد الترجمة بالذكاء الاصطناعي"
-},
-{
-    "name": "yt_asr_phase_model",
-    "value": "تنزيل النموذج"
-},
-{
-    "name": "yt_asr_live_progress",
-    "value": "جارٍ التعرف المباشر…"
-},
-{
-    "name": "yt_asr_failed",
-    "value": "فشل توليد الترجمة؛ حاول لاحقًا"
-},
-{
-    "name": "yt_asr_model_section",
-    "value": "نموذج التعرف على الجهاز"
-},
-{
-    "name": "yt_asr_model_status_ready",
-    "value": "جاهز (تعرف فوري zh/en)"
-},
-{
-    "name": "yt_asr_model_status_none",
-    "value": "لم يتم التنزيل (حوالي 190MB، يُفضل Wi-Fi)"
-},
-{
-    "name": "yt_asr_model_downloading",
-    "value": "جارٍ التنزيل"
-},
-{
-    "name": "yt_asr_model_download",
-    "value": "تنزيل النموذج"
-},
-{
-    "name": "yt_asr_model_delete",
-    "value": "حذف النموذج"
-},
-{
-    "name": "yt_ai_action_cancel",
-    "value": "إلغاء"
-},
+        {
+            "name": "yt_player_subtitle_auto_translated",
+            "value": "ترجمة تلقائية"
+        },
+        {
+            "name": "yt_option_ai_translate",
+            "value": "ترجمة الترجمة بالذكاء الاصطناعي"
+        },
+        {
+            "name": "yt_option_ai_subtitle",
+            "value": "الترجمة بالذكاء الاصطناعي"
+        },
+        {
+            "name": "yt_ai_translate_engine",
+            "value": "محرك الترجمة"
+        },
+        {
+            "name": "yt_ai_translate_engine_gtx",
+            "value": "ترجمة Google المجانية"
+        },
+        {
+            "name": "yt_ai_translate_engine_llm",
+            "value": "نموذج LLM مخصص (متوافق مع OpenAI)"
+        },
+        {
+            "name": "yt_ai_translate_llm_section",
+            "value": "إعدادات LLM"
+        },
+        {
+            "name": "yt_ai_translate_base_url",
+            "value": "عنوان الواجهة (Base URL)"
+        },
+        {
+            "name": "yt_ai_translate_model",
+            "value": "اسم النموذج"
+        },
+        {
+            "name": "yt_ai_translate_api_key",
+            "value": "API Key"
+        },
+        {
+            "name": "yt_ai_translate_test",
+            "value": "اختبار الاتصال"
+        },
+        {
+            "name": "yt_ai_translate_testing",
+            "value": "جارٍ الاختبار…"
+        },
+        {
+            "name": "yt_ai_translate_test_ok",
+            "value": "تم الاتصال بنجاح"
+        },
+        {
+            "name": "yt_ai_translate_test_fail",
+            "value": "فشل الاتصال؛ تحقق من الإعدادات"
+        },
+        {
+            "name": "yt_ai_translate_display_section",
+            "value": "العرض"
+        },
+        {
+            "name": "yt_ai_translate_bilingual",
+            "value": "ثنائي اللغة"
+        },
+        {
+            "name": "yt_ai_translate_bilingual_subtitle",
+            "value": "إظهار النص الأصلي والترجمة معًا"
+        },
+        {
+            "name": "yt_ai_translate_note",
+            "value": "يُرسَل نص الترجمة إلى خدمة الترجمة المحددة. تتبع اللغة المستهدفة \"لغة ترجمة المحتوى\"."
+        },
+        {
+            "name": "yt_ai_translate_menu",
+            "value": "ترجمة ذكية"
+        },
+        {
+            "name": "yt_ai_translate_llm_not_configured",
+            "value": "يرجى إعداد LLM في الإعدادات أولًا"
+        },
+        {
+            "name": "yt_ai_translate_partial_fail",
+            "value": "فشلت ترجمة بعض الأسطر؛ تم الاحتفاظ بالنص الأصلي"
+        },
+        {
+            "name": "yt_ai_translate_failed",
+            "value": "فشلت ترجمة الترجمة؛ حاول لاحقًا"
+        },
+        {
+            "name": "yt_setting_system_ai_caption",
+            "value": "الترجمة الذكية للنظام"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_subtitle",
+            "value": "يتعرف النظام على الصوت الجاري تشغيله في الوقت الفعلي (أجهزة مدعومة فقط، صيني/إنجليزي)"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source",
+            "value": "لغة مصدر الترجمة الذكية"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source_zh",
+            "value": "الصينية"
+        },
+        {
+            "name": "yt_asr_menu",
+            "value": "توليد الترجمة بالذكاء الاصطناعي"
+        },
+        {
+            "name": "yt_asr_phase_model",
+            "value": "تنزيل النموذج"
+        },
+        {
+            "name": "yt_asr_live_progress",
+            "value": "جارٍ التعرف المباشر…"
+        },
+        {
+            "name": "yt_asr_failed",
+            "value": "فشل توليد الترجمة؛ حاول لاحقًا"
+        },
+        {
+            "name": "yt_asr_model_section",
+            "value": "نموذج التعرف على الجهاز"
+        },
+        {
+            "name": "yt_asr_model_status_ready",
+            "value": "جاهز (تعرف فوري zh/en)"
+        },
+        {
+            "name": "yt_asr_model_status_none",
+            "value": "لم يتم التنزيل (حوالي 190MB، يُفضل Wi-Fi)"
+        },
+        {
+            "name": "yt_asr_model_downloading",
+            "value": "جارٍ التنزيل"
+        },
+        {
+            "name": "yt_asr_model_download",
+            "value": "تنزيل النموذج"
+        },
+        {
+            "name": "yt_asr_model_delete",
+            "value": "حذف النموذج"
+        },
+        {
+            "name": "yt_ai_action_cancel",
+            "value": "إلغاء"
+        },
         {
             "name": "yt_player_chapters",
             "value": "الفصول"
@@ -1367,6 +1415,10 @@
         {
             "name": "yt_sub_sync_failed",
             "value": "تعذرت مزامنة الاشتراكات"
+        },
+        {
+            "name": "yt_sub_write_failed",
+            "value": "لم تتم مزامنة تغيير الاشتراك مع يوتيوب، تمت الاستعادة"
         },
         {
             "name": "yt_refresh_failed",
@@ -3488,7 +3540,6 @@
             "name": "yt_option_clear_history_subtitle",
             "value": "حذف كل سجل المشاهدة المحلي والتقدّم"
         },
-
         {
             "name": "yt_toast_history_cleared",
             "value": "تم مسح سجل المشاهدة"
@@ -3604,8 +3655,7 @@
         {
             "name": "yt_home_mode_long",
             "value": "مقاطع طويلة"
-        }
-    ,
+        },
         {
             "name": "yt_download_pause",
             "value": "إيقاف مؤقت"
@@ -3845,7 +3895,7 @@
         {
             "name": "yt_translation_region",
             "value": "المنطقة"
-        },
+        },
         {
             "name": "yt_exp_title",
             "value": "ميزات تجريبية"
@@ -4145,6 +4195,46 @@
         {
             "name": "yt_update_later",
             "value": "لاحقًا"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_channel",
+            "value": "إلغاء الاشتراك في «%s»؟"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_generic",
+            "value": "إلغاء الاشتراك في هذه القناة؟"
+        },
+        {
+            "name": "yt_about_fork_notice",
+            "value": "هذا الإصدار نسخة فرعية شخصية من YourPipe، ويُوزَّع برخصة GPLv3"
+        },
+        {
+            "name": "yt_about_upstream",
+            "value": "المشروع الأصلي YourPipe"
+        },
+        {
+            "name": "yt_changelog_fork_1",
+            "value": "هوية مستقلة: الحزمة com.github.da3456.litevideo والاسم LiteVideo، تُثبَّت بجانب النسخة الأصلية"
+        },
+        {
+            "name": "yt_changelog_fork_2",
+            "value": "تُكتب تغييرات الاشتراك في حساب YouTube وتُطابَق مع قائمة السحابة في الاتجاهين؛ وإلغاء الاشتراك يطلب التأكيد أولاً"
+        },
+        {
+            "name": "yt_changelog_fork_3",
+            "value": "الضغط المطوّل على بطاقة الرئيسية يفتح لوحة سفلية؛ اسحب المقبض لأسفل أو انقر خارجها للإغلاق"
+        },
+        {
+            "name": "yt_changelog_fork_4",
+            "value": "«غير مهتم / لا تُوصِ بهذه القناة / حفظ للمشاهدة لاحقًا» أصبح يرسل ملاحظات إلى الخادم"
+        },
+        {
+            "name": "yt_changelog_fork_5",
+            "value": "أُزيلت أزرار المفضلة وعناصر القائمة؛ وأصبح التبويب الثالث قوائم التشغيل"
+        },
+        {
+            "name": "yt_changelog_fork_6",
+            "value": "يُقدَّم تدفق الرئيسية على دفعات (٣ صفحات لكل دفعة، انقر تبويب الرئيسية مجددًا للدفعة التالية)؛ والتحقق من التحديثات يشير إلى هذا المستودع"
         }
     ]
 }

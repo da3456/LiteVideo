@@ -5,8 +5,8 @@ import { SECTION_CARD_RADIUS } from '../../common/components/MediaCardTokens';
 import { UIConfig } from '../../common/AppState';
 import { resourceManager } from '@kit.LocalizationKit';
 import {
-  APPGALLERY_TEST_URL,
   GITHUB_REPO_URL,
+  UPSTREAM_REPO_URL,
   UpdateCheckResult,
   UpdateChecker
 } from '../../common/UpdateChecker';
@@ -262,14 +262,6 @@ export struct OptionsUpdatePage {
                 .backgroundColor(this.themePrimary)
                 .fontColor($r('app.color.yourtube_text_inverse'))
                 .onClick(() => this.openLink(this.result!.releaseUrl, 'release'))
-              Button($r('app.string.yt_update_open_appgallery'))
-                .fontSize(12)
-                .height(34)
-                .layoutWeight(1)
-                .backgroundColor($r('app.color.yourtube_bg_surface_muted'))
-                .fontColor($r('app.color.yourtube_text_primary'))
-                .border({ width: 1, color: $r('app.color.yourtube_divider') })
-                .onClick(() => this.openLink(APPGALLERY_TEST_URL, 'appgallery'))
             }
             .width('100%')
           }
@@ -293,8 +285,8 @@ export struct OptionsUpdatePage {
           this.ActionLink($r('sys.symbol.doc_plaintext'),
             $r('app.string.yt_about_github_repo'), GITHUB_REPO_URL, 'github_repo')
           Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
-          this.ActionLink($r('sys.symbol.star_fill'),
-            $r('app.string.yt_update_open_appgallery'), APPGALLERY_TEST_URL, 'appgallery')
+          this.ActionLink($r('sys.symbol.arrow_counterclockwise'),
+            $r('app.string.yt_about_upstream'), UPSTREAM_REPO_URL, 'upstream')
         }
         .width('100%')
         .backgroundColor($r('app.color.yourtube_bg_surface_muted'))

@@ -4,8 +4,7 @@ import { customVibrator } from '../../../common/VibratorUtil';
 import { SearchChannelItem } from 'youtube_core';
 import { SubscriptionUser } from '../../../common/SubscriptionModel';
 import { UIConfig } from '../../../common/AppState';
-import { Callback } from '@ohos.base';
-import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
+import { ChannelContextMenu } from '../../../common/components/ChannelContextMenu';
 import {
   MEDIA_CARD_RADIUS,
   MEDIA_CARD_SHADOW_OFFSET_Y,
@@ -15,22 +14,12 @@ import {
   MEDIA_TITLE_SIZE
 } from '../../../common/components/MediaCardTokens';
 
-interface ContextMenuItem {
-  symbolStartIcon?: SymbolGlyphModifier;
-  content: ResourceStr;
-  contentColor?: ResourceColor;
-  callback: Callback<void>;
-}
-
-const SYMBOL_FONT_SIZE: number = 16;
-
 @Component
 export struct ChannelCard {
   @StorageProp('themePrimaryColor') themePrimary: string = '#E53935';
   @Prop channel: SearchChannelItem;
   @Prop typeLabel: ResourceStr = $r('app.string.yt_label_user');
   @Prop showDescription: boolean = true;
-  @Prop forceActionLabel: ResourceStr = '';
   @StorageLink('subscriptions') subscriptions: SubscriptionUser[] = [];
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig();
   @Consume('actionHub') actionHub: ActionHub = new ActionHub();
@@ -48,11 +37,19 @@ export struct ChannelCard {
     return this.subscriptions.some((item: SubscriptionUser) => item.channelId === channelId);
   }
 
-  private getActionLabel(): ResourceStr {
-    if (typeof this.forceActionLabel === 'string' && this.forceActionLabel.length > 0) {
-      return this.forceActionLabel;
+  /**
+   * 统计行合成一条文本：两个 Text 并排（Row 不换行）时，后面的「77k videos」
+   * 会被整段裁掉且不出省略号，合成一条才能按剩余宽度优雅截断。
+   */
+  private getMetaText(): string {
+    const parts: string[] = [];
+    if (this.channel.subscriberText && this.channel.subscriberText.length > 0) {
+      parts.push(this.channel.subscriberText);
     }
-    return this.isSubscribed() ? $r('app.string.yt_action_unsubscribe') : $r('app.string.yt_action_subscribe');
+    if (this.channel.videoCountText && this.channel.videoCountText.length > 0) {
+      parts.push(this.channel.videoCountText);
+    }
+    return parts.join(' · ');
   }
 
   private handleAction(): void {
@@ -67,115 +64,17 @@ export struct ChannelCard {
     this.actionHub.addSubscription(this.channel);
   }
 
-  private getContextMenus(): ContextMenuItem[] {
-    const items: ContextMenuItem[] = [];
-    if (this.isSubscribed()) {
-      items.push({
-        symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.minus_circle'))
-          .fontSize(SYMBOL_FONT_SIZE)
-          .fontColor([$r('sys.color.font_primary')]),
-        content: $r('app.string.yt_action_unsubscribe'),
-        callback: () => {
-          const channelId = this.getChannelId();
-          if (channelId) {
-            this.actionHub.removeSubscription(channelId);
-          }
-        }
-      });
-    } else {
-      items.push({
-        symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_circle'))
-          .fontSize(SYMBOL_FONT_SIZE)
-          .fontColor([$r('sys.color.font_primary')]),
-        content: $r('app.string.yt_action_subscribe'),
-        callback: () => {
-          this.actionHub.addSubscription(this.channel);
-        }
-      });
-    }
-    items.push({
-      symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
-        .fontSize(SYMBOL_FONT_SIZE)
-        .fontColor([$r('sys.color.font_primary')]),
-      content: $r('app.string.yt_action_share'),
-      callback: () => {
-        this.actionHub.shareChannel(this.channel);
-      }
-    });
-    return items;
-  }
-
   @Builder
   contextMenuBuilder() {
-    Scroll() {
-      Column() {
-        // 信息区（与视频卡菜单同范式）：名称 / 订阅数·视频数 / 简介
-        Column() {
-          Text(this.channel.name || $r('app.string.yt_label_unknown'))
-            .fontSize(13)
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('app.color.yourtube_text_primary'))
-            .maxLines(2)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .width('100%')
-
-          if ((this.channel.subscriberText && this.channel.subscriberText.length > 0)
-            || (this.channel.videoCountText && this.channel.videoCountText.length > 0)) {
-            Text([
-              this.channel.subscriberText || '',
-              this.channel.videoCountText || ''
-            ].filter((s: string) => s.length > 0).join(' · '))
-              .fontSize(12)
-              .fontColor($r('app.color.yourtube_text_quaternary'))
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .width('100%')
-              .margin({ top: 4 })
-          }
-
-          if (this.channel.description && this.channel.description.length > 0) {
-            Text(this.channel.description)
-              .fontSize(12)
-              .fontColor($r('app.color.yourtube_text_hint'))
-              .maxLines(2)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .width('100%')
-              .margin({ top: 2 })
-          }
-        }
-        .width('100%')
-        .alignItems(HorizontalAlign.Start)
-        .padding({ left: 12, right: 12, top: 8, bottom: 8 })
-
-        Divider()
-          .strokeWidth(0.5)
-          .color($r('sys.color.comp_divider'))
-
-        Menu() {
-          ForEach(this.getContextMenus(), (item: ContextMenuItem) => {
-            MenuItem({
-              symbolStartIcon: item.symbolStartIcon,
-              content: item.content
-            })
-              .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-              .contentFontColor(item.contentColor ?? $r('sys.color.font_primary'))
-              .onClick(() => {
-                item.callback();
-              });
-          });
-        }
-        .menuItemDivider({ strokeWidth: LengthMetrics.vp(0.5), color: $r('sys.color.comp_divider') })
-        .width('100%')
-        .height('auto')
-      }
-      .backgroundColor($r('app.color.yourtube_bg_surface'))
-      .borderRadius(MEDIA_CARD_RADIUS)
-      .clip(true)
-      // 与视频卡菜单统一 220vp（原 180vp）
-      .width(220)
-    }
-    .nestedScroll({ scrollForward: NestedScrollMode.SELF_FIRST, scrollBackward: NestedScrollMode.SELF_FIRST })
-    .edgeEffect(EdgeEffect.Spring);
+    // 频道菜单统一走共享组件（打开频道 / 订阅·取消订阅 / 分享频道 + 信息区）。
+    ChannelContextMenu({
+      channelId: this.getChannelId(),
+      channelName: this.channel.name || '',
+      avatarUrl: this.channel.avatarUrl || '',
+      channelHandle: this.channel.handle || '',
+      metaText: this.getMetaText(),
+      description: this.showDescription ? (this.channel.description || '') : ''
+    })
   }
 
   build() {
@@ -186,8 +85,10 @@ export struct ChannelCard {
             .width(56)
             .height(56)
             .objectFit(ImageFit.Cover)
-            .borderRadius(28)
+            .borderRadius(28)
             .clip(true)
+            // ArkUI 的 Image 默认可拖拽，长按会被系统拖拽手势吃掉 → 头像这块按不出菜单。
+            .draggable(false)
             .backgroundColor(this.channel.thumbnailColor || $r('app.color.yourtube_icon_hint'));
         } else {
           Circle()
@@ -219,26 +120,14 @@ export struct ChannelCard {
           .fontWeight(FontWeight.Medium)
           .margin({ bottom: 2 });
 
-        Row() {
-          if (this.channel.subscriberText && this.channel.subscriberText.length > 0) {
-            Text(this.channel.subscriberText)
-              .fontSize(MEDIA_META_SIZE)
-              .fontColor($r('app.color.yourtube_text_quaternary'))
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis });
-          }
-          if (this.channel.videoCountText && this.channel.videoCountText.length > 0) {
-            Text(this.channel.subscriberText && this.channel.subscriberText.length > 0
-              ? ` · ${this.channel.videoCountText}`
-              : this.channel.videoCountText)
-              .fontSize(MEDIA_META_SIZE)
-              .fontColor($r('app.color.yourtube_text_hint'))
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis });
-          }
+        if (this.getMetaText().length > 0) {
+          Text(this.getMetaText())
+            .fontSize(MEDIA_META_SIZE)
+            .fontColor($r('app.color.yourtube_text_quaternary'))
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .width('100%');
         }
-        .width('100%')
-        .alignItems(VerticalAlign.Center);
 
         if (this.showDescription && this.channel.description && this.channel.description.length > 0) {
           Text(this.channel.description)
@@ -255,15 +144,27 @@ export struct ChannelCard {
       .alignItems(HorizontalAlign.Start);
 
       Column() {
-        Button(this.getActionLabel())
-          .fontSize(12)
-          .fontColor($r('app.color.yourtube_text_inverse'))
-          .backgroundColor(this.isSubscribed() ? $r('app.color.yourtube_button_disabled') : this.themePrimary)
-          .height(28)
-          .padding({ left: 10, right: 10 })
-          .onClick(() => {
-            this.handleAction();
-          });
+        // 全应用统一：未订阅 = 红色笑脸加号，已订阅 = 灰色对勾。文字按钮会在窄面板
+        // 里挤掉统计行，图标钮 + accessibilityText 两边都不占宽度。
+        Button() {
+          SymbolGlyph(this.isSubscribed() ? $r('sys.symbol.checkmark') : $r('sys.symbol.face_smiling_plus'))
+            .fontSize(this.isSubscribed() ? 15 : 18)
+            .fontColor([this.isSubscribed()
+              ? $r('app.color.yourtube_text_secondary')
+              : $r('app.color.yourtube_text_inverse')])
+        }
+        .width(30)
+        .height(30)
+        .padding(0)
+        .borderRadius(15)
+        .backgroundColor(this.isSubscribed() ? $r('app.color.yourtube_button_disabled') : this.themePrimary)
+        .accessibilityText(this.isSubscribed()
+          ? $r('app.string.yt_action_unsubscribe')
+          : $r('app.string.yt_action_subscribe'))
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .onClick(() => {
+          this.handleAction();
+        });
       }
       .height(56)
       .justifyContent(FlexAlign.Center)

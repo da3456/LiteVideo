@@ -2,11 +2,13 @@
   "name": "@yourpipe/libmpv-napi",
   "version": "0.2.0",
   "description": "MPV player NAPI bridge for YourPipe (OpenHarmony)",
+  // homepage 保留上游项目地址（本模块的出处），repository 指本 fork 仓库。
   "homepage": "https://github.com/Ember5843/YourPipe",
-  "repository": "https://github.com/Ember5843/YourPipe",
+  "repository": "https://github.com/da3456/LiteVideo",
   "main": "src/main/ets/index.ets",
   "author": "YourPipe",
-  "license": "MIT",
+  // 原先写的是 MIT，且 LICENSE 是未填空的模板；整个应用按根目录 GPLv3 分发。
+  "license": "GPL-3.0",
   "dependencies": {
     "libmpv_napi.so": "file:./src/main/cpp/types/libmpv_napi"
   },

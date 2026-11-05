@@ -22,6 +22,7 @@ import { SearchChannelItem } from 'youtube_core';
 import { ChannelInfoService } from '../../user/ChannelInfoService';
 import { VideoItem } from 'youtube_core';
 import { SubscriptionUser } from '../../../common/SubscriptionModel';
+import { SubscriptionStateSync } from '../../../common/SubscriptionStateSync';
 import { ChannelCard } from '../../user/components/ChannelCard';
 import { DownloadDialog, DownloadSelection, buildDownloadTaskFromSelection } from './DownloadDialog';
 import { SavePlaylistSheet } from './SavePlaylistSheet';
@@ -82,7 +83,6 @@ export struct VideoDetails {
           '',
           '#CCCCCC'
         )
-  @State channelInfoError: ResourceStr | null = null;
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig();
   @StorageLink('subscriptions') subscriptions: SubscriptionUser[] = [];
   @Consume('actionHub') actionHub: ActionHub = new ActionHub();
@@ -242,6 +242,8 @@ export struct VideoDetails {
 
   aboutToAppear() {
     this.channelInfoService = new ChannelInfoService();
+    // 播放页频道行的订阅状态要跟云端一致（服务内部防抖 + 在途去重）。
+    this.verifySubscriptionState('details_appear');
     this.resetForCurrentItem();
     this.refreshDeArrowTitle();
     this.refreshAiListFlag();
@@ -343,6 +345,7 @@ export struct VideoDetails {
   private onItemChanged(): void {
     this.isTitleExpanded = false;
     this.resetForCurrentItem();
+    this.verifySubscriptionState('video_changed');
     this.refreshDeArrowTitle();
     this.refreshAiListFlag();
     this.classifyStreamsForDownload();
@@ -357,8 +360,15 @@ export struct VideoDetails {
     this.resetForCurrentItem();
   }
 
+  /** 本地文件没有频道可核对；其余入口都触发一次云端订阅名单核对（服务内部防抖）。 */
+  private verifySubscriptionState(reason: string): void {
+    if (this.isLocalMode) {
+      return;
+    }
+    SubscriptionStateSync.getInstance().syncInBackground(reason);
+  }
+
   private resetForCurrentItem(): void {
-    this.channelInfoError = null;
     const effectiveChannelId = this.channelId || this.item?.channelId || '';
     const effectiveAvatarUrl = this.channelAvatarUrl || this.item?.channelAvatarUrl || '';
     this.channelInfo = new SearchChannelItem(
@@ -479,7 +489,6 @@ export struct VideoDetails {
           profile.description || '',
           '#CCCCCC'
         );
-        this.channelInfoError = null;
         const cacheEntry: CachedChannelProfile = {
           name: profile.name || '',
           subscriberText: profile.subscriberText || '',
@@ -489,11 +498,11 @@ export struct VideoDetails {
         };
         PlayerSession.getInstance().setCachedChannelProfile(channelId, cacheEntry);
       } else {
-        this.channelInfoError = $r('app.string.yt_error_load_channel_info');
+        // 只有订阅数/简介取不到：名称与头像已由提取结果提供，保留卡片即可。
+        Logger.warn(TAG, `[fetchChannelInfo] empty profile channel=${channelId}, keep local card`);
       }
     } catch (error) {
-      Logger.error(TAG, `[fetchChannelInfo] Failed: ${error}`);
-      this.channelInfoError = (error as Error).message || $r('app.string.yt_error_load_channel_info');
+      Logger.warn(TAG, `[fetchChannelInfo] Failed, keep local card: ${error}`);
     }
   }
 
@@ -740,20 +749,12 @@ export struct VideoDetails {
 
         // ── 频道信息行（本地文件无频道）──
         if (!this.isLocalMode) {
-          if (this.channelInfoError) {
-            TabErrorPanel({
-              errorMessage: this.channelInfoError,
-              showRetry: true,
-              onRetry: () => { this.fetchChannelInfo(); }
-            })
-          } else {
-            ChannelCard({
-              channel: this.channelInfo,
-              typeLabel: '',
-              showDescription: false
-            })
-              .margin({ bottom: 12 })
-          }
+          ChannelCard({
+            channel: this.channelInfo,
+            typeLabel: '',
+            showDescription: false
+          })
+            .margin({ bottom: 12 })
         }
 
         // ── 功能按钮行（横向滚动 + 渐变遮罩）──

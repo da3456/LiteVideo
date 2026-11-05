@@ -457,6 +457,46 @@
             "value": "Поделиться"
         },
         {
+            "name": "yt_action_open_channel",
+            "value": "Открыть канал"
+        },
+        {
+            "name": "yt_action_save_to_watch_later",
+            "value": "Сохранить в «Смотреть позже»"
+        },
+        {
+            "name": "yt_action_not_interested",
+            "value": "Не интересно"
+        },
+        {
+            "name": "yt_action_dont_recommend_channel",
+            "value": "Не рекомендовать канал"
+        },
+        {
+            "name": "yt_watch_later_needs_login",
+            "value": "Войдите в аккаунт YouTube, чтобы сохранить в «Смотреть позже»"
+        },
+        {
+            "name": "yt_watch_later_saved",
+            "value": "Добавлено в «Смотреть позже»"
+        },
+        {
+            "name": "yt_watch_later_failed",
+            "value": "Не удалось сохранить в «Смотреть позже»"
+        },
+        {
+            "name": "yt_dismiss_video_notice",
+            "value": "Это видео больше не будет рекомендоваться"
+        },
+        {
+            "name": "yt_feed_feedback_needs_login",
+            "value": "Войдите в аккаунт YouTube, чтобы отправить этот отзыв"
+        },
+        {
+            "name": "yt_feed_feedback_failed",
+            "value": "Не удалось отправить отзыв"
+        },
+        {
             "name": "yt_action_retry",
             "value": "Повторить"
         },
@@ -933,6 +973,14 @@
             "value": "Ошибка загрузки главной страницы, повторите позже"
         },
         {
+            "name": "yt_home_batch_end",
+            "value": "Вы посмотрели эту подборку. Потяните вниз или ещё раз нажмите Главная, чтобы увидеть следующую."
+        },
+        {
+            "name": "yt_home_no_new_videos",
+            "value": "Новых видео пока нет"
+        },
+        {
             "name": "yt_player_mode_progressive",
             "value": "Progressive"
         },
@@ -990,7 +1038,7 @@
         },
         {
             "name": "new_app_name",
-            "value": "YourPipe"
+            "value": "LiteVideo"
         },
         {
             "name": "yt_empty_no_playlists",
@@ -1060,154 +1108,154 @@
             "name": "yt_player_subtitle_off",
             "value": "Субтитры выключены"
         },
-{
-    "name": "yt_player_subtitle_auto_translated",
-    "value": "Автоперевод"
-},
-{
-    "name": "yt_option_ai_translate",
-    "value": "Перевод субтитров с ИИ"
-},
-{
-    "name": "yt_option_ai_subtitle",
-    "value": "ИИ-субтитры"
-},
-{
-    "name": "yt_ai_translate_engine",
-    "value": "Движок перевода"
-},
-{
-    "name": "yt_ai_translate_engine_gtx",
-    "value": "Google Переводчик (бесплатно)"
-},
-{
-    "name": "yt_ai_translate_engine_llm",
-    "value": "Своя LLM (совместимая с OpenAI)"
-},
-{
-    "name": "yt_ai_translate_llm_section",
-    "value": "Настройки LLM"
-},
-{
-    "name": "yt_ai_translate_base_url",
-    "value": "Базовый URL"
-},
-{
-    "name": "yt_ai_translate_model",
-    "value": "Название модели"
-},
-{
-    "name": "yt_ai_translate_api_key",
-    "value": "API Key"
-},
-{
-    "name": "yt_ai_translate_test",
-    "value": "Проверить подключение"
-},
-{
-    "name": "yt_ai_translate_testing",
-    "value": "Проверка…"
-},
-{
-    "name": "yt_ai_translate_test_ok",
-    "value": "Подключение успешно"
-},
-{
-    "name": "yt_ai_translate_test_fail",
-    "value": "Ошибка подключения; проверьте настройки"
-},
-{
-    "name": "yt_ai_translate_display_section",
-    "value": "Отображение"
-},
-{
-    "name": "yt_ai_translate_bilingual",
-    "value": "Двуязычный режим"
-},
-{
-    "name": "yt_ai_translate_bilingual_subtitle",
-    "value": "Показывать оригинал и перевод"
-},
-{
-    "name": "yt_ai_translate_note",
-    "value": "Текст субтитров отправляется выбранному сервису перевода. Целевой язык совпадает с «Языком перевода контента»."
-},
-{
-    "name": "yt_ai_translate_menu",
-    "value": "ИИ-перевод"
-},
-{
-    "name": "yt_ai_translate_llm_not_configured",
-    "value": "Сначала настройте LLM в настройках"
-},
-{
-    "name": "yt_ai_translate_partial_fail",
-    "value": "Некоторые строки не переведены, показан оригинал"
-},
-{
-    "name": "yt_ai_translate_failed",
-    "value": "Ошибка перевода субтитров; повторите позже"
-},
-{
-    "name": "yt_setting_system_ai_caption",
-    "value": "Системные ИИ-субтитры"
-},
-{
-    "name": "yt_setting_system_ai_caption_subtitle",
-    "value": "Система распознаёт воспроизводимый звук в реальном времени (только поддерживаемые устройства, китайский/английский)"
-},
-{
-    "name": "yt_setting_system_ai_caption_source",
-    "value": "Язык источника ИИ-субтитров"
-},
-{
-    "name": "yt_setting_system_ai_caption_source_zh",
-    "value": "Китайский"
-},
-{
-    "name": "yt_asr_menu",
-    "value": "Создать субтитры (ИИ)"
-},
-{
-    "name": "yt_asr_phase_model",
-    "value": "Загрузка модели"
-},
-{
-    "name": "yt_asr_live_progress",
-    "value": "Идёт распознавание…"
-},
-{
-    "name": "yt_asr_failed",
-    "value": "Ошибка генерации субтитров; повторите позже"
-},
-{
-    "name": "yt_asr_model_section",
-    "value": "Модель распознавания на устройстве"
-},
-{
-    "name": "yt_asr_model_status_ready",
-    "value": "Готово (потоковое распознавание zh/en)"
-},
-{
-    "name": "yt_asr_model_status_none",
-    "value": "Не загружено (~190 МБ, рекомендуется Wi-Fi)"
-},
-{
-    "name": "yt_asr_model_downloading",
-    "value": "Загрузка"
-},
-{
-    "name": "yt_asr_model_download",
-    "value": "Скачать модель"
-},
-{
-    "name": "yt_asr_model_delete",
-    "value": "Удалить модель"
-},
-{
-    "name": "yt_ai_action_cancel",
-    "value": "Отмена"
-},
+        {
+            "name": "yt_player_subtitle_auto_translated",
+            "value": "Автоперевод"
+        },
+        {
+            "name": "yt_option_ai_translate",
+            "value": "Перевод субтитров с ИИ"
+        },
+        {
+            "name": "yt_option_ai_subtitle",
+            "value": "ИИ-субтитры"
+        },
+        {
+            "name": "yt_ai_translate_engine",
+            "value": "Движок перевода"
+        },
+        {
+            "name": "yt_ai_translate_engine_gtx",
+            "value": "Google Переводчик (бесплатно)"
+        },
+        {
+            "name": "yt_ai_translate_engine_llm",
+            "value": "Своя LLM (совместимая с OpenAI)"
+        },
+        {
+            "name": "yt_ai_translate_llm_section",
+            "value": "Настройки LLM"
+        },
+        {
+            "name": "yt_ai_translate_base_url",
+            "value": "Базовый URL"
+        },
+        {
+            "name": "yt_ai_translate_model",
+            "value": "Название модели"
+        },
+        {
+            "name": "yt_ai_translate_api_key",
+            "value": "API Key"
+        },
+        {
+            "name": "yt_ai_translate_test",
+            "value": "Проверить подключение"
+        },
+        {
+            "name": "yt_ai_translate_testing",
+            "value": "Проверка…"
+        },
+        {
+            "name": "yt_ai_translate_test_ok",
+            "value": "Подключение успешно"
+        },
+        {
+            "name": "yt_ai_translate_test_fail",
+            "value": "Ошибка подключения; проверьте настройки"
+        },
+        {
+            "name": "yt_ai_translate_display_section",
+            "value": "Отображение"
+        },
+        {
+            "name": "yt_ai_translate_bilingual",
+            "value": "Двуязычный режим"
+        },
+        {
+            "name": "yt_ai_translate_bilingual_subtitle",
+            "value": "Показывать оригинал и перевод"
+        },
+        {
+            "name": "yt_ai_translate_note",
+            "value": "Текст субтитров отправляется выбранному сервису перевода. Целевой язык совпадает с «Языком перевода контента»."
+        },
+        {
+            "name": "yt_ai_translate_menu",
+            "value": "ИИ-перевод"
+        },
+        {
+            "name": "yt_ai_translate_llm_not_configured",
+            "value": "Сначала настройте LLM в настройках"
+        },
+        {
+            "name": "yt_ai_translate_partial_fail",
+            "value": "Некоторые строки не переведены, показан оригинал"
+        },
+        {
+            "name": "yt_ai_translate_failed",
+            "value": "Ошибка перевода субтитров; повторите позже"
+        },
+        {
+            "name": "yt_setting_system_ai_caption",
+            "value": "Системные ИИ-субтитры"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_subtitle",
+            "value": "Система распознаёт воспроизводимый звук в реальном времени (только поддерживаемые устройства, китайский/английский)"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source",
+            "value": "Язык источника ИИ-субтитров"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source_zh",
+            "value": "Китайский"
+        },
+        {
+            "name": "yt_asr_menu",
+            "value": "Создать субтитры (ИИ)"
+        },
+        {
+            "name": "yt_asr_phase_model",
+            "value": "Загрузка модели"
+        },
+        {
+            "name": "yt_asr_live_progress",
+            "value": "Идёт распознавание…"
+        },
+        {
+            "name": "yt_asr_failed",
+            "value": "Ошибка генерации субтитров; повторите позже"
+        },
+        {
+            "name": "yt_asr_model_section",
+            "value": "Модель распознавания на устройстве"
+        },
+        {
+            "name": "yt_asr_model_status_ready",
+            "value": "Готово (потоковое распознавание zh/en)"
+        },
+        {
+            "name": "yt_asr_model_status_none",
+            "value": "Не загружено (~190 МБ, рекомендуется Wi-Fi)"
+        },
+        {
+            "name": "yt_asr_model_downloading",
+            "value": "Загрузка"
+        },
+        {
+            "name": "yt_asr_model_download",
+            "value": "Скачать модель"
+        },
+        {
+            "name": "yt_asr_model_delete",
+            "value": "Удалить модель"
+        },
+        {
+            "name": "yt_ai_action_cancel",
+            "value": "Отмена"
+        },
         {
             "name": "yt_player_chapters",
             "value": "Главы"
@@ -1367,6 +1415,10 @@
         {
             "name": "yt_sub_sync_failed",
             "value": "Не удалось синхронизировать подписки"
+        },
+        {
+            "name": "yt_sub_write_failed",
+            "value": "Изменение подписки не синхронизировано с YouTube; отменено"
         },
         {
             "name": "yt_refresh_failed",
@@ -3488,7 +3540,6 @@
             "name": "yt_option_clear_history_subtitle",
             "value": "Удалить всю локальную историю и прогресс"
         },
-
         {
             "name": "yt_toast_history_cleared",
             "value": "История очищена"
@@ -3604,8 +3655,7 @@
         {
             "name": "yt_home_mode_long",
             "value": "Длинные видео"
-        }
-    ,
+        },
         {
             "name": "yt_download_pause",
             "value": "Пауза"
@@ -3845,7 +3895,7 @@
         {
             "name": "yt_translation_region",
             "value": "Регион"
-        },
+        },
         {
             "name": "yt_exp_title",
             "value": "Экспериментальные функции"
@@ -4145,6 +4195,46 @@
         {
             "name": "yt_update_later",
             "value": "Позже"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_channel",
+            "value": "Отписаться от «%s»?"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_generic",
+            "value": "Отписаться от этого канала?"
+        },
+        {
+            "name": "yt_about_fork_notice",
+            "value": "Эта сборка — личный форк YourPipe, распространяемый под лицензией GPLv3"
+        },
+        {
+            "name": "yt_about_upstream",
+            "value": "Вышестоящий проект"
+        },
+        {
+            "name": "yt_changelog_fork_1",
+            "value": "Собственная идентичность: пакет com.github.da3456.litevideo, имя LiteVideo, ставится рядом с оригиналом"
+        },
+        {
+            "name": "yt_changelog_fork_2",
+            "value": "Изменения подписок записываются в аккаунт YouTube и сверяются с облачным списком; отписка требует подтверждения"
+        },
+        {
+            "name": "yt_changelog_fork_3",
+            "value": "Долгое нажатие на карточку домашней ленты открывает нижний лист; потяните ручку вниз или нажмите вне, чтобы закрыть"
+        },
+        {
+            "name": "yt_changelog_fork_4",
+            "value": "«Не интересно / Не рекомендовать этот канал / Сохранить в «Смотреть позже»» теперь отправляет обратную связь на сервер"
+        },
+        {
+            "name": "yt_changelog_fork_5",
+            "value": "Убраны кнопки и пункты меню избранного; третья вкладка теперь «Плейлисты»"
+        },
+        {
+            "name": "yt_changelog_fork_6",
+            "value": "Домашняя лента выдаётся пакетами (3 страницы, повторное нажатие «Главная» — следующий пакет); проверка обновлений указывает на этот репозиторий"
         }
     ]
 }

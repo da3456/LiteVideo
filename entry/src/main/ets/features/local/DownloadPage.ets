@@ -406,7 +406,6 @@ struct DownloadTaskRow {
     VideoItemContextMenu({
       video: this.toVideoItem(),
       showDownload: false,
-      showFavorite: this.hasYouTubeId(),
       showShare: this.hasYouTubeId(),
       extraItems: this.buildTaskMenuExtras()
     })

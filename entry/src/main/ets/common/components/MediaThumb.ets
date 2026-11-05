@@ -116,6 +116,7 @@ export struct MediaThumb {
             .height(this.fillParent ? '100%' : this.heightVp)
             .objectFit(ImageFit.Cover)
             .borderRadius(this.borderRadiusVp)
+            .draggable(false)
 
           Rect()
             .width(this.fillParent ? '100%' : this.widthVp)
@@ -131,6 +132,9 @@ export struct MediaThumb {
             .height(this.fillParent ? '100%' : this.heightVp)
             .objectFit(ImageFit.Contain)
             .borderRadius(this.borderRadiusVp)
+            // ArkUI 的 Image 默认可拖拽，长按会被系统拖拽手势吃掉 → 卡片长按菜单
+            // 只有文字区能弹。本应用没有拖放功能，缩略图一律关闭拖拽。
+            .draggable(false)
             .onError(() => {
               this.onImageError();
             })
@@ -140,6 +144,7 @@ export struct MediaThumb {
             .height(this.fillParent ? '100%' : this.heightVp)
             .objectFit(ImageFit.Contain)
             .borderRadius(this.borderRadiusVp)
+            .draggable(false)
             .onError(() => {
               this.onImageError();
             })

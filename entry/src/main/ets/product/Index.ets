@@ -7,10 +7,12 @@ import { fileIo as fs } from '@kit.CoreFileKit';
 import type { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
 import { ActionHub, ActionHubEvent } from '../common/ActionHub';
+import { customVibrator } from '../common/VibratorUtil';
 import { AuthSessionManager, SearchChannelItem, SearchPlaylistItem,
   YoutubeJavaScriptPlayerManager, YOUTUBE_COOKIE_STORAGE_NAME, AUTH_STORAGE_NAME } from 'youtube_core';
 import { VideoItem } from 'youtube_core';
 import { SubscriptionUser } from '../common/SubscriptionModel';
+import { SubscriptionStateSync } from '../common/SubscriptionStateSync';
 import { LocalStore } from '../common/LocalStore';
 import { PreferencesStore } from '../common/PreferencesStore';
 import { PlaylistItem, StoredLocalQueue } from '../common/PlaylistModel';
@@ -693,6 +695,8 @@ struct Index {
     AuthStateHelper.refresh();
     AuthStateHelper.reconcilePlaybackClient();
     this.refreshHomeAfterAuthChange();
+    // 换账号后旧的核对时间戳/在途请求属于上一个账号，作废。
+    SubscriptionStateSync.getInstance().reset();
     this.syncUserLibraryAfterLogin();
   }
 
@@ -713,39 +717,8 @@ struct Index {
         logger.error('syncUserLibrary history failed:', JSON.stringify(historyErr));
       }
       try {
-        const channels = await library.fetchSubscribedChannels();
-        if (channels.length > 0) {
-          const map: Record<string, SubscriptionUser> = {};
-          this.subscriptions.forEach((item) => {
-            map[item.channelId] = item;
-          });
-          channels.forEach((item) => {
-            const id = (item.channelId || '').trim();
-            if (!id) {
-              return;
-            }
-            const prev = map[id];
-            if (prev) {
-              map[id] = new SubscriptionUser(
-                id,
-                item.displayName || prev.displayName,
-                item.avatarUrl || prev.avatarUrl,
-                item.subscriberText || prev.subscriberText,
-                item.videoCountText || prev.videoCountText,
-                item.description || prev.description,
-                item.thumbnailColor || prev.thumbnailColor
-              );
-            } else {
-              map[id] = item;
-            }
-          });
-          const merged: SubscriptionUser[] = [];
-          Object.keys(map).forEach((key) => {
-            merged.push(map[key]);
-          });
-          this.subscriptions = merged;
-          LocalStore.persistSubscriptions();
-        }
+        // 云端名单权威：登录即强制核对一次，网页端退订的频道在这里收敛。
+        await SubscriptionStateSync.getInstance().sync('post_login', true);
       } catch (channelErr) {
         logger.error('syncUserLibrary channels failed:', JSON.stringify(channelErr));
       }
@@ -848,23 +821,11 @@ struct Index {
     this.actionHub.closePage = () => {
       this.closeCurrentPage();
     };
-    this.actionHub.addFavorite = (video: VideoItem) => {
-      this.addFavorite(video);
-    };
-    this.actionHub.removeFavorite = (videoId: string) => {
-      this.removeFavorite(videoId);
-    };
     this.actionHub.addSubscription = (channel: SearchChannelItem) => {
       this.addSubscription(channel);
     };
     this.actionHub.removeSubscription = (channelId: string) => {
       this.removeSubscription(channelId);
-    };
-    this.actionHub.addPlaylist = (playlist: SearchPlaylistItem) => {
-      this.addPlaylist(playlist);
-    };
-    this.actionHub.removePlaylist = (playlistId: string) => {
-      this.removePlaylist(playlistId);
     };
     this.actionHub.saveCurrentQueueAsLocal = (name: string) => {
       this.saveCurrentQueueAsLocal(name);
@@ -909,6 +870,12 @@ struct Index {
     this.actionHub.downloadVideo = (video: VideoItem) => {
       this.startCardDownload(video);
     };
+    this.actionHub.saveToWatchLater = (video: VideoItem) => {
+      this.saveVideoToWatchLater(video);
+    };
+    this.actionHub.sendFeedFeedback = (video: VideoItem, token: string) => {
+      this.sendFeedFeedback(video, token);
+    };
     this.actionHub.on(ActionHubEvent.IS_REPLIES_OPEN_CHANGE, (isOpen: boolean) => {
       this.isRepliesOpen = isOpen;
     });
@@ -942,6 +909,8 @@ struct Index {
       channel.thumbnailColor || ''
     )];
     LocalStore.persistSubscriptions();
+    this.vibrateOnSubscriptionChange();
+    this.syncSubscriptionToCloud(channelId, true);
   }
 
   private removeSubscription(channelId: string): void {
@@ -949,8 +918,174 @@ struct Index {
     if (!trimmed) {
       return;
     }
-    this.subscriptions = this.subscriptions.filter((item) => item.channelId !== trimmed);
+    // 灰色 pill 只 30vp，误触就会把「退订」写回服务端；先确认，确认后才走原来那套。
+    const removed = this.subscriptions.find((item) => item.channelId === trimmed);
+    this.showUnsubscribeConfirmDialog(trimmed, removed ? removed.displayName : '');
+  }
+
+  private showUnsubscribeConfirmDialog(channelId: string, displayName: string): void {
+    const resourceManager = getContext().resourceManager;
+    const message: string = displayName.length > 0
+      ? resourceManager.getStringSync($r('app.string.yt_confirm_unsubscribe_channel').id, displayName)
+      : resourceManager.getStringSync($r('app.string.yt_confirm_unsubscribe_generic').id);
+    const uiContext: UIContext = this.getUIContext();
+    uiContext.showAlertDialog({
+      title: $r('app.string.yt_action_unsubscribe'),
+      message: message,
+      autoCancel: true,
+      alignment: DialogAlignment.Center,
+      offset: { dx: 0, dy: -20 },
+      buttonDirection: DialogButtonDirection.HORIZONTAL,
+      buttons: [
+        {
+          value: $r('app.string.yt_action_cancel'),
+          action: () => {}
+        },
+        {
+          value: $r('app.string.yt_action_confirm'),
+          action: () => {
+            this.executeUnsubscribe(channelId);
+          }
+        }
+      ],
+      cancel: () => {},
+      onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+        if (dismissDialogAction.reason === DismissReason.PRESS_BACK) {
+          dismissDialogAction.dismiss();
+        }
+        if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+          dismissDialogAction.dismiss();
+        }
+      }
+    });
+  }
+
+  private executeUnsubscribe(channelId: string): void {
+    const removed = this.subscriptions.find((item) => item.channelId === channelId);
+    this.subscriptions = this.subscriptions.filter((item) => item.channelId !== channelId);
     LocalStore.persistSubscriptions();
+    this.vibrateOnSubscriptionChange();
+    this.syncSubscriptionToCloud(channelId, false, removed);
+  }
+
+  /** 订阅状态确认后的轻触感（跟随「触感反馈」开关，服务端回滚不再震一次）。 */
+  private vibrateOnSubscriptionChange(): void {
+    if (this.uiConfig.isVibrate) {
+      customVibrator.vibratorTriggerLight();
+    }
+  }
+
+  /**
+   * 订阅动作双写：登录态下把变更推到 Innertube，失败则回滚本地并提示。
+   * 未登录时保持纯本地，不自动建账号订阅（登录后也不批量上传）。
+   */
+  private async syncSubscriptionToCloud(
+    channelId: string,
+    subscribe: boolean,
+    rollbackEntry?: SubscriptionUser
+  ): Promise<void> {
+    if (AuthSessionManager.getInstance()?.hasAuthForUserData() !== true) {
+      return;
+    }
+    const action = subscribe ? 'subscribe' : 'unsubscribe';
+    try {
+      const library = FeedServiceProvider.getInstance().getUserLibraryService();
+      if (subscribe) {
+        await library.subscribeChannel(channelId);
+      } else {
+        await library.unsubscribeChannel(channelId);
+      }
+      logger.info(`[SubSync] stage=${action}_cloud_ok channelId=${channelId}`);
+      const stateSync = SubscriptionStateSync.getInstance();
+      // 服务端传播有延迟：刚动过的条目这段时间内不参与云端核对的删除分支。
+      stateSync.markLocalMutation();
+      if (subscribe) {
+        const pushed = this.subscriptions.find((item) => item.channelId === channelId);
+        if (pushed) {
+          pushed.fromCloud = true;
+          LocalStore.persistSubscriptions();
+        }
+      }
+    } catch (err) {
+      logger.error(`[SubSync] stage=${action}_cloud_failed channelId=${channelId} err=${JSON.stringify(err)}`);
+      if (subscribe) {
+        this.subscriptions = this.subscriptions.filter((item) => item.channelId !== channelId);
+      } else if (rollbackEntry) {
+        this.subscriptions = [...this.subscriptions, rollbackEntry];
+      }
+      LocalStore.persistSubscriptions();
+      this.getUIContext().getPromptAction().showToast({ message: $r('app.string.yt_sub_write_failed') });
+    }
+  }
+
+  /**
+   * 卡片长按菜单「保存到稍后观看」：写回账号的 Watch later 列表（服务端 `WL`）。
+   * 未登录不做本地代存——列表语义只在账号上，点了却悄悄存进本地列表会让人以为
+   * 已经同步；所以直接提示登录。
+   */
+  private async saveVideoToWatchLater(video: VideoItem): Promise<void> {
+    const videoId = (video.videoId || '').trim();
+    if (videoId.length === 0) {
+      return;
+    }
+    if (AuthSessionManager.getInstance()?.hasAuthForUserData() !== true) {
+      logger.warn(`[WatchLater] stage=blocked_no_auth videoId=${videoId}`);
+      this.getUIContext().getPromptAction().showToast({
+        message: $r('app.string.yt_watch_later_needs_login')
+      });
+      return;
+    }
+    try {
+      const library = FeedServiceProvider.getInstance().getUserLibraryService();
+      await library.saveToWatchLater(videoId);
+      logger.info(`[WatchLater] stage=ok videoId=${videoId}`);
+      this.getUIContext().getPromptAction().showToast({
+        message: $r('app.string.yt_watch_later_saved')
+      });
+    } catch (err) {
+      logger.error(`[WatchLater] stage=failed videoId=${videoId} err=${JSON.stringify(err)}`);
+      this.getUIContext().getPromptAction().showToast({
+        message: $r('app.string.yt_watch_later_failed')
+      });
+    }
+  }
+
+  /**
+   * 卡片长按菜单的服务端反馈项（网页的「不感兴趣 / 不推荐该频道」）：
+   * 回传这条 feed 自带的 `feedbackEndpoint.token` 给 Innertube `feedback`，
+   * 成功后把卡片从当前首页列表摘掉（和网页一样）。失败就如实提示，不做本地屏蔽兜底。
+   */
+  private async sendFeedFeedback(video: VideoItem, token: string): Promise<void> {
+    const videoId = (video.videoId || '').trim();
+    const feedbackToken = (token || '').trim();
+    if (feedbackToken.length === 0) {
+      logger.warn(`[FeedFeedback] stage=blocked videoId=${videoId} reason=empty_token`);
+      this.getUIContext().getPromptAction().showToast({
+        message: $r('app.string.yt_feed_feedback_failed')
+      });
+      return;
+    }
+    if (AuthSessionManager.getInstance()?.hasAuthForUserData() !== true) {
+      logger.warn(`[FeedFeedback] stage=blocked videoId=${videoId} reason=no_auth`);
+      this.getUIContext().getPromptAction().showToast({
+        message: $r('app.string.yt_feed_feedback_needs_login')
+      });
+      return;
+    }
+    try {
+      const library = FeedServiceProvider.getInstance().getUserLibraryService();
+      await library.sendFeedFeedback(feedbackToken);
+      logger.info(`[FeedFeedback] stage=ok videoId=${videoId} tokenLength=${feedbackToken.length}`);
+      this.homeTabController.removeFeedbackCards(videoId, '');
+      this.getUIContext().getPromptAction().showToast({
+        message: $r('app.string.yt_dismiss_video_notice')
+      });
+    } catch (err) {
+      logger.error(`[FeedFeedback] stage=failed videoId=${videoId} err=${JSON.stringify(err)}`);
+      this.getUIContext().getPromptAction().showToast({
+        message: $r('app.string.yt_feed_feedback_failed')
+      });
+    }
   }
 
   private reloadHomeForSearchLocaleChange(): void {
@@ -1171,47 +1306,6 @@ struct Index {
     this.navPathStack.pop();
   }
 
-  private addFavorite(video: VideoItem): void {
-    const exists = this.favorites.some((item) => item.videoId === video.videoId);
-    if (exists) {
-      return;
-    }
-    this.favorites = [...this.favorites, video];
-    LocalStore.persistFavorites();
-  }
-
-  private removeFavorite(videoId: string): void {
-    this.favorites = this.favorites.filter((item) => item.videoId !== videoId);
-    LocalStore.persistFavorites();
-  }
-
-  private addPlaylist(playlist: SearchPlaylistItem): void {
-    const playlistId = (playlist.playlistId || '').trim();
-    if (!playlistId) {
-      return;
-    }
-    const exists = this.playlists.some((item) => item.playlistId === playlistId);
-    if (exists) {
-      return;
-    }
-    const next = new PlaylistItem(
-      playlistId,
-      playlist.name || playlistId,
-      playlist.coverUrl || ''
-    );
-    this.playlists = [...this.playlists, next];
-    LocalStore.persistPlaylists();
-  }
-
-  private removePlaylist(playlistId: string): void {
-    const trimmed = (playlistId || '').trim();
-    if (!trimmed) {
-      return;
-    }
-    this.playlists = this.playlists.filter((item) => item.playlistId !== trimmed);
-    LocalStore.persistPlaylists();
-  }
-
   private shareVideo(video: VideoItem): void {
     const videoId = (video.videoId || '').trim();
     const title = video.title || '';
@@ -1344,7 +1438,7 @@ struct Index {
       case 1:
         return $r('app.string.yt_tab_subscriptions');
       case 2:
-        return $r('app.string.yt_tab_favorites');
+        return $r('app.string.yt_tab_playlists');
       case 3:
         return $r('app.string.yt_tab_local');
       default:
@@ -1412,6 +1506,19 @@ struct Index {
           }, () => {
             this.activeTabIndex = index;
           });
+          // TabContent 只在首次构建时跑 aboutToAppear，之后再点这一页不会自己复活；
+          // 所以底部页签切到订阅页时由宿主补一次云端核对。
+          if (index === 1) {
+            SubscriptionStateSync.getInstance().syncInBackground('subscriptions_tab');
+          }
+        })
+        // 已经停在首页时**再点一次**首页页签 = 开启下一批内容（回顶部 + 往后要新页）。
+        // Tabs.onChange 同索引不回调，官方 BottomTabBarStyle 也拿不到点击事件，
+        // 只有 HdsTabs.onTabBarClick 能区分"点了哪一页"。
+        .onTabBarClick((index: number) => {
+          if (index === 0 && this.activeTabIndex === 0) {
+            this.homeTabController.advanceBatch();
+          }
         })
 
         // 主页 Shorts 悬浮球：**已停用**（全屏 Shorts 模式下线，入口改为
@@ -1724,11 +1831,11 @@ struct Index {
    */
   private buildTabStyle(index: number): BottomTabBarStyle {
     const normalIcons: Resource[] = [
-      $r('sys.symbol.house'), $r('sys.symbol.person_2'), $r('sys.symbol.heart'), $r('sys.symbol.folder')
+      $r('sys.symbol.house'), $r('sys.symbol.person_2'), $r('sys.symbol.list_bullet_square'), $r('sys.symbol.folder')
     ];
     const selectedIcons: Resource[] = [
       $r('sys.symbol.house_fill'), $r('sys.symbol.person_2_fill'),
-      $r('sys.symbol.heart_fill'), $r('sys.symbol.folder_fill')
+      $r('sys.symbol.list_bullet_square'), $r('sys.symbol.folder_fill')
     ];
     const normal = new SymbolGlyphModifier(normalIcons[index])
       .fontColor([$r('app.color.yourtube_text_primary')]);

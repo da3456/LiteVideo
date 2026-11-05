@@ -6,6 +6,8 @@ export class SubscriptionUser {
   videoCountText: string;
   description: string;
   thumbnailColor: string;
+  /** 已被服务端确认过（云端名单快照 / 本地订阅写回成功）；核对只删这类条目。 */
+  fromCloud: boolean;
 
   constructor(
     channelId: string,
@@ -14,7 +16,8 @@ export class SubscriptionUser {
     subscriberText: string = '',
     videoCountText: string = '',
     description: string = '',
-    thumbnailColor: string = ''
+    thumbnailColor: string = '',
+    fromCloud: boolean = false
   ) {
     this.channelId = channelId;
     this.displayName = displayName;
@@ -23,5 +26,6 @@ export class SubscriptionUser {
     this.videoCountText = videoCountText;
     this.description = description;
     this.thumbnailColor = thumbnailColor;
+    this.fromCloud = fromCloud;
   }
 }

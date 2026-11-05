@@ -265,9 +265,6 @@ export struct PlaylistDetailPage {
   PlaylistVideoGridCard(slot: MediaFeedItemSlot) {
     VideoCardGrid({
       video: slot.item as VideoItem,
-      actionLabel: $r('app.string.yt_action_favorite'),
-      actionType: 'favorite',
-      useFavoriteToggle: true,
       onOpenVideo: () => {
         this.openPlaylistVideo(slot.item as VideoItem, slot.index);
       }
@@ -278,9 +275,6 @@ export struct PlaylistDetailPage {
   PlaylistVideoListCard(slot: MediaFeedItemSlot) {
     VideoCard({
       video: slot.item as VideoItem,
-      actionLabel: $r('app.string.yt_action_favorite'),
-      actionType: 'favorite',
-      useFavoriteToggle: true,
       onOpenVideo: () => {
         this.openPlaylistVideo(slot.item as VideoItem, slot.index);
       }

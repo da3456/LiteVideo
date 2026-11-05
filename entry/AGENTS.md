@@ -1,6 +1,7 @@
 # entry/AGENTS.md
 
-> UI shell for YourPipe. Stage-model `entry` module, loaded by
+> UI shell for LiteVideo (the `com.github.da3456.litevideo` fork of YourPipe).
+> Stage-model `entry` module, loaded by
 > `EntryAbility`. Wires up stores, log sinks, engine config providers,
 > auth, network proxy, and startup prewarm. Owns all user-facing pages,
 > presentation mode, cross-device handoff, and the SABR PoToken WebView
@@ -22,7 +23,8 @@ entry/src/main/
   resources/                               — i18n strings, media assets
 ```
 
-Bottom tabs in `product/Index.ets`: **Home | Subscriptions | Favorites | Local**.
+Bottom tabs in `product/Index.ets`: **Home | Subscriptions | Playlists | Local**
+(the third tab is the fork's rename of upstream's Favorites tab — see §2 `favorites`).
 Search is a `NavDestination` (not a tab). Options is a panel/sheet (not a tab):
 one `bindSheet` (LARGE, system drag bar, close menu on the root title bar)
 hosting `OptionsSheetHost` — a single inner `HdsNavigation(optionsNavStack)`;
@@ -38,14 +40,14 @@ comes from `OptionsNavScaffold`'s custom `backIcon`.
 ## 2. Features (`features/<feature>/`)
 | Feature | Contents |
 |---|---|
-| `home` | Home feed, channel/playlist/search services + parsers (incl. TV lockup view-model parsing), recommend swiper / list UI; `HomeTabContent` — 首页 tab 内容宿主（feed 加载状态机 + 推荐位 banner + 三个 @LocalBuilder 卡片），Index 经 `HomeTabController` 触发 reset。**首页信息流按 `VideoItem.isShort` 拆成 `longList` / `shortList` 两份**（同一份 feed，切换维度不重新请求）：标题栏（搜索图标左侧）的切换符号在两者间切（`UIConfig.homeFeedMode`，持久化 `cfg_homeFeedMode`）。短视频只来自账号相关内容：① 首页 feed 的 Shorts 货架（`harvestShortsFromFeed` 自动多翻 ≤5 页去收）；② **feed 翻到顶后**接「我的频道」的 `/shorts`（`topUpShortsFromChannels`：订阅频道 → 观看历史频道，去重 ≤12 个，独立分页，`interleaveByChannel` 轮转交织防"整屏同一作者"）。**不用泛搜索补货**。推荐位 banner 只在长视频维度显示 |
+| `home` | Home feed, channel/playlist/search services + parsers (incl. TV lockup view-model parsing), recommend swiper / list UI; `HomeTabContent` — 首页 tab 内容宿主（feed 加载状态机 + 推荐位 banner + 三个 @LocalBuilder 卡片），Index 经 `HomeTabController` 触发 reset；首页按「批」供给（一批 3 页 ≈ 60 条，取满后不再自动翻页，下拉刷新或**已停在首页时再点一次首页页签**开启下一批；批上限与触发入口见 §8，feed 内容**不去重**，服务端推什么显示什么）。**首页信息流按 `VideoItem.isShort` 拆成 `longList` / `shortList` 两份**（同一份 feed，切换维度不重新请求）：标题栏（搜索图标左侧）的切换符号在两者间切（`UIConfig.homeFeedMode`，持久化 `cfg_homeFeedMode`）。短视频只来自账号相关内容：① 首页 feed 的 Shorts 货架（`harvestShortsFromFeed` 自动多翻 ≤5 页去收）；② **feed 翻到顶后**接「我的频道」的 `/shorts`（`topUpShortsFromChannels`：订阅频道 → 观看历史频道，去重 ≤12 个，独立分页，`interleaveByChannel` 轮转交织防"整屏同一作者"）。**不用泛搜索补货**。推荐位 banner 只在长视频维度显示 |
 | `search` | `SearchPage` (NavDestination) |
 | `player` | Player / detail pages, play queue, `YouTubePlayService`, environment, continuation, PiP, **SABR PoToken mint** (`SabrWebViewPoTokenProvider`, `SabrPoTokenWebRuntime`, `SabrLocalDomPoTokenGenerator`), stream-info sheet live stats (`StatsBarGraph` + 500ms `controller.getPlaybackStats()` polling, only while the sheet is open), **布局状态机**（PlayerPage 方法派生，输入 `@Env(WINDOW_SIZE/BREAK_POINT)` + 视频比例：竖向窗口 → 上视频+下信息；真横屏且容得下 → 左视频+右信息栏 `clamp(W/3, 320, 480)`；非竖向但容不下 → 挤压强制铺满，信息经播放器菜单"视频信息"以 CENTER sheet 打开；内容组件 `components/PlayerInfoPanel.ets` 三处复用；信息 sheet 必须 `showClose: false`（自带关闭按钮与面板 Tab 栏重叠，关闭走拖拽条/点空白）；强制全屏态（`isFullLandscapeScreen() && !isManualFullscreen`）必须 `VideoPlayer.showFullscreenButton=false`（仅用户手动全屏保留退出入口）；ArkUI V1 @Component 不支持 ES get 访问器——布局派生必须用普通方法）, **直播聊天/实时评论（只读）**：`PlayerInfoPanel` 在 `isLiveNow` 时追加第 4 个「聊天」Tab（`LiveChatPanel`），可见时才轮询、离开/切台/换视频即停；首访 `/next` 的 `conversationBar.liveChatRenderer` 取 continuation，之后按服务端 `timeoutMs`（1–15s 夹紧）轮询 `live_chat/get_live_chat`，失败 5s 重连；只解析文本 / Super Chat / 会员消息，不做发送或点赞（避免账号风控）。协议实现见 `youtube_core` `LiveChatExtractor`，网络走 `YouTubePlayService.fetchLiveChatInitial/fetchLiveChatPage`）, **AI subtitle**: live path = P0 tlang 服务端自动翻译轨（`withAutoTranslatedTrack` 追加虚拟轨；注意 YouTube 按出口 IP 做 429 风控，出不出字幕取决于网络）；**[DISABLED]** P1 系统 AICaptionComponent、P2 gtx/LLM 整轨翻译（`translate/`）、P3 端侧 ASR（`asr/` + `workers/AsrStreamingWorker.ets`：`AsrLiveCaptionService` 真流式识别，MPV PCM tap + sherpa OnlineRecognizer 流式 zipformer 中英双语 int8；菜单项、Options 入口/设置页、PlayerSession/AVPlayer 接线、build-profile worker 注册均已注释，`AsrModelManager.clearAll`/`clearCaches` 的清数据接线保留以清理已下载模型）——入口/设置项均已注释，代码保留，重新启用 = 取消对应 [DISABLED] 注释块 |
 | `playlist` | Playlist list + detail |
-| `subscription` | Subscription manage + feed service (bottom tab) |
-| `favorites` | `FavoritesPage` |
+| `subscription` | Subscription manage + feed service (bottom tab). Subscription writes are **two-way when signed in**: `Index.addSubscription` / `removeSubscription` optimistically update the local list, then call `UserLibraryService.subscribeChannel` / `unsubscribeChannel` (Innertube `subscription/subscribe` / `unsubscribe` via `youtube_core`); a failed write rolls the local entry back and toasts `yt_sub_write_failed`. **Unsubscribing is confirm-gated**: `Index.removeSubscription` only raises the `yt_confirm_unsubscribe_channel` dialog (falls back to `..._generic` when the local entry has no `displayName`) and the actual removal + cloud write lives in `Index.executeUnsubscribe`, so every entry point — the grey pill on card / channel page / details page and the channel long-press menu — asks first and the button state does not change until 确定. Signed-out toggles stay local-only and are **not** bulk-pushed on login. Reading back is owned by `common/SubscriptionStateSync` (cloud channel list is authoritative, pruning is guarded by the persisted `SubscriptionUser.fromCloud` flag; see §3) — triggered from this page's appear + pull-refresh, `VideoDetails`, `UserPage`, and post-login |
+| `favorites` | `FavoritesPage` — the bottom **Playlists** tab (`yt_tab_playlists`, `sys.symbol.list_bullet_square`): subscription-feed entry + merged playlists (account library / favorited / local queues). The favorited-**videos** section and every favorite UI (card action button, card long-press menu item, playlist-card heart) were removed; the `favorites` store itself is still loaded/persisted and stays part of backup + clear-all-data, so previously favourited videos keep their data but are no longer surfaced. Dead keys left in all 14 locales — **do not "fix" them as missing wiring**: `yt_action_favorite`, `yt_tab_favorites` |
 | `local` | Local library：`LocalPage` 两个 sub-tab（观看历史 / **本地媒体**）。本地媒体 = `DownloadPage` 内的合一列表：顶部导入入口 + 「下载视频」段（`DownloadTaskRow`，下载管理状态不变）+「本地文件」段（`LocalMediaRow`，系统文件选择器导入、应用内播放、删除）。导入文件复制到 `filesDir/local_media/`，索引 `local_media_json`（目录/索引与下载库独立）；**播放队列共用**：`DownloadPage.buildLocalQueue()` 把已完成下载按列表顺序放在前、导入文件按导入顺序追加在后，统一切成 `localMedia` 队列（`<12` 条以外走 `PlayQueueManager` 的 pending 分批），点击任一条目都从这条队列起播。播放复用 `PlayerSession` 的 `LOCAL_FILE` 通道与 `local:<id>` 续播键。`DownloadPage` 因此需要 `@Consume('actionHub')` |
-| `options` | `OptionsSheetHost` — options sheet 宿主（inner HdsNavigation + 全部子页 destination + `OptionsNavScaffold`；无入口的 app_lang/content_lang/content_country picker destination 已移除），Index 经单对象 params 传回调。Main（一级菜单分 通用/个性化/播放/其他 四组）/ appearance / playback（拆分为四页：播放 `OptionsPlaybackPage`（含 下载 并发 picker + **下载超时 picker**）/ 手势与操控 `OptionsGestureControlPage`（长按倍速 `HOLD_SPEED_VALUES` 等手势项 + **中央播放按钮开关** + **点击画面切换播放/暂停开关**）/ 字幕 `OptionsSubtitlePage`（字幕样式：字号/底边距/颜色/背景/偏移/翻译语言）/ **翻译服务 `OptionsTranslationPage`**（入口在「语言与地区」页；gtx / Google Cloud / MyMemory / Lingva / LibreTranslate / DeepL / Azure / LLM / 自定义接口，含端点/key/region/模板与连接测试）/ 性能与缓冲 `OptionsPerformancePage`（后台纯音频、硬解、GPU 渲染、内存缓存/预读/缓冲大小调参）；播放端点 per-state: guest `visionos|mweb` (default visionos), signed-in `tv_downgraded|mweb`, persisted in `PlaybackConfig`, applied via `AuthStateHelper.applyPlayerClientConfig` + prefetch-cache clear) / language-region / **network**（含**常驻连接状态条** + **重新应用并重启**按钮 + 地址格式示例）/ log_page（应用日志页）/ data-account（页尾含 恢复 组：恢复所有配置 / 清除应用全部数据；独立 `OptionsRecoveryPage` 已删除，回调经 data_account destination 透传）/ ai-subtitle **[DISABLED]**（`ai_translate` destination 与 OptionsMainPage 入口行均已注释，产品只保留 P0 tlang；`OptionsAiTranslatePage` — 端侧识别模型下载/删除管理，标题 `yt_option_ai_subtitle`，页内 P2 gtx/LLM 配置区同处注释块） / **update_page**（`OptionsUpdatePage`：检查 GitHub 更新总开关 + 启动静默检查开关（默认开，4s 后执行；无更新/失败不打扰，发现新版本时弹一次对话框，同一 versionCode 只提示一次）+ 手动检查（结果也用对话框，不用 toast）/结果/Release 链接；`UpdateChecker` 走 `releases.atom` 而不是 REST API，避免匿名 60 次/小时的 403 限流，`versionCode` 仍取自 `releases/latest/download/version.json`；更新开关在 `UIConfig.checkGithubUpdates` / `checkUpdatesOnStartup`，随设置备份与恢复默认；启动提示去重键 `cfg_last_prompted_update_code`，恢复默认时清空） / about-update (AppGallery test link; the About UI is `common/components/AboutPage.ets`, hosted as the `about_page` destination on `optionsNavStack` via `onAboutClick` — there is no `OptionsAboutPage`) / **实验性功能**（`experimental` group entry → `OptionsExperimentalPage` 插件列表 → `OptionsSponsorBlockPage`；配置 `ExperimentalConfig`（`cfg_experimental_json`），默认全部关闭。SponsorBlock 跳过策略在 `common/experimental/SponsorBlockSkipper`（挂 `PlayerSession`，订阅 `AvPlayerController` 进度；片段开始前提前提示，未撤销才 seek 到片段末尾，后台/PiP 同样生效），网络经 `CommunityHttp`（`HttpDownloader` 代理）→ `SponsorBlockClient`（SHA-256 前 4 位哈希查询 + 内存缓存）；DeArrow 标题/缩略图回填已实现（`DeArrowClient` → `MediaVideoFeed` 可见区异步替换 + `notifyDataChange`，播放页 `VideoDetails` 覆盖标题；缩略图替换失败由 `MediaThumb.fallbackImageUrl` 回退原图）；AiSList 频道级名单已实现（`AiListStore`：blocklist/warnlist 每日同步到 `cacheDir/community/`，支持仅标记/直接隐藏，数据 CC BY-NC 4.0）） |
+| `options` | `OptionsSheetHost` — options sheet 宿主（inner HdsNavigation + 全部子页 destination + `OptionsNavScaffold`；无入口的 app_lang/content_lang/content_country picker destination 已移除），Index 经单对象 params 传回调。Main（一级菜单分 通用/个性化/播放/其他 四组）/ appearance / playback（拆分为四页：播放 `OptionsPlaybackPage`（含 下载 并发 picker + **下载超时 picker**）/ 手势与操控 `OptionsGestureControlPage`（长按倍速 `HOLD_SPEED_VALUES` 等手势项 + **中央播放按钮开关** + **点击画面切换播放/暂停开关**）/ 字幕 `OptionsSubtitlePage`（字幕样式：字号/底边距/颜色/背景/偏移/翻译语言）/ **翻译服务 `OptionsTranslationPage`**（入口在「语言与地区」页；gtx / Google Cloud / MyMemory / Lingva / LibreTranslate / DeepL / Azure / LLM / 自定义接口，含端点/key/region/模板与连接测试）/ 性能与缓冲 `OptionsPerformancePage`（后台纯音频、硬解、GPU 渲染、内存缓存/预读/缓冲大小调参）；播放端点 per-state: guest `visionos|mweb` (default visionos), signed-in `tv_downgraded|mweb`, persisted in `PlaybackConfig`, applied via `AuthStateHelper.applyPlayerClientConfig` + prefetch-cache clear) / language-region / **network**（含**常驻连接状态条** + **重新应用并重启**按钮 + 地址格式示例）/ log_page（应用日志页）/ data-account（页尾含 恢复 组：恢复所有配置 / 清除应用全部数据；独立 `OptionsRecoveryPage` 已删除，回调经 data_account destination 透传）/ ai-subtitle **[DISABLED]**（`ai_translate` destination 与 OptionsMainPage 入口行均已注释，产品只保留 P0 tlang；`OptionsAiTranslatePage` — 端侧识别模型下载/删除管理，标题 `yt_option_ai_subtitle`，页内 P2 gtx/LLM 配置区同处注释块） / **update_page**（`OptionsUpdatePage`：检查 GitHub 更新总开关 + 启动静默检查开关（默认开，4s 后执行；无更新/失败不打扰，发现新版本时弹一次对话框，同一 versionCode 只提示一次）+ 手动检查（结果也用对话框，不用 toast）/结果/Release 链接；`UpdateChecker` 走 `releases.atom` 而不是 REST API，避免匿名 60 次/小时的 403 限流，`versionCode` 仍取自 `releases/latest/download/version.json`；两条 URL 与「打开仓库」都指向本 fork（`GITHUB_REPO_URL`），`UPSTREAM_REPO_URL` 只作来源链接；fork 未发布过 Release 时检查静默失败，不弹任何东西；更新开关在 `UIConfig.checkGithubUpdates` / `checkUpdatesOnStartup`，随设置备份与恢复默认；启动提示去重键 `cfg_last_prompted_update_code`，恢复默认时清空） / **about_page**（About UI = `common/components/AboutPage.ets`，作为 `optionsNavStack` 的 `about_page` destination 经 `onAboutClick` 打开 — 没有 `OptionsAboutPage`。显示的是 fork 身份：包名行与 GitHub 行指向 `da3456/LiteVideo`，另有「上游项目」行指向 `Ember5843/YourPipe`（GPLv3 署名要求，也是回看原版改动的入口），加 `yt_about_fork_notice` 说明段；页脚 `LiteVideo v<versionName> · GPL-3.0`，保留上游 `© Talon` 版权行并追加 `Fork © da3456`；CHANGELOG 第一条是 fork 自己的改动（`yt_changelog_fork_1..6`），上游历史条目原样保留在下面。上游的 QQ 群 / Telegram 群 / AppGallery 测试渠道入口**已删除**——本 fork 不自带商店渠道，把用户指回原版等于把更新和账号动作导向原作者）；被删入口的文案 `yt_about_qq_group` / `yt_about_tg_group` / `yt_update_open_appgallery` 是**留着不用的死 key**，合并上游时不要把行加回来 / **实验性功能**（`experimental` group entry → `OptionsExperimentalPage` 插件列表 → `OptionsSponsorBlockPage`；配置 `ExperimentalConfig`（`cfg_experimental_json`），默认全部关闭。SponsorBlock 跳过策略在 `common/experimental/SponsorBlockSkipper`（挂 `PlayerSession`，订阅 `AvPlayerController` 进度；片段开始前提前提示，未撤销才 seek 到片段末尾，后台/PiP 同样生效），网络经 `CommunityHttp`（`HttpDownloader` 代理）→ `SponsorBlockClient`（SHA-256 前 4 位哈希查询 + 内存缓存）；DeArrow 标题/缩略图回填已实现（`DeArrowClient` → `MediaVideoFeed` 可见区异步替换 + `notifyDataChange`，播放页 `VideoDetails` 覆盖标题；缩略图替换失败由 `MediaThumb.fallbackImageUrl` 回退原图）；AiSList 频道级名单已实现（`AiListStore`：blocklist/warnlist 每日同步到 `cacheDir/community/`，支持仅标记/直接隐藏，数据 CC BY-NC 4.0）） |
 | `help` | `HelpGuidePage` — 6-page onboarding/help swiper (welcome + sign-in, account data, network proxy, quality/cache, downloads). Two entries: first-launch full-screen overlay on `Index` (an `if`-mounted layer in the root Stack, shown while `PreferencesStore` key `cfg_help_seen` != `'true'` with a 500 ms delay; bindSheet/bindContentCover on Navigation-hosted nodes do NOT present at app-start timing — do not revert to them) and Options main page "帮助" item (`help_page` destination in the options sheet). `resetAllConfigs` resets the flag; `clearAllAppData` clears it via `PreferencesStore.clearAll()`. Illustrations are `resources/base/media/guide_*.png` (welcome page uses `app_icon.png`). |
 | `user` | User / channel info; Library saved playlists (WEB classic renderers + TV lockup view models) |
 | `shorts` | **已停用（代码保留）**：全屏 Shorts 页 + 主页悬浮球 —— `ShortsPage`（NavDestination，纵向 Swiper + 常驻单 surface）、`ShortsFeedService`、`FloatingShortsBall`、`ShortsSurface`；播放走 `PlayerSession.playShorts`（同会话换源 + `AvPlayerController.setFileLoop` 单条循环 + `YouTubePlayService.prefetch` 预取）。入口已换成**首页标题栏的长/短视频切换**（见 `home` 行），`mediaservice` 的 `setFileLoop`/`setMuted` 也随之停用。恢复方式见 `shorts-design.md` 附录 A。已踩的坑（恢复时别再踩）：Swiper 页内容只声明 `parallelGesture(TapGesture)`、不声明 `LongPressGesture`（400ms 后无条件成立，会吃掉慢速拖动 → Swiper 不滚动），长按 2x 用 `onTouch` + 计时器自实现；滑动换条先调 `PlayerSession.invalidatePendingPlay()` 作废在飞代际，过期源不得提交；feed 条目非响应式，作者/头像要复制到 `@State` 才有 UI 刷新；搜索源必须递归展开货架容器 |
@@ -186,7 +188,7 @@ Persistent state and shared singletons:
   `Index.aboutToAppear` and rebuilds completed entries, dropping any whose
   `outputPath` no longer exists on disk; it then scans `filesDir/downloads/*`
   and revives directories with no index record (`recoverOrphanedDownloads`,
-  title taken from the file name, no YouTube id — favorite/share are hidden for
+  title taken from the file name, no YouTube id — share is hidden for
   those), so files can never become unreachable. A finished
   entry **is** the playable video entry: tap plays it in-app, delete removes the
   entry plus its sandbox `filesDir/downloads/<taskId>` directory, and export
@@ -271,8 +273,8 @@ Persistent state and shared singletons:
 Reusable components: `HdsTitleBar`, video cards / grids / thumbs, error / about /
 log / tab error panels, option rows, backup + language pickers, placeholders.
 `VideoItemContextMenu` (`common/components/VideoItemContextMenu.ets`) is the single
-long-press context menu for video items: info section + standard items (favorite
-toggle / view author / audio-only / download / share) + per-surface `extraItems`.
+long-press context menu for video items: info section + standard items (view
+author / audio-only / download / share) + per-surface `extraItems`.
 Surfaces trim standard items via `show*` flags — the play queue disables
 audio-only (its click already switches in-queue), playlist-sourced history entries
 disable the whole video set (delete-record extra only). It resolves `actionHub`
@@ -341,15 +343,82 @@ Shared geometry tokens live in `MediaCardTokens` (`MEDIA_CARD_*`,
 PlaylistCard, ChannelCard, DownloadTaskRow, history, queue) must consume them,
 never literals. Grid-mode `VideoMediaCard` is a top-to-bottom card:
 edge-to-edge 16:9 thumbnail clipped by the card radius (thumb radius 0), meta
-bar below = title (≤2 lines) + one meta row `作者 · 统计` (stat slot = view
-count → publish time → duration, first available) with the action button
-pinned at the row's right end; both segments render whenever the data exists
-and overflow truncates with ellipsis — the long-press menu carries the full
-info.
+bar below = title (≤2 lines) + author line + stat line (view count ·
+`publishedTimeText`, degrading to duration when both are absent); each line is
+single-line ellipsis-truncated and the long-press menu carries the full info.
+**Every grid card line is fixed height** (`MEDIA_GRID_TITLE_BLOCK_HEIGHT` = two
+title lines, `MEDIA_META_LINE_HEIGHT` for author and stat): a short title still
+occupies both lines and a missing author/stat keeps its blank line, because the
+Grid aligns by row, so one naturally-shorter card leaves a hole under its
+neighbour and the two columns read as mis-aligned. Whether a line renders at all
+still follows `showAuthor` / `showViewCount` — those flags are uniform per
+surface, so cards inside one feed stay equal.
+The thumb box is always 16:9 and draws with `ImageFit.Contain`, so a non-16:9
+thumbnail (live entries commonly ship a portrait/square still) leaves bare
+background strips on its left and right — the card reads as mis-aligned next to
+its neighbour. `VideoMediaCard` fills those strips with `MediaThumb`'s
+`useCoverBackdrop` (darkened cover copy), but **only for `video.isLive`**: the
+Shorts dimension is all portrait stills, so a blanket flag would add one extra
+image decode per card and make scrolling heavier.
+Cards render `publishedTimeText` through `common/utils/PublishTimeFormat`
+(`compactPublishTime`) so the relative time reads like the web ("4 hours ago" →
+"4h ago"); it only rewrites a recognised `<number> <unit-word>` pair and
+returns the server string untouched otherwise (CJK texts, absolute dates),
+while the long-press menu keeps the verbatim server text.
+Surfaces pass `showAuthor: false` (channel videos) or `showViewCount: false` to
+drop a line. Cards carry no inline action button.
+`ChannelCard` / `UserPage` render the subscribe toggle as the same 30vp round
+pill in **both** states — no text button anywhere. Subscribed is grey
+(`yourtube_button_disabled` + `sys.symbol.checkmark`); unsubscribed is
+`sys.symbol.face_smiling_plus` (smiley + plus badge, the web-style "add
+subscription" mark; plain `plus` was rejected) on the theme colour. The label
+lives in `accessibilityText` only. There is no `compactAction` /
+`forceActionLabel` escape hatch — the pill is narrow by design so the stat line
+keeps its width in the player details panel. Both toggles vibrate through
+`customVibrator.vibratorTriggerLight()` (`haptic.effect.soft`, gated on
+`UIConfig.isVibrate`) from `Index.addSubscription` / `executeUnsubscribe` (the
+unsubscribe tap first raises the confirm dialog, so the tap only fires once
+the removal actually happens), so every entry point — card, channel page,
+details page — gets the same light tap
+and a cloud-write rollback does not re-trigger it. Its meta line is a single
+combined `subscriberText · videoCountText` Text — two sibling Texts in a nowrap
+Row clip the tail with no ellipsis, so the video count silently disappeared
+behind the button.
+Subscription state is **verified against the server**, not just mirrored from
+local writes: `common/SubscriptionStateSync` (singleton) pulls the cloud channel
+list through `UserLibraryService.fetchSubscribedChannelsSnapshot()` and
+reconciles `AppStorage('subscriptions')` — cloud-only channels are added, and
+local entries absent from the cloud are dropped **only** when they carry
+`SubscriptionUser.fromCloud` (set by a cloud snapshot or a successful
+`subscription/subscribe` write-back, persisted in `subscriptionsJson`), the
+snapshot is `complete` (FEchannels翻页 ran out within `CHANNELS_MAX_PAGES` and
+no scan node cap was hit), and no local mutation happened inside the 30s grace
+window. Offline subscriptions therefore never vanish, and an empty cloud list is
+treated as a failure rather than "unsubscribed from everything". Triggers
+(`syncInBackground`, fire-and-forget): bottom-tab switch to the subscription tab
+(`Index` Tabs `onChange`, index 1 — `TabContent` only runs `aboutToAppear` on its
+first build, so the host has to re-arm it), `SubscriptionManagePage` appear and
+pull-refresh (pull-refresh forces), `VideoDetails.aboutToAppear` **and**
+`onItemChanged` (the panel is reused across queue/auto-play switches),
+`UserPage.aboutToAppear`, plus a forced `sync('post_login')` from
+`Index.syncUserLibraryAfterLogin`; `Index.handleLoginSuccess` resets the
+throttle when the account changes. `SYNC_TTL_MS` is a 5s **debounce** for those
+cascade triggers, not a cache — the user expects every entry point to actually
+re-check. `SubscriptionManagePage` @Watch on `subscriptions` reloads the channel
+profiles whenever the id set changes (metadata-only writes are skipped, so
+`loadProfiles` cannot re-trigger itself).
 PlaylistCard/ChannelCard context menus follow the same 220vp + info-section
 pattern as `VideoItemContextMenu`; floating-title-bar pages reserve
 `safeAreaTop + TITLE_BAR_HEIGHT` at content top and set
 `avoidLayoutSafeArea: true` on the title bar.
+`PlaylistCard.CoverBlock` is the empty-playlist placeholder: when `coverUrl` is
+blank (a Watch later / Liked videos with nothing in it, or a snapshot whose
+first video has no thumb) it draws a `bg_surface_muted` plate with a centred
+`sys.symbol.list_bullet_square` in `icon_muted` plus the type badge, instead of
+an empty grey `MediaThumb` box. No new string keys — the badge reuses the caller's
+`typeLabel`. Symbol+plate colors are tokens, so light/dark both keep contrast;
+don't hardcode `#CCCCCC` there (it is the `thumbnailColor` fallback that made the
+bare box unreadable in dark mode).
 
 ## 4. AppStorage keys
 Key cross-cutting keys (**non-exhaustive** — grep `AppStorage.setOrCreate`
@@ -535,6 +604,109 @@ store caches (`favorites`, `playlists`, `subscriptions`, `watchHistory`,
 - **Config reads**: `entry` is the only place that calls `AppStorage.get`.
   `mediaservice` / `youtube_core` receive values through `setProvider`
   callbacks (playback, engine, HTTP proxy).
+- **首页 feed 不做自动去重/过滤**（用户明确要求「推什么加载什么」）：`HomeTabContent.splitByType(items)`
+  只是按 `VideoItem.isShort` 拆两份列表，同页 / 跨页 / 跨批次重复的 `videoId`
+  一律照原样显示。解析层（`collectHomeFeedLeaves`）同样不去重。
+  已知代价：重复 `videoId` = 重复 LazyForEach key，ArkUI 按 key 复用节点，
+  服务端在同一次响应里重复推某条视频时，画面上可能有两个一模一样的格子，
+  或某个格子刷新后没变——这是**接受的行为**，不要靠加去重规则修，
+  也不要在别处偷偷补第二套过滤逻辑。信息流**没有任何持久化过滤名单**；
+  「不感兴趣」只走服务端反馈（见下条）。
+- **卡片长按菜单的 feed 动作**（`VideoItemContextMenu`，`showFeedbackActions` 只由首页卡片开）：
+  - 「保存到稍后观看」是**服务端写入**：`youtube_core` `addVideoToPlaylist('WL', videoId)`
+    （Innertube `playlist/addVideoToPlaylist`，复用订阅写入那套 rail/认证形状），
+    entry 侧 `UserLibraryService.saveToWatchLater` → `Index.saveVideoToWatchLater`。
+    未登录**不做本地代存**（列表语义只在账号上），直接 toast 提示登录。
+  - 「不感兴趣 / 不推荐该频道」同样是**服务端反馈**：网页那两项提交的
+    `feedbackEndpoint.feedbackToken`（部分结构里叫 `token`）是服务端在 feed 响应里
+    一并下发的不透明串，客户端造不出来，只能原样回传。所以
+    `common/FeedFeedbackStore.ets` 在 `buildHomeKioskVideoItems` 解析每条时扫出
+    `(label, token)`：先深度定位该条的 `videoId`（`videoId`/`contentId`/`entityId`，
+    renderer 和 viewmodel 两种套壳都吃），再深度找直接挂着 token 的节点，token 字段名
+    只认 `feedbackToken`，裸 `token` 只认父键是 `feedbackEndpoint`/`feedCommandWrapper`
+    的那一个（否则会误抓 `continuationCommand.token` 那种分页游标）。
+  - **token 藏得非常深，改这块前先读 `MAX_WALK_DEPTH` 的注释**：真机网页实测，桌面 WEB
+    首页每张卡片的三点菜单是 `showSheetCommand.panelLoadingStrategy.inlineContent.sheetViewModel`
+    （**随 feed 一起内联下发，点开菜单不发请求**），从条目节点起算要穿 21 层才到
+    `…listItems[].listItemViewModel.rendererContext.commandContext.onTap.innertubeCommand.feedbackEndpoint.feedbackToken`；
+    而条目文案在同一个 `listItemViewModel` 的 `title.content` 上，距 token **5 层远**。
+    所以解析有两个必须够大的窗口，历史上都因为太小而误判「服务端没下发」：
+    DFS 深度 `MAX_WALK_DEPTH = 28`，和 label 沿祖先链回溯的层数 `LABEL_ANCESTOR_HOPS = 6`
+    （只看 parent/grandparent 一定拿不到 label）。
+    label 跟随 `hl` 已本地化（支持 `{content}` / `{simpleText}` / `{runs:[{text}]}`）。
+    `collectHomeFeedLeaves` 会把货架展开成单卡叶子，所以货架级 `richShelfRenderer.menu`
+    上那个「整条货架不推荐」的 token 落在叶子之外、**不记**——只要单卡自己的那几项。
+    长按菜单**渲染服务端给的那几项**，点哪项就提交哪项的 token →
+    `youtube_core` `postFeedFeedback` → Innertube `feedback`。
+  - **提交形状（`youtube_core` `postFeedFeedback`）**：`FeedbackRequest` 里 token 是
+    **repeated 字段 `feedbackTokens`**，配 `isFeedbackTokenUnencrypted:false` +
+    `shouldMerge:false`；**单数 `feedbackToken` 不是这个 message 的字段** ——
+    proto3 JSON 会静默丢掉未知字段，服务端回 200、不报错、也**什么都不记**
+    （症状就是「卡片明明消失了但账号侧查无此事」）。受理判据是响应里的
+    `feedbackResponses[]`：拿不到这个数组就抛错 → UI 走 `yt_feed_feedback_failed` toast，
+    **不再本地摘卡**（`Index.sendFeedFeedback` 只在 await 成功后 `removeFeedbackCards`）。
+    日志 `[FeedFeedback] stage=ok … responses=N processed=M` 是服务端有没有落库的判据。
+  - **别把这条链路想成即时生效**：YouTube 的「不感兴趣」是**建议性信号**，账号里
+    **没有任何可见清单**可以核对（不像屏蔽广告主会在 Google 广告设置里列出来），
+    推荐流的变化通常要几小时～几天；能在网页端看到的即时效果只有「该条不再出现在
+    这一批 feed 里」。用户报告「Google 那边找不到这条反馈」时先讲清这一点，再看
+    `responses/processed` 日志判断协议层是否受理。
+    禁止把它改成本地屏蔽名单/持久化过滤（用户明确要求走服务端）；
+    没扫到 token 就不显示该项，判据分两行：
+    `[HomeFeed] stage=split ... auth=… rail=… feedback=videos=N tokens=M`（整批扫到多少）和
+    `[FeedFeedback] stage=menu_open videoId=… entries=M`（打开菜单时该条有没有）。
+    若 `videos=0`，同批还会打 `[FeedProbe] stage=probe reason=… paths=N` + 若干行
+    `a.b.c | d.e.f` ——那是**只含键名路径**的完整骨架（不记任何 value），照它改解析即可。
+    反馈成功后只 `removeFeedbackCards` 摘掉当前屏幕那张卡（与网页一致），不落地。
+- **首页视频卡长按 = 底部半模态，不再做浮层**（`VideoMediaCard.openMenuSheet` +
+  `bindSheet($$this.isShowMenuSheet, this.menuSheetBuilder(), …)`，`VideoItemContextMenu`
+  的 `asSheet: true` + `onClose`）：`bindContextMenu` 的 220vp 浮层会把卡片顶得往上跳，
+  用户明确否掉了。半模态满宽、一行一项（`SymbolGlyph(sheetIcon)` + 文案），点完先跑
+  `callback()` 再 `onClose()` 收起；`detents: [SheetSize.FIT_CONTENT]` 负责内容多高面板
+  多高，点面板外由系统遮罩关闭；`$$` 双向绑定保证系统关闭时
+  `isShowMenuSheet` 一起落回 false。**顶部横条是自绘的**（`VideoItemContextMenu.SheetHandleBar`，
+  36x5vp 胶囊 + 上下留白），因为系统 `dragBar: true` 在这个 SDK 的 `SheetType.BOTTOM`
+  面板上不出现，宿主必须传 `dragBar: false`，否则真机上是两条 / 零条。**这个 SDK 的 `SheetOptions` 没有 `backgroundColor`
+  / `onDisappear` / `maskClosable`**（只在旧版有），底色要画在内容自己的 Column 上；
+  `blurStyle` 只对面板背后那层生效，面板以外的区域是遮罩压暗而非高斯模糊。
+  其余宿主（下载页 / 本地页 / 播放队列 / 推荐位 banner）仍走原浮层，`asSheet` 默认 false。
+- **频道专属菜单只在频道卡上**（`common/components/ChannelContextMenu.ets`）：
+  `ChannelCard` 的整卡长按出频道项（打开频道 / 订阅·取消订阅 / 分享频道），头像
+  `Image` 带 `.draggable(false)`，否则长按被系统拖拽手势吃掉。
+  视频卡的**作者行曾经也绑过这个菜单**，结果和整卡的视频菜单在同一张卡片上打架，
+  1.0.20 起**视频卡（含作者行）长按只出视频菜单**，作者行的手势已删除、冒泡到整卡；
+  播放详情页目前没有频道长按菜单，要加得另做。
+  订阅态读 `AppStorage('subscriptions')`，写动作走 `actionHub.addSubscription` /
+  `removeSubscription` / `shareChannel` / `openChannelById`，与频道页同一套。
+- **缩略图也要能长按**：ArkUI `Image` 默认可拖拽，长按缩略图会被系统拖拽手势吃掉，
+  卡片只有文字区能弹菜单。`MediaThumb` 的两处 `Image` 都带 `.draggable(false)`
+  （本应用没有拖放功能），共享缩略图的卡片/列表一律适用。
+- **Feed 卡作者名有 owner-avatar 兜底**：`features/home/utils/LockupViewModelParser.ets`
+  的 `getLockupUploaderName` 先扫 `metadataRows`；扫不到（有些 lockup 只给了
+  播放量 + 相对时间，没有作者行）再走 `getLockupOwnerAvatarName`，从
+  `metadata.lockupMetadataViewModel.image` 的 `decoratedOwnerAvatarViewModel` /
+  `decoratedAvatarViewModel` / `avatarViewModel` 里取 `title.content` /
+  `tooltip.content` / `altText`。这是对服务端结构的**best-effort 猜测**：若两处都
+  取不到，说明这条 lockup 真的没带频实名，卡片会显示固定高度的空行而不是猜一个。
+- **首页按「批」供给，不是无限下滑**（`HOME_BATCH_MAX_PAGES = 3`）：一页 ≈ 20 条，
+  一批 3 页 ≈ 60 条。下滑仍然是**触底要一页**的无感节奏（`fetchFeedPage(false, …)`，
+  每次触底只有一次网络请求），只是取满 3 页后 `doLoadLiveVideos(false)` 直接不再请求，
+  改为弹一次 `yt_home_batch_end` toast。**下一批由两个入口触发**：下拉刷新，或已停在首页时
+  再点一次底栏首页页签（`HdsTabs.onTabBarClick` —— `Tabs.onChange` 同索引不回调、
+  官方 `BottomTabBarStyle` 也没有点击事件，所以只能用它；经
+  `HomeTabController.advanceBatch()` 回到内容侧 = 回顶部 + `refreshHomeFeed()`）。
+  `startHomeBatch()` 只取**一页**当批首并整列替换（不跳页、不多请求串联），页空则保留当前列表。
+  `refreshHomeFeed` **不清分页状态**：有 token 就顺着
+  continuation 链条往后要，链条到头（服务端不再给 token）才重新起链 —— 首页推荐
+  对同一 session 是确定性的，清空 token 等于回到同一批。
+  短视频维度**不套批上限**，仍走 `harvestShortsFromFeed` + `topUpShortsFromChannels`
+  的频道续供（那条路径只在 `shortList` 内部防重复 key，属于列表自身的一致性，不是 feed 去重）。
+  `yt_home_no_new_videos` 是**留着不用的死 key**（跳页逻辑删掉后没有调用方），别当漏改清理。
+- **请求 locale 只走 `SearchLocaleManager`**：youtubei 请求的 `Localization` /
+  `ContentCountry` 一律取 `getSearchLocaleBundle()`（`hl` 归一化成 2 字母码）。
+  不要把 `i18n.System.getSystemLanguage()` 原样当 `hl` 发（真机是 `zh-Hans-CN`
+  这类带文字子标签的标签，不是 YouTube 的界面语言代码）；需要系统语言时先过
+  `LanguageManager.normalizeLanguageCode`。
 - **`$r('app.string.x', 参数)` 返回的是「带格式化参数的 Resource」，不是已格式化的
   字符串**（官方 `Resource` 定义：包含"资源 ID、资源类型和格式化参数"）。`Text(...)`
   渲染 Resource 时会套用参数，但 **ArkUI 的 `Select` 解析 Resource 走的是

@@ -91,20 +91,14 @@ export struct SubscriptionFeedPage {
   @LocalBuilder
   private FeedGridCard(slot: MediaFeedItemSlot) {
     VideoCardGrid({
-      video: SubscriptionFeedStore.toVideoItem(slot.item as SubscriptionFeedItem),
-      actionLabel: $r('app.string.yt_action_favorite'),
-      actionType: 'favorite',
-      useFavoriteToggle: true
+      video: SubscriptionFeedStore.toVideoItem(slot.item as SubscriptionFeedItem)
     })
   }
 
   @LocalBuilder
   private FeedListCard(slot: MediaFeedItemSlot) {
     VideoCard({
-      video: SubscriptionFeedStore.toVideoItem(slot.item as SubscriptionFeedItem),
-      actionLabel: $r('app.string.yt_action_favorite'),
-      actionType: 'favorite',
-      useFavoriteToggle: true
+      video: SubscriptionFeedStore.toVideoItem(slot.item as SubscriptionFeedItem)
     })
   }
 

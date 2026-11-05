@@ -138,10 +138,65 @@ function isUploaderCandidateText(content: string): boolean {
  * History shelves often put views/date first; prefer parts with browseEndpoint,
  * then first non-stats text.
  */
+/**
+ * Channel name carried by the avatar block instead of a metadata row
+ * (`image.decoratedAvatarViewModel` / `decoratedOwnerAvatarViewModel` /
+ * `avatarViewModel`). Some home-feed lockups put only
+ * `186K views` + `10 months ago` into `metadataRows` and keep the byline on the
+ * owner avatar (`title.content`, `altText`, `tooltip.content`) — reading it here
+ * is what makes the author line appear on those cards.
+ */
+function getLockupOwnerAvatarName(lockup: Record<string, Object>): string {
+  const metadata = lockup["metadata"] as Record<string, Object>;
+  const lmv = metadata ? (metadata["lockupMetadataViewModel"] as Record<string, Object>) : undefined;
+  const image = lmv ? (lmv["image"] as Record<string, Object>) : undefined;
+  if (!image) {
+    return "";
+  }
+  const decorated = image["decoratedOwnerAvatarViewModel"] as Record<string, Object>;
+  const decoratedAvatar = image["decoratedAvatarViewModel"] as Record<string, Object>;
+  const carriers: Array<Record<string, Object> | undefined> = [];
+  carriers.push(decorated);
+  if (decorated) {
+    carriers.push(decorated["avatar"] as Record<string, Object>);
+  }
+  carriers.push(decoratedAvatar);
+  if (decoratedAvatar) {
+    carriers.push(decoratedAvatar["avatar"] as Record<string, Object>);
+  }
+  carriers.push(image["avatarViewModel"] as Record<string, Object>);
+  for (let i = 0; i < carriers.length; i++) {
+    const node = carriers[i];
+    if (!node) {
+      continue;
+    }
+    const candidates: string[] = [
+      readTextContent(node["title"]),
+      readTextContent(node["tooltip"]),
+      (node["altText"] as string) || ""
+    ];
+    for (let j = 0; j < candidates.length; j++) {
+      const text = candidates[j].trim();
+      if (isUploaderCandidateText(text)) {
+        return text;
+      }
+    }
+  }
+  return "";
+}
+
+function readTextContent(node: Object | undefined): string {
+  if (!node) {
+    return "";
+  }
+  const rec = node as Record<string, Object>;
+  return (rec["content"] as string) || "";
+}
+
 export function getLockupUploaderName(lockup: Record<string, Object>): string {
   const rows = getLockupMetadataRows(lockup);
   if (!rows || rows.length === 0) {
-    return "";
+    return getLockupOwnerAvatarName(lockup);
   }
 
   // Prefer metadata parts that actually navigate to a channel.
@@ -175,7 +230,7 @@ export function getLockupUploaderName(lockup: Record<string, Object>): string {
       }
     }
   }
-  return "";
+  return getLockupOwnerAvatarName(lockup);
 }
 
 export function getLockupChannelId(lockup: Record<string, Object>): string {

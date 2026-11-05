@@ -466,6 +466,15 @@ export class HttpDownloader {
     options.usingProxy = false;
   }
 
+  /** 错误响应体的日志摘要：折叠空白、截断，避免把整页 HTML 写进日志。 */
+  public static bodySnippetForLog(body?: string): string {
+    const flat = (body || '').replace(/\s+/g, ' ').trim();
+    if (flat.length === 0) {
+      return '<empty>';
+    }
+    return flat.length <= 300 ? flat : `${flat.slice(0, 300)}…(+${flat.length - 300})`;
+  }
+
   /**
    * API 26 connection-pool reuse (`reuseConnections` / `inactivityMs`): cuts
    * repeat TCP/TLS handshakes for callers hitting the same hosts. The fields
@@ -609,7 +618,10 @@ export class HttpDownloader {
             responseBody
           );
 
-          logger.error(`HTTP error: ${httpError.getFriendlyMessage()}`);
+          // 服务端在 4xx body 里给出真正的原因（如 innertube 的 "Invalid value at
+          // 'context'…"），只带状态码的话这类 400 无法定位——截断后一并落日志。
+          logger.error(`HTTP error: ${httpError.getFriendlyMessage()} `
+            + `bodySnippet=${HttpDownloader.bodySnippetForLog(responseBody)}`);
 
           // 如果是可恢复的错误且还有重试机会，则重试
           if (httpError.isRecoverable && attempt < maxAttempts) {

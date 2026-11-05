@@ -21,7 +21,8 @@ export class LocalStore {
         LocalStore.asString(item['subscriberText']),
         LocalStore.asString(item['videoCountText']),
         LocalStore.asString(item['description']),
-        LocalStore.asString(item['thumbnailColor'])
+        LocalStore.asString(item['thumbnailColor']),
+        LocalStore.asBool(item['fromCloud'])
       ));
     } catch (err) {
       logger.error('Failed to parse subscriptions:', JSON.stringify(err));
@@ -175,5 +176,9 @@ export class LocalStore {
 
   private static asString(value: Object | undefined): string {
     return typeof value === 'string' ? value : '';
+  }
+
+  private static asBool(value: Object | undefined): boolean {
+    return typeof value === 'boolean' ? value : false;
   }
 }

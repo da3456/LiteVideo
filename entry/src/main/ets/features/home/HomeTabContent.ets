@@ -10,6 +10,8 @@ import { getFeedContentWidthVp, getVideoGridColumnCount } from '../../common/uti
 import { ErrorPage } from '../../common/components/ErrorPage';
 import { customAnimationUtil } from '../../common/AnimationUtil';
 import { FeedServiceProvider } from '../../common/FeedServiceProvider';
+import { FeedFeedbackStore } from '../../common/FeedFeedbackStore';
+import { KioskPageResult } from './HomeFeedService';
 import { UIConfig } from '../../common/AppState';
 import { SubscriptionUser } from '../../common/SubscriptionModel';
 import { WatchHistoryStore } from '../../common/WatchHistoryStore';
@@ -33,6 +35,11 @@ const HOME_SHORTS_MAX_CHANNELS: number = 20;
 const HOME_SHORTS_CHANNEL_FETCH_PER_ROUND: number = 6;
 /** 一轮频道补货最多并入多少条短视频。 */
 const HOME_SHORTS_CHANNEL_BATCH: number = 60;
+/**
+ * 一批长视频取几页（约 3 页 ≈ 60 条）。取满后下滑不再请求，提示"下一批"由
+ * 下拉刷新 / 再点一次底部首页触发 —— 短视频维度不受这个上限约束。
+ */
+const HOME_BATCH_MAX_PAGES: number = 3;
 
 /** 短视频补收用的频道游标（每个频道独立分页）。 */
 interface ShortsChannelState {
@@ -61,6 +68,8 @@ export class HomeTabController {
   private queuedReload: boolean = false;
   private hasQueuedReset: boolean = false;
   private modeSwitchImpl: ((mode: string) => void) | null = null;
+  private batchAdvanceImpl: (() => void) | null = null;
+  private removeFeedbackImpl: ((videoId: string, channelId: string) => void) | null = null;
 
   registerReset(impl: (clearList: boolean, reload: boolean) => void): void {
     this.resetImpl = impl;
@@ -91,6 +100,33 @@ export class HomeTabController {
   switchMode(mode: string): void {
     if (this.modeSwitchImpl) {
       this.modeSwitchImpl(mode);
+    }
+  }
+
+  /**
+   * 开启下一批首页内容（回到顶部 + 取新的一批）。
+   * 由 Index 在"已经停在首页时再点一次底部首页页签"时触发 —— 官方
+   * BottomTabBarStyle 没有点击事件，Tabs.onChange 同索引也不回调，
+   * 所以走 HdsTabs.onTabBarClick 回到内容侧。
+   */
+  registerBatchAdvance(impl: () => void): void {
+    this.batchAdvanceImpl = impl;
+  }
+
+  advanceBatch(): void {
+    if (this.batchAdvanceImpl) {
+      this.batchAdvanceImpl();
+    }
+  }
+
+  /** 服务端反馈成功后，把这条视频 / 这个频道的卡片从当前首页列表即时摘掉。 */
+  registerRemoveFeedbackCards(impl: (videoId: string, channelId: string) => void): void {
+    this.removeFeedbackImpl = impl;
+  }
+
+  removeFeedbackCards(videoId: string, channelId: string): void {
+    if (this.removeFeedbackImpl) {
+      this.removeFeedbackImpl(videoId, channelId);
     }
   }
 }
@@ -127,13 +163,21 @@ export struct HomeTabContent {
   @State homeModeNoticeMessage: string = '';
   /** 每次首页 reset 成功后 +1：仅驱动推荐位 banner 重建；列表刷新由 DataChangeListener 全量通知负责 */
   @State homeFeedEpoch: number = 0;
-  @State kioskNextPageToken: string | null = null;
-  @State kioskVisitorData: string = '';
+  /**
+   * 分页游标：只给请求用，不进 build()，所以是普通字段 ——
+   * 每页都写 @State 会让整个 tab 组件多挨一次脏标记。
+   */
+  private kioskNextPageToken: string | null = null;
+  private kioskVisitorData: string = '';
   @State homeFeedSource: string = 'kiosk';
   @State homeMode: string = 'kiosk';
   /** 首页信息流 LazyForEach 数据源：当前维度的列表变更后由 syncHomeFeedDataSource 同步 */
   private homeFeedDataSource: FeedDataSource = new FeedDataSource();
   private homeBannerMax: number = 6;
+  /** 当前批已取页数（长视频维度据此判定批尾）。 */
+  private batchPages: number = 0;
+  /** 批尾提示每批只弹一次（下滑触底会被反复触发）。 */
+  private batchEndAnnounced: boolean = false;
   /**
    * 首页 feed 请求代次：每次 reset/刷新递增。旧请求晚返回时不得覆盖新结果
    * （登录态/内容源切换与启动加载并发时，旧的 kiosk 响应会把推荐列表顶掉）。
@@ -146,6 +190,13 @@ export struct HomeTabContent {
     });
     this.controller.registerModeSwitch((mode: string) => {
       this.onHomeModeSwitched(mode);
+    });
+    this.controller.registerBatchAdvance(() => {
+      this.scrollHomeFeedToTop();
+      this.refreshHomeFeed().catch(() => undefined);
+    });
+    this.controller.registerRemoveFeedbackCards((videoId: string, channelId: string) => {
+      this.removeFeedbackCards(videoId, channelId);
     });
   }
 
@@ -183,6 +234,8 @@ export struct HomeTabContent {
     if (clearList) {
       this.longList = [];
       this.shortList = [];
+      this.batchPages = 0;
+      this.batchEndAnnounced = false;
       this.syncHomeFeedDataSource();
     }
     if (reload) {
@@ -203,90 +256,59 @@ export struct HomeTabContent {
       this.isLoadingMore = false;
       this.isInitialLoading = this.activeList().length === 0;
       this.homeErrorMessage = '';
+      this.batchPages = 0;
+      this.batchEndAnnounced = false;
     } else {
       if (this.isLoadingMore) {
         return;
       }
-    }
-    const generation = this.homeLoadGeneration;
-
-    const startId = reset ? 1 : (this.longList.length + this.shortList.length + 1);
-    const loadStartedAt = Date.now();
-    logger.info(`[HomeFeed] stage=load_start reset=${reset} mode=${this.homeMode} `
-      + `source=${this.homeFeedSource} startId=${startId} long=${this.longList.length} `
-      + `short=${this.shortList.length}`);
-    try {
-      if (this.homeMode === 'kiosk') {
-        if (!reset) {
-          if (!this.kioskNextPageToken) {
-            return;
-          }
-          this.isLoadingMore = true;
-        }
-        const homeService = FeedServiceProvider.getInstance().getHomeFeedService();
-        const useAuthContinuation = this.homeFeedSource.indexOf('recommended') === 0;
-        const feedStyle = UIConfig.normalizeHomeFeedStyle(this.uiConfig.homeFeedStyle);
-        const kioskResult = reset
-          ? await homeService.fetchHomeKioskInitial(startId, feedStyle)
-          : await homeService.fetchHomeKioskNext(
-            this.kioskNextPageToken ?? '',
-            this.kioskVisitorData,
-            startId,
-            useAuthContinuation,
-            this.homeFeedSource
-          );
-        if (generation !== this.homeLoadGeneration) {
-          logger.info(`[HomeFeed] stage=stale_drop reset=${reset} generation=${generation} `
-            + `current=${this.homeLoadGeneration}`);
-          return;
-        }
-        if (reset) {
-          const split = this.splitByType(kioskResult.items);
-          this.longList = split.long;
-          this.shortList = split.short;
-          this.homeFeedSource = kioskResult.source || 'kiosk';
-          this.homeFeedEpoch += 1;
-          this.scrollHomeFeedToTop();
-        } else {
-          const split = this.splitByType(kioskResult.items);
-          this.longList = this.longList.concat(split.long);
-          this.shortList = this.shortList.concat(split.short);
-        }
-        this.syncHomeFeedDataSource();
-        this.kioskNextPageToken = kioskResult.nextPageToken;
-        if (kioskResult.visitorData && kioskResult.visitorData.length > 0) {
-          this.kioskVisitorData = kioskResult.visitorData;
-        }
-        this.homeErrorMessage = '';
-        this.homeModeNoticeMessage = '';
-        if (reset && kioskResult.source === 'kiosk' && feedStyle === 'recommended') {
-          const authRejected = AuthSessionManager.getInstance()?.consumeAuthRejectionNotice() === true;
-          if (authRejected) {
-            // 登录态被拒后已回落到游客 kiosk，提示用户重新登录。
-            this.homeModeNoticeMessage = getContext().resourceManager.getStringSync(
-              $r('app.string.yt_home_auth_expired_notice').id);
-          } else if (AuthSessionManager.getInstance()?.hasAuthForUserData() === true) {
-            // 有用户数据权限但推荐源失败/为空时已回退 kiosk：明确提示，
-            // 否则用户会以为「推荐/直播」设置没有生效。
-            this.homeModeNoticeMessage = getContext().resourceManager.getStringSync(
-              $r('app.string.yt_home_recommended_error').id);
-          }
-        }
-        logger.info(`[HomeFeed] stage=load_done reset=${reset} mode=kiosk source=${this.homeFeedSource} `
-          + `items=${kioskResult.items.length} long=${this.longList.length} `
-          + `short=${this.shortList.length} elapsed=${Date.now() - loadStartedAt}ms`);
-        // 短视频维度：
-        // - 短视频还不够 → 往后再翻几页 feed，把 Shorts 货架收进来；
-        // - feed 已经翻到头（continuation 有限）→ 换「我的频道」的 /shorts 续上。
-        if (this.isShortMode()) {
-          if (this.shortList.length < HOME_SHORTS_TOPUP_THRESHOLD) {
-            this.harvestShortsFromFeed().catch(() => undefined);
-          } else if (!this.kioskNextPageToken) {
-            this.topUpShortsFromChannels().catch(() => undefined);
-          }
-        }
+      if (!this.isShortMode() && this.batchPages >= HOME_BATCH_MAX_PAGES) {
+        // 批尾：这一批取满了，下滑不再要页 —— 下一批由下拉刷新 / 再点一次首页触发。
+        this.announceBatchEnd();
         return;
       }
+      if (!this.kioskNextPageToken) {
+        return;
+      }
+      this.isLoadingMore = true;
+    }
+    const generation = this.homeLoadGeneration;
+    const loadStartedAt = Date.now();
+    logger.info(`[HomeFeed] stage=load_start reset=${reset} mode=${this.homeMode} `
+      + `source=${this.homeFeedSource} batchPages=${this.batchPages} `
+      + `long=${this.longList.length} short=${this.shortList.length}`);
+    try {
+      if (this.homeMode !== 'kiosk') {
+        return;
+      }
+      if (reset) {
+        await this.startHomeBatch(generation, loadStartedAt);
+        return;
+      }
+      const page = await this.fetchFeedPage(false, this.longList.length + this.shortList.length + 1, generation);
+      if (page === null) {
+        return;
+      }
+      const split = this.splitByType(page.items);
+      // 空数组也要 concat 会白折腾一次 @State 通知（整列重渲染），有内容才写。
+      if (split.long.length > 0) {
+        this.longList = this.longList.concat(split.long);
+      }
+      if (split.short.length > 0) {
+        this.shortList = this.shortList.concat(split.short);
+      }
+      // 短视频维度不设批上限，它翻页时顺带并入的长视频不该吃掉长视频的批次预算。
+      if (!this.isShortMode()) {
+        this.batchPages += 1;
+      }
+      this.homeErrorMessage = '';
+      this.syncHomeFeedDataSource();
+      logger.info(`[HomeFeed] stage=load_done reset=false batchPages=${this.batchPages} `
+        + `source=${this.homeFeedSource} items=${page.items.length} `
+        + `long=${this.longList.length} short=${this.shortList.length} `
+        + `elapsed=${Date.now() - loadStartedAt}ms`);
+      this.maybeTopUpShorts();
+      return;
     } catch (err) {
       if (generation !== this.homeLoadGeneration) {
         logger.info(`[HomeFeed] stage=stale_error_drop reset=${reset} generation=${generation} `
@@ -325,17 +347,132 @@ export struct HomeTabContent {
     }
   }
 
+  /**
+   * 取一页首页 feed 并推进分页状态（token / visitorData / source）。返回 null
+   * 表示这次请求已经作废（代次被后来的刷新顶掉），调用方直接放弃本轮。
+   * 列表内容不在这里改 —— 批首是整页替换、追加页是 concat，所以并入时机由
+   * `startHomeBatch` / 追加路径各自决定。
+   */
+  private async fetchFeedPage(useInitial: boolean, startId: number,
+    generation: number): Promise<KioskPageResult | null> {
+    const homeService = FeedServiceProvider.getInstance().getHomeFeedService();
+    const feedStyle = UIConfig.normalizeHomeFeedStyle(this.uiConfig.homeFeedStyle);
+    const useAuthContinuation = this.homeFeedSource.indexOf('recommended') === 0;
+    const result = useInitial
+      ? await homeService.fetchHomeKioskInitial(startId, feedStyle)
+      : await homeService.fetchHomeKioskNext(
+        this.kioskNextPageToken ?? '',
+        this.kioskVisitorData,
+        startId,
+        useAuthContinuation,
+        this.homeFeedSource
+      );
+    if (generation !== this.homeLoadGeneration) {
+      logger.info(`[HomeFeed] stage=stale_drop generation=${generation} `
+        + `current=${this.homeLoadGeneration}`);
+      return null;
+    }
+    if (useInitial) {
+      this.homeFeedSource = result.source || 'kiosk';
+    }
+    this.kioskNextPageToken = result.nextPageToken;
+    if (result.visitorData && result.visitorData.length > 0) {
+      this.kioskVisitorData = result.visitorData;
+    }
+    return result;
+  }
+
+  /**
+   * 开启新一批：只取一页当批首，后面每页仍按原来的"触底再要"节奏无感追加。
+   * 推荐流返回什么就显示什么，不做跨批去重，所以这里只有一次网络请求。
+   * 页空（服务端没给内容）时保留当前列表，不白屏。
+   */
+  private async startHomeBatch(generation: number, startedAt: number): Promise<void> {
+    const page = await this.fetchFeedPage(this.kioskNextPageToken === null,
+      this.longList.length + this.shortList.length + 1, generation);
+    if (page === null) {
+      return;
+    }
+    if (page.items.length === 0) {
+      logger.info(`[HomeFeed] stage=batch_empty elapsed=${Date.now() - startedAt}ms `
+        + `source=${this.homeFeedSource} long=${this.longList.length} short=${this.shortList.length}`);
+      return;
+    }
+    if (!this.isShortMode()) {
+      this.batchPages += 1;
+    }
+    const split = this.splitByType(page.items);
+    this.longList = split.long;
+    this.shortList = split.short;
+    this.homeFeedEpoch += 1;
+    this.scrollHomeFeedToTop();
+    this.syncHomeFeedDataSource();
+    this.homeErrorMessage = '';
+    this.homeModeNoticeMessage = '';
+    if ((page.source || this.homeFeedSource) === 'kiosk'
+      && UIConfig.normalizeHomeFeedStyle(this.uiConfig.homeFeedStyle) === 'recommended') {
+      const authRejected = AuthSessionManager.getInstance()?.consumeAuthRejectionNotice() === true;
+      if (authRejected) {
+        // 登录态被拒后已回落到游客 kiosk，提示用户重新登录。
+        this.homeModeNoticeMessage = getContext().resourceManager.getStringSync(
+          $r('app.string.yt_home_auth_expired_notice').id);
+      } else if (AuthSessionManager.getInstance()?.hasAuthForUserData() === true) {
+        // 有用户数据权限但推荐源失败/为空时已回退 kiosk：明确提示，
+        // 否则用户会以为「推荐/直播」设置没有生效。
+        this.homeModeNoticeMessage = getContext().resourceManager.getStringSync(
+          $r('app.string.yt_home_recommended_error').id);
+      }
+    }
+    logger.info(`[HomeFeed] stage=load_done reset=true mode=kiosk source=${this.homeFeedSource} `
+      + `batchPages=${this.batchPages} long=${this.longList.length} `
+      + `short=${this.shortList.length} elapsed=${Date.now() - startedAt}ms`);
+    this.maybeTopUpShorts();
+  }
+
+  /**
+   * 短视频维度补收：
+   * - 短视频还不够 → 往后再翻几页混合 feed，把 Shorts 货架收进来；
+   * - feed 已经翻到头（continuation 有限）→ 换「我的频道」的 /shorts 续上。
+   */
+  private maybeTopUpShorts(): void {
+    if (!this.isShortMode()) {
+      return;
+    }
+    if (this.shortList.length < HOME_SHORTS_TOPUP_THRESHOLD) {
+      this.harvestShortsFromFeed().catch(() => undefined);
+    } else if (!this.kioskNextPageToken) {
+      this.topUpShortsFromChannels().catch(() => undefined);
+    }
+  }
+
+  /** 这一批取满了：提示一次"下一批"怎么拿（每批只弹一次，触底会反复回调）。 */
+  private announceBatchEnd(): void {
+    if (this.batchEndAnnounced) {
+      return;
+    }
+    this.batchEndAnnounced = true;
+    logger.info(`[HomeFeed] stage=batch_end pages=${this.batchPages} `
+      + `long=${this.longList.length} short=${this.shortList.length}`);
+    this.getUIContext()?.getPromptAction().showToast({
+      message: $r('app.string.yt_home_batch_end'),
+      duration: 2500
+    });
+  }
+
+  /**
+   * 开启下一批（下拉刷新 / 停在首页再点底栏首页页签都会走这里）。
+   * 刻意不清分页状态：有 token 就顺着链条往后要，链条到头才重新起链。
+   */
   private async refreshHomeFeed(): Promise<void> {
     // Refresh sets the two-way bound value before invoking onRefreshing.
     // Always perform the work and clear it in finally.
-    logger.info(`[HomeRefresh] stage=start mode=${this.homeMode} source=${this.homeFeedSource}`);
+    logger.info(`[HomeRefresh] stage=start mode=${this.homeMode} source=${this.homeFeedSource} `
+      + `batchPages=${this.batchPages} token=${this.kioskNextPageToken ? 'yes' : 'no'}`);
     const startedAt = Date.now();
     const prevHead = this.activeList().length > 0
       ? (this.activeList()[0].videoId || this.activeList()[0].id.toString())
       : '';
     try {
-      this.kioskNextPageToken = null;
-      this.kioskVisitorData = '';
       await this.loadLiveVideos(true);
       const nextHead = this.activeList().length > 0
         ? (this.activeList()[0].videoId || this.activeList()[0].id.toString())
@@ -434,14 +571,18 @@ export struct HomeTabContent {
         }
       }
       const merged = this.interleaveByChannel(nonEmpty, HOME_SHORTS_CHANNEL_BATCH);
+      // 只在短视频列表内部防重复条目（重复 videoId = 重复 LazyForEach key）。
       const seen = new Set<string>();
       for (let i = 0; i < this.shortList.length; i++) {
-        seen.add(this.shortList[i].videoId);
+        const existing = (this.shortList[i].videoId || '').trim();
+        if (existing.length > 0) {
+          seen.add(existing);
+        }
       }
       const added: Array<VideoItem> = [];
       for (let i = 0; i < merged.length; i++) {
-        const videoId = merged[i].videoId;
-        if (!videoId || seen.has(videoId)) {
+        const videoId = (merged[i].videoId || '').trim();
+        if (videoId.length === 0 || seen.has(videoId)) {
           continue;
         }
         seen.add(videoId);
@@ -541,7 +682,8 @@ export struct HomeTabContent {
   }
 
   /**
-   * 一页 feed 按 `isShort` 拆成两份：长视频列表 + 短视频列表。
+   * 一页 feed 按 `isShort` 拆成两份：长视频列表 + 短视频列表，**不做任何去重/过滤**
+   * —— 服务端推什么就显示什么。
    *
    * 两份列表来自**同一次请求**（首页 feed 的 Shorts 货架就在里面），所以切换
    * 维度不需要重新请求；短视频那份的作者分布也跟首页一致（多作者），不会
@@ -551,16 +693,49 @@ export struct HomeTabContent {
     const long: VideoItem[] = [];
     const short: VideoItem[] = [];
     for (let i = 0; i < items.length; i++) {
-      if (items[i].isShort === true) {
-        short.push(items[i]);
+      const item = items[i];
+      if (item.isShort === true) {
+        short.push(item);
       } else {
-        long.push(items[i]);
+        long.push(item);
       }
     }
-    if (short.length > 0) {
-      logger.info(`[HomeFeed] stage=split long=${long.length} short=${short.length}`);
-    }
+    const session = AuthSessionManager.getInstance();
+    const rail = session ? (session.preferredUserDataRail() || 'none') : 'none';
+    const signedIn = !!session && session.isAuthEnabledForUserData() === true;
+    logger.info(`[HomeFeed] stage=split long=${long.length} short=${short.length} `
+      + `in=${items.length} auth=${signedIn ? 'on' : 'off'} rail=${rail} `
+      + `feedback=${FeedFeedbackStore.summary()}`);
     return { long: long, short: short };
+  }
+
+  /**
+   * 「不感兴趣 / 不推荐该频道」服务端反馈成功后，把卡片从当前首页列表即时摘掉
+   * ——和网页一致（网页也是本地先消失，服务端随后不再推）。频道反馈要连同这一批里
+   * 同频道的所有卡片一起摘。这里**不落地任何屏蔽名单**：服务端没记住的话，
+   * 下次刷新自然会再出现，那是真实结果，不是客户端在偷偷过滤。
+   */
+  private removeFeedbackCards(videoId: string, channelId: string): void {
+    const keep = (item: VideoItem): boolean => {
+      if (videoId.length > 0 && item.videoId === videoId) {
+        return false;
+      }
+      if (channelId.length > 0 && (item.channelId || '') === channelId) {
+        return false;
+      }
+      return true;
+    };
+    const before = this.longList.length + this.shortList.length;
+    const nextLong = this.longList.filter(keep);
+    const nextShort = this.shortList.filter(keep);
+    if (nextLong.length === this.longList.length && nextShort.length === this.shortList.length) {
+      return;
+    }
+    this.longList = nextLong;
+    this.shortList = nextShort;
+    this.syncHomeFeedDataSource();
+    logger.info(`[HomeFeed] stage=feedback_remove before=${before} `
+      + `after=${this.longList.length + this.shortList.length} videoId=${videoId} channelId=${channelId}`);
   }
 
   /** 当前维度（'long' | 'short'）。 */
@@ -754,9 +929,7 @@ export struct HomeTabContent {
   HomeVideoGridCard(slot: MediaFeedItemSlot) {
     VideoCardGrid({
       video: slot.item as VideoItem,
-      actionLabel: $r('app.string.yt_action_favorite'),
-      actionType: 'favorite',
-      useFavoriteToggle: true
+      showFeedbackActions: true
     })
   }
 
@@ -766,9 +939,7 @@ export struct HomeTabContent {
     Column() {
       VideoCard({
         video: slot.item as VideoItem,
-        actionLabel: $r('app.string.yt_action_favorite'),
-        actionType: 'favorite',
-        useFavoriteToggle: true
+        showFeedbackActions: true
       })
     }
     .padding({ left: 12, right: 12 })

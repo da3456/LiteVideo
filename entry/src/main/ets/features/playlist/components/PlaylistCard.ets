@@ -1,6 +1,5 @@
 import { SearchPlaylistItem } from 'youtube_core';
 import { ActionHub } from '../../../common/ActionHub';
-import { PlaylistItem } from '../../../common/PlaylistModel';
 import { customAnimationUtil } from '../../../common/AnimationUtil';
 import { customVibrator } from '../../../common/VibratorUtil';
 import { UIConfig } from '../../../common/AppState';
@@ -36,8 +35,6 @@ export struct PlaylistCard {
   @Prop playlist: SearchPlaylistItem;
   @Prop typeLabel: ResourceStr = $r('app.string.yt_tab_playlists');
   @Prop enableOpen: boolean = true;
-  @Prop forceActionLabel: ResourceStr = '';
-  @StorageLink('playlists') playlists: PlaylistItem[] = [];
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig();
   @Consume('actionHub') actionHub: ActionHub = new ActionHub();
   @State isShowContextMenu: boolean = false;
@@ -49,40 +46,6 @@ export struct PlaylistCard {
   /** 本地播放列表的 id 带 local_ 前缀，与联机播放列表区分。 */
   private isLocal(): boolean {
     return this.getPlaylistId().startsWith('local_');
-  }
-
-  private isFavorited(): boolean {
-    const playlistId = this.getPlaylistId();
-    if (!playlistId) {
-      return false;
-    }
-    return this.playlists.some((item: PlaylistItem) => item.playlistId === playlistId);
-  }
-
-  private getActionLabel(): ResourceStr {
-    if (this.isLocal()) {
-      return $r('app.string.yt_action_delete');
-    }
-    if (typeof this.forceActionLabel === 'string' && this.forceActionLabel.length > 0) {
-      return this.forceActionLabel;
-    }
-    return this.isFavorited() ? $r('app.string.yt_action_unfavorite') : $r('app.string.yt_action_favorite');
-  }
-
-  private handleAction(): void {
-    const playlistId = this.getPlaylistId();
-    if (!playlistId) {
-      return;
-    }
-    if (this.isLocal()) {
-      this.actionHub.deleteLocalQueue(playlistId);
-      return;
-    }
-    if (this.isFavorited()) {
-      this.actionHub.removePlaylist(playlistId);
-    } else {
-      this.actionHub.addPlaylist(this.playlist);
-    }
   }
 
   private getContextMenus(): ContextMenuItem[] {
@@ -101,30 +64,6 @@ export struct PlaylistCard {
         }
       });
       return items;
-    }
-    if (this.isFavorited()) {
-      items.push({
-        symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.heart_fill'))
-          .fontSize(SYMBOL_FONT_SIZE)
-          .fontColor([$r('sys.color.font_primary')]),
-        content: $r('app.string.yt_action_unfavorite'),
-        callback: () => {
-          const playlistId = this.getPlaylistId();
-          if (playlistId) {
-            this.actionHub.removePlaylist(playlistId);
-          }
-        }
-      });
-    } else {
-      items.push({
-        symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.heart'))
-          .fontSize(SYMBOL_FONT_SIZE)
-          .fontColor([$r('sys.color.font_primary')]),
-        content: $r('app.string.yt_action_favorite'),
-        callback: () => {
-          this.actionHub.addPlaylist(this.playlist);
-        }
-      });
     }
     items.push({
       symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
@@ -216,8 +155,18 @@ export struct PlaylistCard {
     return resolveResourceStr(this.typeLabel);
   }
 
-  build() {
-    Row() {
+  private hasCover(): boolean {
+    return (this.playlist.coverUrl || '').trim().length > 0;
+  }
+
+  /**
+   * 封面位：有封面走 MediaThumb；没有封面（空播放列表 —— 喜欢 / 稍后观看里还没
+   * 东西、本地队列被清空，或服务端没回缩略图）不再留一块写死的 `#CCCCCC` 灰板
+   * （深色模式下它很刺眼），改成主题色的浅板 + 「空清单」符号当占位封面。
+   */
+  @Builder
+  CoverBlock() {
+    if (this.hasCover()) {
       MediaThumb({
         imageUrl: this.playlist.coverUrl || '',
         placeholderColor: this.playlist.thumbnailColor || '',
@@ -226,8 +175,34 @@ export struct PlaylistCard {
         borderRadiusVp: MEDIA_THUMB_RADIUS,
         typeLabel: this.getTypeLabelText()
       })
-        .margin({ right: MEDIA_LIST_THUMB_GAP });
+        .margin({ right: MEDIA_LIST_THUMB_GAP })
+    } else {
+      Stack({ alignContent: Alignment.Center }) {
+        SymbolGlyph($r('sys.symbol.list_bullet_square'))
+          .fontSize(26)
+          .fontColor([$r('app.color.yourtube_icon_muted')])
 
+        if (this.getTypeLabelText().length > 0) {
+          Text(this.getTypeLabelText())
+            .fontSize(8)
+            .fontColor($r('app.color.yourtube_text_inverse'))
+            .backgroundColor($r('app.color.yourtube_bg_tag'))
+            .padding({ left: 4, right: 4, top: 2, bottom: 2 })
+            .borderRadius({ topLeft: MEDIA_THUMB_RADIUS, bottomRight: 6 })
+            .position({ x: 0, y: 0 })
+        }
+      }
+      .width(MEDIA_LIST_THUMB_WIDTH)
+      .height(MEDIA_LIST_THUMB_HEIGHT)
+      .borderRadius(MEDIA_THUMB_RADIUS)
+      .backgroundColor($r('app.color.yourtube_bg_surface_muted'))
+      .margin({ right: MEDIA_LIST_THUMB_GAP })
+    }
+  }
+
+  build() {
+    Row() {
+      this.CoverBlock()
       Column() {
         Text(this.playlist.name || 'Untitled')
           .fontSize(MEDIA_TITLE_SIZE)
@@ -271,20 +246,25 @@ export struct PlaylistCard {
         }
 
         Blank();
-        Row() {
-          Button(this.getActionLabel())
-            .fontSize(12)
-            .fontColor($r('app.color.yourtube_text_inverse'))
-            .backgroundColor(this.isFavorited() ? $r('app.color.yourtube_button_disabled') : this.themePrimary)
-            .height(28)
-            .padding({ left: 10, right: 10 })
-            .onClick(() => {
-              this.handleAction();
-            });
+        if (this.isLocal()) {
+          Row() {
+            Button($r('app.string.yt_action_delete'))
+              .fontSize(12)
+              .fontColor($r('app.color.yourtube_text_inverse'))
+              .backgroundColor(this.themePrimary)
+              .height(28)
+              .padding({ left: 10, right: 10 })
+              .onClick(() => {
+                const playlistId = this.getPlaylistId();
+                if (playlistId) {
+                  this.actionHub.deleteLocalQueue(playlistId);
+                }
+              });
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.End)
+          .margin({ bottom: 2 });
         }
-        .width('100%')
-        .justifyContent(FlexAlign.End)
-        .margin({ bottom: 2 });
       }
       .layoutWeight(1)
       .height(MEDIA_LIST_THUMB_HEIGHT)

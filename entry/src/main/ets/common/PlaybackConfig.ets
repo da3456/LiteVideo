@@ -180,7 +180,7 @@ export function getGpuApiDisplay(value: GpuApi): Resource {
 
 @Observed
 export class PlaybackConfig {
-  @Track defaultQuality: VideoQualityCap = '480p';
+  @Track defaultQuality: VideoQualityCap = '720p';
   @Track mobileQuality: VideoQualityCap = '480p';
   /** Full-surface swipe shortcuts. Visible controls remain available when disabled. */
   @Track gestureSeekEnabled: boolean = true;
@@ -193,9 +193,9 @@ export class PlaybackConfig {
   /** 长按多久触发加速（毫秒） */
   @Track holdSpeedDelayMs: number = 500;
   /** 手势交互方案预设（改任一分项开关后自动变为 custom） */
-  @Track gestureScheme: GestureScheme = 'enhanced';
+  @Track gestureScheme: GestureScheme = 'bilibili';
   /** 双击屏幕的动作：左右快进退 / 播放暂停 / 关闭 */
-  @Track doubleTapAction: DoubleTapAction = 'seek';
+  @Track doubleTapAction: DoubleTapAction = 'playpause';
   /** 双击快进退步长（秒），仅 doubleTapAction='seek' 时生效 */
   @Track doubleTapSeekSeconds: number = 15;
   /** 返回键/home 键时是否自动进入画中画（设备不支持时强制 false） */
@@ -208,7 +208,7 @@ export class PlaybackConfig {
   /** 进入后台后多久关视频（秒），0=立即 */
   @Track backgroundVideoOffDelaySec: BackgroundVideoOffDelay = '15';
   /** 是否继续播放下一个视频（每次启动时作为队列自动播放会话开关的默认值） */
-  @Track autoPlayNext: boolean = true;
+  @Track autoPlayNext: boolean = false;
 
   // MPV 播放器设置
   /** 硬件解码开关 */
@@ -314,7 +314,7 @@ export class PlaybackConfig {
 
   static loadFromPreferences(): PlaybackConfig {
     const cfg = new PlaybackConfig();
-    cfg.defaultQuality = normalizeQuality(PreferencesStore.getString('cfg_pb_defaultQuality', '480p'), '480p');
+    cfg.defaultQuality = normalizeQuality(PreferencesStore.getString('cfg_pb_defaultQuality', '720p'), '720p');
     cfg.mobileQuality = normalizeQuality(PreferencesStore.getString('cfg_pb_mobileQuality', '480p'), '480p');
     cfg.gestureSeekEnabled = PreferencesStore.getString('cfg_pb_gestureSeekEnabled', 'true') === 'true';
     cfg.gestureBrightnessEnabled = PreferencesStore.getString('cfg_pb_gestureBrightnessEnabled', 'true') === 'true';
@@ -324,14 +324,14 @@ export class PlaybackConfig {
     cfg.holdSpeedValue = HOLD_SPEED_VALUES.includes(holdSpeedValue) ? holdSpeedValue : 2.0;
     const holdSpeedDelay = Number(PreferencesStore.getString('cfg_pb_holdSpeedDelayMs', '500'));
     cfg.holdSpeedDelayMs = HOLD_SPEED_DELAYS.includes(holdSpeedDelay) ? holdSpeedDelay : 500;
-    const gestureSchemeRaw = PreferencesStore.getString('cfg_pb_gestureScheme', 'enhanced');
+    const gestureSchemeRaw = PreferencesStore.getString('cfg_pb_gestureScheme', 'bilibili');
     // 旧版本存过 'classic'（= 现在的 YouTube 经典），保留映射避免丢配置
     cfg.gestureScheme = gestureSchemeRaw === 'classic' ? 'youtube'
       : (GESTURE_SCHEME_LABELS.includes(gestureSchemeRaw as GestureScheme)
-        ? gestureSchemeRaw as GestureScheme : 'enhanced');
-    const doubleTapRaw = PreferencesStore.getString('cfg_pb_doubleTapAction', 'seek');
+        ? gestureSchemeRaw as GestureScheme : 'bilibili');
+    const doubleTapRaw = PreferencesStore.getString('cfg_pb_doubleTapAction', 'playpause');
     cfg.doubleTapAction = DOUBLE_TAP_ACTION_LABELS.includes(doubleTapRaw as DoubleTapAction)
-      ? doubleTapRaw as DoubleTapAction : 'seek';
+      ? doubleTapRaw as DoubleTapAction : 'playpause';
     const doubleTapSecs = Number(PreferencesStore.getString('cfg_pb_doubleTapSeekSeconds', '15'));
     cfg.doubleTapSeekSeconds = DOUBLE_TAP_SEEK_SECONDS.includes(doubleTapSecs) ? doubleTapSecs : 15;
     cfg.pipOnReturn = PreferencesStore.getString('cfg_pb_pipOnReturn', 'true') === 'true';
@@ -339,7 +339,7 @@ export class PlaybackConfig {
     const delay = PreferencesStore.getString('cfg_pb_backgroundVideoOffDelaySec', '15');
     cfg.backgroundVideoOffDelaySec = BACKGROUND_VIDEO_OFF_DELAY_LABELS.includes(delay as BackgroundVideoOffDelay)
       ? delay as BackgroundVideoOffDelay : '15';
-    cfg.autoPlayNext = PreferencesStore.getString('cfg_pb_autoPlayNext', 'true') === 'true';
+    cfg.autoPlayNext = PreferencesStore.getString('cfg_pb_autoPlayNext', 'false') === 'true';
 
     // MPV 播放器设置
     cfg.hwdecEnabled = PreferencesStore.getString('cfg_pb_hwdecEnabled', 'true') === 'true';

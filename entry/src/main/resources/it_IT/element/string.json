@@ -489,6 +489,46 @@
             "value": "Condividi"
         },
         {
+            "name": "yt_action_open_channel",
+            "value": "Apri canale"
+        },
+        {
+            "name": "yt_action_save_to_watch_later",
+            "value": "Salva in \"Guarda dopo\""
+        },
+        {
+            "name": "yt_action_not_interested",
+            "value": "Non mi interessa"
+        },
+        {
+            "name": "yt_action_dont_recommend_channel",
+            "value": "Non consigliare il canale"
+        },
+        {
+            "name": "yt_watch_later_needs_login",
+            "value": "Accedi al tuo account YouTube per salvare in \"Guarda dopo\""
+        },
+        {
+            "name": "yt_watch_later_saved",
+            "value": "Aggiunto a \"Guarda dopo\""
+        },
+        {
+            "name": "yt_watch_later_failed",
+            "value": "Impossibile salvare in \"Guarda dopo\""
+        },
+        {
+            "name": "yt_dismiss_video_notice",
+            "value": "Questo video non verrà più consigliato"
+        },
+        {
+            "name": "yt_feed_feedback_needs_login",
+            "value": "Accedi al tuo account YouTube per inviare questo feedback"
+        },
+        {
+            "name": "yt_feed_feedback_failed",
+            "value": "Impossibile inviare il feedback"
+        },
+        {
             "name": "yt_action_retry",
             "value": "Riprova"
         },
@@ -981,6 +1021,14 @@
             "value": "Caricamento della home non riuscito, riprova più tardi"
         },
         {
+            "name": "yt_home_batch_end",
+            "value": "Hai visto questo gruppo. Trascina verso il basso o tocca di nuovo Home per il prossimo."
+        },
+        {
+            "name": "yt_home_no_new_videos",
+            "value": "Nessun nuovo video al momento"
+        },
+        {
             "name": "yt_player_mode_progressive",
             "value": "Progressive"
         },
@@ -1146,7 +1194,7 @@
         },
         {
             "name": "new_app_name",
-            "value": "YourPipe"
+            "value": "LiteVideo"
         },
         {
             "name": "yt_empty_no_playlists",
@@ -1440,154 +1488,154 @@
             "name": "yt_player_subtitle_off",
             "value": "Sottotitoli disattivati"
         },
-{
-    "name": "yt_player_subtitle_auto_translated",
-    "value": "Traduzione automatica"
-},
-{
-    "name": "yt_option_ai_translate",
-    "value": "Traduzione dei sottotitoli AI"
-},
-{
-    "name": "yt_option_ai_subtitle",
-    "value": "Sottotitoli IA"
-},
-{
-    "name": "yt_ai_translate_engine",
-    "value": "Motore di traduzione"
-},
-{
-    "name": "yt_ai_translate_engine_gtx",
-    "value": "Google Traduttore (gratuito)"
-},
-{
-    "name": "yt_ai_translate_engine_llm",
-    "value": "LLM personalizzato (compatibile con OpenAI)"
-},
-{
-    "name": "yt_ai_translate_llm_section",
-    "value": "Impostazioni LLM"
-},
-{
-    "name": "yt_ai_translate_base_url",
-    "value": "URL di base"
-},
-{
-    "name": "yt_ai_translate_model",
-    "value": "Nome del modello"
-},
-{
-    "name": "yt_ai_translate_api_key",
-    "value": "API Key"
-},
-{
-    "name": "yt_ai_translate_test",
-    "value": "Prova connessione"
-},
-{
-    "name": "yt_ai_translate_testing",
-    "value": "Test in corso…"
-},
-{
-    "name": "yt_ai_translate_test_ok",
-    "value": "Connessione riuscita"
-},
-{
-    "name": "yt_ai_translate_test_fail",
-    "value": "Connessione non riuscita; controlla le impostazioni"
-},
-{
-    "name": "yt_ai_translate_display_section",
-    "value": "Visualizzazione"
-},
-{
-    "name": "yt_ai_translate_bilingual",
-    "value": "Bilingue"
-},
-{
-    "name": "yt_ai_translate_bilingual_subtitle",
-    "value": "Mostra originale e traduzione"
-},
-{
-    "name": "yt_ai_translate_note",
-    "value": "Il testo dei sottotitoli viene inviato al servizio di traduzione selezionato. La lingua di destinazione segue \"Lingua di traduzione dei contenuti\"."
-},
-{
-    "name": "yt_ai_translate_menu",
-    "value": "Traduzione AI"
-},
-{
-    "name": "yt_ai_translate_llm_not_configured",
-    "value": "Configura prima l'LLM nelle impostazioni"
-},
-{
-    "name": "yt_ai_translate_partial_fail",
-    "value": "Alcune righe non tradotte; testo originale mantenuto"
-},
-{
-    "name": "yt_ai_translate_failed",
-    "value": "Traduzione non riuscita; riprova più tardi"
-},
-{
-    "name": "yt_setting_system_ai_caption",
-    "value": "Sottotitoli AI di sistema"
-},
-{
-    "name": "yt_setting_system_ai_caption_subtitle",
-    "value": "Il sistema trascrivi l'audio in riproduzione in tempo reale (solo dispositivi supportati, cinese/inglese)"
-},
-{
-    "name": "yt_setting_system_ai_caption_source",
-    "value": "Lingua di origine dei sottotitoli AI"
-},
-{
-    "name": "yt_setting_system_ai_caption_source_zh",
-    "value": "Cinese"
-},
-{
-    "name": "yt_asr_menu",
-    "value": "Genera sottotitoli AI"
-},
-{
-    "name": "yt_asr_phase_model",
-    "value": "Download del modello"
-},
-{
-    "name": "yt_asr_live_progress",
-    "value": "Riconoscimento in diretta…"
-},
-{
-    "name": "yt_asr_failed",
-    "value": "Generazione sottotitoli AI non riuscita; riprova più tardi"
-},
-{
-    "name": "yt_asr_model_section",
-    "value": "Modello di riconoscimento sul dispositivo"
-},
-{
-    "name": "yt_asr_model_status_ready",
-    "value": "Pronto (riconoscimento streaming zh/en)"
-},
-{
-    "name": "yt_asr_model_status_none",
-    "value": "Non scaricato (~190 MB; Wi-Fi consigliato)"
-},
-{
-    "name": "yt_asr_model_downloading",
-    "value": "Download in corso"
-},
-{
-    "name": "yt_asr_model_download",
-    "value": "Scarica modello"
-},
-{
-    "name": "yt_asr_model_delete",
-    "value": "Elimina modello"
-},
-{
-    "name": "yt_ai_action_cancel",
-    "value": "Annulla"
-},
+        {
+            "name": "yt_player_subtitle_auto_translated",
+            "value": "Traduzione automatica"
+        },
+        {
+            "name": "yt_option_ai_translate",
+            "value": "Traduzione dei sottotitoli AI"
+        },
+        {
+            "name": "yt_option_ai_subtitle",
+            "value": "Sottotitoli IA"
+        },
+        {
+            "name": "yt_ai_translate_engine",
+            "value": "Motore di traduzione"
+        },
+        {
+            "name": "yt_ai_translate_engine_gtx",
+            "value": "Google Traduttore (gratuito)"
+        },
+        {
+            "name": "yt_ai_translate_engine_llm",
+            "value": "LLM personalizzato (compatibile con OpenAI)"
+        },
+        {
+            "name": "yt_ai_translate_llm_section",
+            "value": "Impostazioni LLM"
+        },
+        {
+            "name": "yt_ai_translate_base_url",
+            "value": "URL di base"
+        },
+        {
+            "name": "yt_ai_translate_model",
+            "value": "Nome del modello"
+        },
+        {
+            "name": "yt_ai_translate_api_key",
+            "value": "API Key"
+        },
+        {
+            "name": "yt_ai_translate_test",
+            "value": "Prova connessione"
+        },
+        {
+            "name": "yt_ai_translate_testing",
+            "value": "Test in corso…"
+        },
+        {
+            "name": "yt_ai_translate_test_ok",
+            "value": "Connessione riuscita"
+        },
+        {
+            "name": "yt_ai_translate_test_fail",
+            "value": "Connessione non riuscita; controlla le impostazioni"
+        },
+        {
+            "name": "yt_ai_translate_display_section",
+            "value": "Visualizzazione"
+        },
+        {
+            "name": "yt_ai_translate_bilingual",
+            "value": "Bilingue"
+        },
+        {
+            "name": "yt_ai_translate_bilingual_subtitle",
+            "value": "Mostra originale e traduzione"
+        },
+        {
+            "name": "yt_ai_translate_note",
+            "value": "Il testo dei sottotitoli viene inviato al servizio di traduzione selezionato. La lingua di destinazione segue \"Lingua di traduzione dei contenuti\"."
+        },
+        {
+            "name": "yt_ai_translate_menu",
+            "value": "Traduzione AI"
+        },
+        {
+            "name": "yt_ai_translate_llm_not_configured",
+            "value": "Configura prima l'LLM nelle impostazioni"
+        },
+        {
+            "name": "yt_ai_translate_partial_fail",
+            "value": "Alcune righe non tradotte; testo originale mantenuto"
+        },
+        {
+            "name": "yt_ai_translate_failed",
+            "value": "Traduzione non riuscita; riprova più tardi"
+        },
+        {
+            "name": "yt_setting_system_ai_caption",
+            "value": "Sottotitoli AI di sistema"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_subtitle",
+            "value": "Il sistema trascrivi l'audio in riproduzione in tempo reale (solo dispositivi supportati, cinese/inglese)"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source",
+            "value": "Lingua di origine dei sottotitoli AI"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source_zh",
+            "value": "Cinese"
+        },
+        {
+            "name": "yt_asr_menu",
+            "value": "Genera sottotitoli AI"
+        },
+        {
+            "name": "yt_asr_phase_model",
+            "value": "Download del modello"
+        },
+        {
+            "name": "yt_asr_live_progress",
+            "value": "Riconoscimento in diretta…"
+        },
+        {
+            "name": "yt_asr_failed",
+            "value": "Generazione sottotitoli AI non riuscita; riprova più tardi"
+        },
+        {
+            "name": "yt_asr_model_section",
+            "value": "Modello di riconoscimento sul dispositivo"
+        },
+        {
+            "name": "yt_asr_model_status_ready",
+            "value": "Pronto (riconoscimento streaming zh/en)"
+        },
+        {
+            "name": "yt_asr_model_status_none",
+            "value": "Non scaricato (~190 MB; Wi-Fi consigliato)"
+        },
+        {
+            "name": "yt_asr_model_downloading",
+            "value": "Download in corso"
+        },
+        {
+            "name": "yt_asr_model_download",
+            "value": "Scarica modello"
+        },
+        {
+            "name": "yt_asr_model_delete",
+            "value": "Elimina modello"
+        },
+        {
+            "name": "yt_ai_action_cancel",
+            "value": "Annulla"
+        },
         {
             "name": "yt_player_chapters",
             "value": "Capitoli"
@@ -1747,6 +1795,10 @@
         {
             "name": "yt_sub_sync_failed",
             "value": "Sincronizzazione delle iscrizioni non riuscita"
+        },
+        {
+            "name": "yt_sub_write_failed",
+            "value": "Modifica iscrizione non sincronizzata con YouTube; annullata"
         },
         {
             "name": "yt_refresh_failed",
@@ -3488,7 +3540,6 @@
             "name": "yt_option_clear_history_subtitle",
             "value": "Elimina tutta la cronologia locale e i progressi"
         },
-
         {
             "name": "yt_toast_history_cleared",
             "value": "Cronologia cancellata"
@@ -3604,8 +3655,7 @@
         {
             "name": "yt_home_mode_long",
             "value": "Video lunghi"
-        }
-    ,
+        },
         {
             "name": "yt_download_pause",
             "value": "Pausa"
@@ -3845,7 +3895,7 @@
         {
             "name": "yt_translation_region",
             "value": "Area"
-        },
+        },
         {
             "name": "yt_exp_title",
             "value": "Funzioni sperimentali"
@@ -4145,6 +4195,46 @@
         {
             "name": "yt_update_later",
             "value": "Più tardi"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_channel",
+            "value": "Annullare l'iscrizione a «%s»?"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_generic",
+            "value": "Annullare l'iscrizione a questo canale?"
+        },
+        {
+            "name": "yt_about_fork_notice",
+            "value": "Questa versione è un fork personale di YourPipe, distribuito con licenza GPLv3"
+        },
+        {
+            "name": "yt_about_upstream",
+            "value": "Progetto upstream"
+        },
+        {
+            "name": "yt_changelog_fork_1",
+            "value": "Identità propria: pacchetto com.github.da3456.litevideo, nome LiteVideo, affianca l’originale"
+        },
+        {
+            "name": "yt_changelog_fork_2",
+            "value": "Le modifiche agli abbonamenti sono scritte sull’account YouTube e confrontate con l’elenco online; la cancellazione chiede conferma"
+        },
+        {
+            "name": "yt_changelog_fork_3",
+            "value": "Tenendo premuta una scheda home si apre un foglio inferiore; trascina la maniglia o tocca fuori per chiuderlo"
+        },
+        {
+            "name": "yt_changelog_fork_4",
+            "value": "“Non interessato / Non raccomandare questo canale / Salva in Guarda più tardi” invia ora feedback al server"
+        },
+        {
+            "name": "yt_changelog_fork_5",
+            "value": "Rimossi pulsanti e voci di menu dei preferiti; la terza scheda ora è Playlist"
+        },
+        {
+            "name": "yt_changelog_fork_6",
+            "value": "Il feed home viene servito a lotti (3 pagine, tocca di nuovo Home per il successivo); il controllo aggiornamenti punta a questo repo"
         }
     ]
 }

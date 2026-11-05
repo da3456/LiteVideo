@@ -58,10 +58,7 @@ export struct ChannelVideoTab {
   VideoGridCard(slot: MediaFeedItemSlot) {
     VideoCardGrid({
       video: slot.item as VideoItem,
-      actionLabel: $r('app.string.yt_action_favorite'),
-      actionType: 'favorite',
-      showAuthor: false,
-      useFavoriteToggle: true
+      showAuthor: false
     })
   }
 
@@ -69,10 +66,7 @@ export struct ChannelVideoTab {
   VideoListCard(slot: MediaFeedItemSlot) {
     VideoCard({
       video: slot.item as VideoItem,
-      actionLabel: $r('app.string.yt_action_favorite'),
-      actionType: 'favorite',
-      showAuthor: false,
-      useFavoriteToggle: true
+      showAuthor: false
     })
   }
 

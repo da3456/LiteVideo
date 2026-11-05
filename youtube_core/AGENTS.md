@@ -14,7 +14,13 @@ extractor（模型 + 异常层次 + 评论 + HLS 解析 + `ItagItem`）、sabr/i
 路径）、cipher（`YoutubeJavaScriptPlayerManager`）、model/localization、
 network（含 `YOUTUBE_COOKIE_STORAGE_NAME`）、auth（含 `AUTH_STORAGE_NAME`
 与 `AuthExpiredError` / `isAuthRejectionResponse`）、
-service（`YoutubeApi` 的高层函数）、`YTCoreLogger`。
+service（`YoutubeApi` 的高层函数：browse / search / suggestions / RSS，以及
+订阅写入 `subscribeChannels` / `unsubscribeChannels` —— Innertube
+`subscription/subscribe`|`unsubscribe`，body 只有 `context` + `channelIds`
+（`params` 只控通知铃铛，缺省沿用服务端默认），按调用方给的 `useTvRail`
+在 WEB（Cookie + SAPISIDHASH）与 TV（OAuth Bearer）两条 rail 间选头与
+context；非 auth 的 Innertube `error` 会抛错，让 entry 回滚本地状态）、
+`YTCoreLogger`。
 
 ## 2. Layout
 ```

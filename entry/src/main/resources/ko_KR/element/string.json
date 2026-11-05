@@ -489,6 +489,46 @@
             "value": "공유"
         },
         {
+            "name": "yt_action_open_channel",
+            "value": "채널 열기"
+        },
+        {
+            "name": "yt_action_save_to_watch_later",
+            "value": "나중에 볼 동영상에 저장"
+        },
+        {
+            "name": "yt_action_not_interested",
+            "value": "마음에 들지 않음"
+        },
+        {
+            "name": "yt_action_dont_recommend_channel",
+            "value": "채널 추천 안 하기"
+        },
+        {
+            "name": "yt_watch_later_needs_login",
+            "value": "나중에 볼 동영상에 저장하려면 YouTube 계정에 로그인하세요"
+        },
+        {
+            "name": "yt_watch_later_saved",
+            "value": "나중에 볼 동영상에 추가했습니다"
+        },
+        {
+            "name": "yt_watch_later_failed",
+            "value": "나중에 볼 동영상에 저장하지 못했습니다"
+        },
+        {
+            "name": "yt_dismiss_video_notice",
+            "value": "이 동영상을 더 이상 추천하지 않습니다"
+        },
+        {
+            "name": "yt_feed_feedback_needs_login",
+            "value": "의견을 보내려면 YouTube 계정에 로그인하세요"
+        },
+        {
+            "name": "yt_feed_feedback_failed",
+            "value": "의견을 보내지 못했습니다"
+        },
+        {
             "name": "yt_action_retry",
             "value": "다시 시도"
         },
@@ -981,6 +1021,14 @@
             "value": "홈 로드 실패. 잠시 후 다시 시도하세요"
         },
         {
+            "name": "yt_home_batch_end",
+            "value": "이 목록을 모두 봤습니다. 아래로 당기거나 홈을 한 번 더 누르면 다음 목록입니다"
+        },
+        {
+            "name": "yt_home_no_new_videos",
+            "value": "새로운 동영상이 없습니다"
+        },
+        {
             "name": "yt_player_mode_progressive",
             "value": "프로그레시브 (Progressive)"
         },
@@ -1146,7 +1194,7 @@
         },
         {
             "name": "new_app_name",
-            "value": "YourPipe"
+            "value": "LiteVideo"
         },
         {
             "name": "yt_empty_no_playlists",
@@ -1440,154 +1488,154 @@
             "name": "yt_player_subtitle_off",
             "value": "자막 끄기"
         },
-{
-    "name": "yt_player_subtitle_auto_translated",
-    "value": "자동 번역"
-},
-{
-    "name": "yt_option_ai_translate",
-    "value": "AI 자막 번역"
-},
-{
-    "name": "yt_option_ai_subtitle",
-    "value": "AI 자막"
-},
-{
-    "name": "yt_ai_translate_engine",
-    "value": "번역 엔진"
-},
-{
-    "name": "yt_ai_translate_engine_gtx",
-    "value": "Google 번역(무료)"
-},
-{
-    "name": "yt_ai_translate_engine_llm",
-    "value": "사용자 정의 LLM(OpenAI 호환)"
-},
-{
-    "name": "yt_ai_translate_llm_section",
-    "value": "LLM 설정"
-},
-{
-    "name": "yt_ai_translate_base_url",
-    "value": "기본 URL"
-},
-{
-    "name": "yt_ai_translate_model",
-    "value": "모델 이름"
-},
-{
-    "name": "yt_ai_translate_api_key",
-    "value": "API Key"
-},
-{
-    "name": "yt_ai_translate_test",
-    "value": "연결 테스트"
-},
-{
-    "name": "yt_ai_translate_testing",
-    "value": "테스트 중…"
-},
-{
-    "name": "yt_ai_translate_test_ok",
-    "value": "연결 성공"
-},
-{
-    "name": "yt_ai_translate_test_fail",
-    "value": "연결 실패, 설정을 확인하세요"
-},
-{
-    "name": "yt_ai_translate_display_section",
-    "value": "표시"
-},
-{
-    "name": "yt_ai_translate_bilingual",
-    "value": "이중 언어"
-},
-{
-    "name": "yt_ai_translate_bilingual_subtitle",
-    "value": "원문과 번역문 함께 표시"
-},
-{
-    "name": "yt_ai_translate_note",
-    "value": "자막 텍스트는 선택한 번역 서비스로 전송됩니다. 대상 언어는 \"콘텐츠 번역 언어\"를 따릅니다."
-},
-{
-    "name": "yt_ai_translate_menu",
-    "value": "AI 번역"
-},
-{
-    "name": "yt_ai_translate_llm_not_configured",
-    "value": "먼저 설정에서 LLM을 구성하세요"
-},
-{
-    "name": "yt_ai_translate_partial_fail",
-    "value": "일부 자막 번역 실패, 원문을 표시합니다"
-},
-{
-    "name": "yt_ai_translate_failed",
-    "value": "자막 번역 실패, 나중에 다시 시도하세요"
-},
-{
-    "name": "yt_setting_system_ai_caption",
-    "value": "시스템 AI 자막"
-},
-{
-    "name": "yt_setting_system_ai_caption_subtitle",
-    "value": "재생 중인 오디오를 시스템이 실시간으로 인식(지원 기기 한정, 중국어/영어)"
-},
-{
-    "name": "yt_setting_system_ai_caption_source",
-    "value": "AI 자막 원본 언어"
-},
-{
-    "name": "yt_setting_system_ai_caption_source_zh",
-    "value": "중국어"
-},
-{
-    "name": "yt_asr_menu",
-    "value": "AI 자막 생성"
-},
-{
-    "name": "yt_asr_phase_model",
-    "value": "모델 다운로드 중"
-},
-{
-    "name": "yt_asr_live_progress",
-    "value": "실시간 인식 중…"
-},
-{
-    "name": "yt_asr_failed",
-    "value": "AI 자막 생성 실패, 나중에 다시 시도하세요"
-},
-{
-    "name": "yt_asr_model_section",
-    "value": "온디바이스 인식 모델"
-},
-{
-    "name": "yt_asr_model_status_ready",
-    "value": "준비됨(중/영 스트리밍 인식)"
-},
-{
-    "name": "yt_asr_model_status_none",
-    "value": "다운로드되지 않음(약 190MB, Wi-Fi 권장)"
-},
-{
-    "name": "yt_asr_model_downloading",
-    "value": "다운로드 중"
-},
-{
-    "name": "yt_asr_model_download",
-    "value": "모델 다운로드"
-},
-{
-    "name": "yt_asr_model_delete",
-    "value": "모델 삭제"
-},
-{
-    "name": "yt_ai_action_cancel",
-    "value": "취소"
-},
+        {
+            "name": "yt_player_subtitle_auto_translated",
+            "value": "자동 번역"
+        },
+        {
+            "name": "yt_option_ai_translate",
+            "value": "AI 자막 번역"
+        },
+        {
+            "name": "yt_option_ai_subtitle",
+            "value": "AI 자막"
+        },
+        {
+            "name": "yt_ai_translate_engine",
+            "value": "번역 엔진"
+        },
+        {
+            "name": "yt_ai_translate_engine_gtx",
+            "value": "Google 번역(무료)"
+        },
+        {
+            "name": "yt_ai_translate_engine_llm",
+            "value": "사용자 정의 LLM(OpenAI 호환)"
+        },
+        {
+            "name": "yt_ai_translate_llm_section",
+            "value": "LLM 설정"
+        },
+        {
+            "name": "yt_ai_translate_base_url",
+            "value": "기본 URL"
+        },
+        {
+            "name": "yt_ai_translate_model",
+            "value": "모델 이름"
+        },
+        {
+            "name": "yt_ai_translate_api_key",
+            "value": "API Key"
+        },
+        {
+            "name": "yt_ai_translate_test",
+            "value": "연결 테스트"
+        },
+        {
+            "name": "yt_ai_translate_testing",
+            "value": "테스트 중…"
+        },
+        {
+            "name": "yt_ai_translate_test_ok",
+            "value": "연결 성공"
+        },
+        {
+            "name": "yt_ai_translate_test_fail",
+            "value": "연결 실패, 설정을 확인하세요"
+        },
+        {
+            "name": "yt_ai_translate_display_section",
+            "value": "표시"
+        },
+        {
+            "name": "yt_ai_translate_bilingual",
+            "value": "이중 언어"
+        },
+        {
+            "name": "yt_ai_translate_bilingual_subtitle",
+            "value": "원문과 번역문 함께 표시"
+        },
+        {
+            "name": "yt_ai_translate_note",
+            "value": "자막 텍스트는 선택한 번역 서비스로 전송됩니다. 대상 언어는 \"콘텐츠 번역 언어\"를 따릅니다."
+        },
+        {
+            "name": "yt_ai_translate_menu",
+            "value": "AI 번역"
+        },
+        {
+            "name": "yt_ai_translate_llm_not_configured",
+            "value": "먼저 설정에서 LLM을 구성하세요"
+        },
+        {
+            "name": "yt_ai_translate_partial_fail",
+            "value": "일부 자막 번역 실패, 원문을 표시합니다"
+        },
+        {
+            "name": "yt_ai_translate_failed",
+            "value": "자막 번역 실패, 나중에 다시 시도하세요"
+        },
+        {
+            "name": "yt_setting_system_ai_caption",
+            "value": "시스템 AI 자막"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_subtitle",
+            "value": "재생 중인 오디오를 시스템이 실시간으로 인식(지원 기기 한정, 중국어/영어)"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source",
+            "value": "AI 자막 원본 언어"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source_zh",
+            "value": "중국어"
+        },
+        {
+            "name": "yt_asr_menu",
+            "value": "AI 자막 생성"
+        },
+        {
+            "name": "yt_asr_phase_model",
+            "value": "모델 다운로드 중"
+        },
+        {
+            "name": "yt_asr_live_progress",
+            "value": "실시간 인식 중…"
+        },
+        {
+            "name": "yt_asr_failed",
+            "value": "AI 자막 생성 실패, 나중에 다시 시도하세요"
+        },
+        {
+            "name": "yt_asr_model_section",
+            "value": "온디바이스 인식 모델"
+        },
+        {
+            "name": "yt_asr_model_status_ready",
+            "value": "준비됨(중/영 스트리밍 인식)"
+        },
+        {
+            "name": "yt_asr_model_status_none",
+            "value": "다운로드되지 않음(약 190MB, Wi-Fi 권장)"
+        },
+        {
+            "name": "yt_asr_model_downloading",
+            "value": "다운로드 중"
+        },
+        {
+            "name": "yt_asr_model_download",
+            "value": "모델 다운로드"
+        },
+        {
+            "name": "yt_asr_model_delete",
+            "value": "모델 삭제"
+        },
+        {
+            "name": "yt_ai_action_cancel",
+            "value": "취소"
+        },
         {
             "name": "yt_player_chapters",
             "value": "챕터"
@@ -1747,6 +1795,10 @@
         {
             "name": "yt_sub_sync_failed",
             "value": "구독 목록 동기화 실패"
+        },
+        {
+            "name": "yt_sub_write_failed",
+            "value": "구독 변경을 YouTube에 동기화하지 못해 되돌렸습니다"
         },
         {
             "name": "yt_refresh_failed",
@@ -3488,7 +3540,6 @@
             "name": "yt_option_clear_history_subtitle",
             "value": "로컬 시청 기록과 재생 위치를 모두 삭제합니다"
         },
-
         {
             "name": "yt_toast_history_cleared",
             "value": "시청 기록을 지웠습니다"
@@ -3604,8 +3655,7 @@
         {
             "name": "yt_home_mode_long",
             "value": "일반 동영상"
-        }
-    ,
+        },
         {
             "name": "yt_download_pause",
             "value": "일시정지"
@@ -3845,7 +3895,7 @@
         {
             "name": "yt_translation_region",
             "value": "지역"
-        },
+        },
         {
             "name": "yt_exp_title",
             "value": "실험적 기능"
@@ -4145,6 +4195,46 @@
         {
             "name": "yt_update_later",
             "value": "나중에"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_channel",
+            "value": "\"%s\"의 구독을 취소할까요?"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_generic",
+            "value": "이 채널의 구독을 취소할까요?"
+        },
+        {
+            "name": "yt_about_fork_notice",
+            "value": "이 빌드는 YourPipe의 개인용 포크이며 GPLv3 라이선스로 배포됩니다"
+        },
+        {
+            "name": "yt_about_upstream",
+            "value": "업스트림 프로젝트"
+        },
+        {
+            "name": "yt_changelog_fork_1",
+            "value": "독립 정체성: 패키지 com.github.da3456.litevideo, 앱 이름 LiteVideo, 원본과 공존 설치"
+        },
+        {
+            "name": "yt_changelog_fork_2",
+            "value": "구독 변경을 YouTube 계정에 다시 저장하고 클라우드 목록과 양방향 대조; 구독 취소 전 확인"
+        },
+        {
+            "name": "yt_changelog_fork_3",
+            "value": "홈 카드 길게 누르기가 하단 시트 메뉴로 바뀌었습니다; 핸들을 아래로 드리거나 바깥을 탭해 닫음"
+        },
+        {
+            "name": "yt_changelog_fork_4",
+            "value": "“관심 없음 / 이 채널 추천 안 함 / 나중에 시청에 저장”이 이제 서버 측 피드백을 제출합니다"
+        },
+        {
+            "name": "yt_changelog_fork_5",
+            "value": "즐겨찾기 버튼과 메뉴 항목을 삭제하고 세 번째 탭을 재생 목록으로 변경"
+        },
+        {
+            "name": "yt_changelog_fork_6",
+            "value": "홈 피드를 묶음으로 공급(한 묶음 3 페이지, 홈 탭을 다시 눌러 다음 묶음); 업데이트 확인은 이 저장소를 가리킴"
         }
     ]
 }

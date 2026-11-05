@@ -1,10 +1,12 @@
 import { AppLog } from '../../common/AppLog';
 import { TITLE_BAR_HEIGHT } from '../../common/components/MediaCardTokens';
 import { ActionHub } from '../../common/ActionHub';
+import { customAnimationUtil } from '../../common/AnimationUtil';
 import { SearchLocaleManager } from '../../common/SearchLocaleManager';
 import { FeedServiceProvider } from '../../common/FeedServiceProvider';
 import { SearchChannelItem, SearchPlaylistItem } from 'youtube_core';
 import { SubscriptionUser } from '../../common/SubscriptionModel';
+import { SubscriptionStateSync } from '../../common/SubscriptionStateSync';
 import { VideoItem } from 'youtube_core';
 import { ChannelInfoService, ChannelProfile } from '../../features/user/ChannelInfoService';
 
@@ -235,6 +237,8 @@ export struct UserPage {
 
   aboutToAppear() {
     this.displayChannel = this.channel;
+    // 网页端可能已经改过订阅：进频道页先跟云端名单核对一次（服务内部节流）。
+    SubscriptionStateSync.getInstance().syncInBackground('channel_page');
     this.loadAllContent();
   }
 
@@ -564,7 +568,7 @@ export struct UserPage {
             .width(72)
             .height(72)
             .objectFit(ImageFit.Cover)
-            .borderRadius(36)
+            .borderRadius(36)
             .clip(true)
             .backgroundColor(this.displayChannel.thumbnailColor || $r('app.color.yourtube_icon_hint'))
         } else {
@@ -608,15 +612,26 @@ export struct UserPage {
         .margin({ left: 12 })
         .alignItems(HorizontalAlign.Start)
 
-        Button(this.isSubscribed() ? $r('app.string.yt_action_unsubscribe') : $r('app.string.yt_action_subscribe'))
-          .fontSize(12)
-          .fontColor($r('app.color.yourtube_text_inverse'))
-          .backgroundColor(this.isSubscribed() ? $r('app.color.yourtube_button_disabled') : this.themePrimary)
-          .height(28)
-          .padding({ left: 10, right: 10 })
-          .onClick(() => {
-            this.handleSubscription();
-          })
+        // 与频道卡片同一枚圆钮：未订阅笑脸加号，已订阅灰色对勾。
+        Button() {
+          SymbolGlyph(this.isSubscribed() ? $r('sys.symbol.checkmark') : $r('sys.symbol.face_smiling_plus'))
+            .fontSize(this.isSubscribed() ? 15 : 18)
+            .fontColor([this.isSubscribed()
+              ? $r('app.color.yourtube_text_secondary')
+              : $r('app.color.yourtube_text_inverse')])
+        }
+        .width(30)
+        .height(30)
+        .padding(0)
+        .borderRadius(15)
+        .backgroundColor(this.isSubscribed() ? $r('app.color.yourtube_button_disabled') : this.themePrimary)
+        .accessibilityText(this.isSubscribed()
+          ? $r('app.string.yt_action_unsubscribe')
+          : $r('app.string.yt_action_subscribe'))
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .onClick(() => {
+          this.handleSubscription();
+        });
       }
       .width('100%')
       .padding({ left: 16, right: 16, top: 12, bottom: 12 })

@@ -20,7 +20,7 @@ import { UIConfig } from '../../common/AppState';
 import { SearchHistoryStore, SearchHistoryItem } from '../../common/SearchHistoryStore';
 import type { BusinessError } from '@kit.BasicServicesKit';
 import { HdsNavDestination, HdsNavDestinationTitleMode } from '@kit.UIDesignKit';
-import { buildYourTubeTitleBar } from '../../common/components/HdsTitleBar';
+import { buildYourTubeTitleBar } from '../../common/components/HdsTitleBar';
 import { TITLE_BAR_HEIGHT } from '../../common/components/MediaCardTokens';
 
 const logger = AppLog.getInstance('SearchPage');
@@ -502,9 +502,9 @@ export struct SearchPage {
                   this.showDeleteConfirmDialog(item.query);
                 }))
             }, (item: SearchHistoryItem) => item.query + item.timestamp.toString())
-          }
-          .width('100%')
-          .backgroundColor($r('app.color.yourtube_bg_surface'))
+          }
+          .width('100%')
+          .backgroundColor($r('app.color.yourtube_bg_surface'))
           .scrollBar(BarState.Off)
         } else {
           Column() {
@@ -565,9 +565,9 @@ export struct SearchPage {
               this.runSearch(true);
             })
           }, (item: string) => item)
-        }
-        .width('100%')
-        .backgroundColor($r('app.color.yourtube_bg_surface'))
+        }
+        .width('100%')
+        .backgroundColor($r('app.color.yourtube_bg_surface'))
         .scrollBar(BarState.Off)
       }
     }
@@ -583,10 +583,7 @@ export struct SearchPage {
     if ((slot.item as SearchInfoItem).type === SearchInfoType.STREAM) {
       VideoCardGrid({
         video: (slot.item as SearchStreamItem).video,
-        actionLabel: $r('app.string.yt_action_favorite'),
-        actionType: 'favorite',
-        typeLabel: $r('app.string.yt_filter_videos'),
-        useFavoriteToggle: true
+        typeLabel: $r('app.string.yt_filter_videos')
       })
     } else if ((slot.item as SearchInfoItem).type === SearchInfoType.CHANNEL) {
       ChannelCard({
@@ -607,10 +604,7 @@ export struct SearchPage {
     if ((slot.item as SearchInfoItem).type === SearchInfoType.STREAM) {
       VideoCard({
         video: (slot.item as SearchStreamItem).video,
-        actionLabel: $r('app.string.yt_action_favorite'),
-        actionType: 'favorite',
-        typeLabel: $r('app.string.yt_filter_videos'),
-        useFavoriteToggle: true
+        typeLabel: $r('app.string.yt_filter_videos')
       })
     } else if ((slot.item as SearchInfoItem).type === SearchInfoType.CHANNEL) {
       ChannelCard({

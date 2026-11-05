@@ -489,6 +489,46 @@
             "value": "分享"
         },
         {
+            "name": "yt_action_open_channel",
+            "value": "打开频道"
+        },
+        {
+            "name": "yt_action_save_to_watch_later",
+            "value": "保存到“稍后观看”"
+        },
+        {
+            "name": "yt_action_not_interested",
+            "value": "不感兴趣"
+        },
+        {
+            "name": "yt_action_dont_recommend_channel",
+            "value": "不推荐该频道"
+        },
+        {
+            "name": "yt_watch_later_needs_login",
+            "value": "登录 YouTube 账号后才能保存到稍后观看"
+        },
+        {
+            "name": "yt_watch_later_saved",
+            "value": "已添加到稍后观看"
+        },
+        {
+            "name": "yt_watch_later_failed",
+            "value": "保存到稍后观看失败"
+        },
+        {
+            "name": "yt_dismiss_video_notice",
+            "value": "已不再推荐这条视频"
+        },
+        {
+            "name": "yt_feed_feedback_needs_login",
+            "value": "登录 YouTube 账号后才能提交该反馈"
+        },
+        {
+            "name": "yt_feed_feedback_failed",
+            "value": "反馈提交失败，请稍后重试"
+        },
+        {
             "name": "yt_action_retry",
             "value": "重试"
         },
@@ -981,6 +1021,14 @@
             "value": "主页加载失败，请稍后重试"
         },
         {
+            "name": "yt_home_batch_end",
+            "value": "这批已看完，下拉刷新或再点一次首页可看下一批"
+        },
+        {
+            "name": "yt_home_no_new_videos",
+            "value": "暂时没有更多新视频"
+        },
+        {
             "name": "yt_player_mode_progressive",
             "value": "渐进式 (Progressive)"
         },
@@ -1146,7 +1194,7 @@
         },
         {
             "name": "new_app_name",
-            "value": "YourPipe"
+            "value": "LiteVideo"
         },
         {
             "name": "yt_empty_no_playlists",
@@ -1440,154 +1488,154 @@
             "name": "yt_player_subtitle_off",
             "value": "关闭字幕"
         },
-{
-    "name": "yt_player_subtitle_auto_translated",
-    "value": "自动翻译"
-},
-{
-    "name": "yt_option_ai_translate",
-    "value": "AI 字幕翻译"
-},
-{
-    "name": "yt_option_ai_subtitle",
-    "value": "AI 字幕"
-},
-{
-    "name": "yt_ai_translate_engine",
-    "value": "翻译引擎"
-},
-{
-    "name": "yt_ai_translate_engine_gtx",
-    "value": "Google 免费翻译"
-},
-{
-    "name": "yt_ai_translate_engine_llm",
-    "value": "自定义 LLM（OpenAI 兼容）"
-},
-{
-    "name": "yt_ai_translate_llm_section",
-    "value": "LLM 配置"
-},
-{
-    "name": "yt_ai_translate_base_url",
-    "value": "接口地址（Base URL）"
-},
-{
-    "name": "yt_ai_translate_model",
-    "value": "模型名称"
-},
-{
-    "name": "yt_ai_translate_api_key",
-    "value": "API Key"
-},
-{
-    "name": "yt_ai_translate_test",
-    "value": "测试连接"
-},
-{
-    "name": "yt_ai_translate_testing",
-    "value": "测试中…"
-},
-{
-    "name": "yt_ai_translate_test_ok",
-    "value": "连接成功"
-},
-{
-    "name": "yt_ai_translate_test_fail",
-    "value": "连接失败，请检查配置"
-},
-{
-    "name": "yt_ai_translate_display_section",
-    "value": "显示"
-},
-{
-    "name": "yt_ai_translate_bilingual",
-    "value": "双语对照"
-},
-{
-    "name": "yt_ai_translate_bilingual_subtitle",
-    "value": "同时显示原文与译文"
-},
-{
-    "name": "yt_ai_translate_note",
-    "value": "字幕文本将发送到所选翻译服务。目标语言与「内容翻译语言」一致。"
-},
-{
-    "name": "yt_ai_translate_menu",
-    "value": "AI 翻译"
-},
-{
-    "name": "yt_ai_translate_llm_not_configured",
-    "value": "请先在设置中完成 LLM 配置"
-},
-{
-    "name": "yt_ai_translate_partial_fail",
-    "value": "部分字幕翻译失败，已保留原文"
-},
-{
-    "name": "yt_ai_translate_failed",
-    "value": "字幕翻译失败，请稍后重试"
-},
-{
-    "name": "yt_setting_system_ai_caption",
-    "value": "系统 AI 字幕"
-},
-{
-    "name": "yt_setting_system_ai_caption_subtitle",
-    "value": "由系统实时识别播放中的音频（部分机型支持，中/英文）"
-},
-{
-    "name": "yt_setting_system_ai_caption_source",
-    "value": "AI 字幕源语言"
-},
-{
-    "name": "yt_setting_system_ai_caption_source_zh",
-    "value": "中文"
-},
-{
-    "name": "yt_asr_menu",
-    "value": "AI 生成字幕"
-},
-{
-    "name": "yt_asr_phase_model",
-    "value": "下载模型"
-},
-{
-    "name": "yt_asr_live_progress",
-    "value": "实时识别中…"
-},
-{
-    "name": "yt_asr_failed",
-    "value": "AI 生成字幕失败，请稍后重试"
-},
-{
-    "name": "yt_asr_model_section",
-    "value": "端侧识别模型"
-},
-{
-    "name": "yt_asr_model_status_ready",
-    "value": "已就绪（中英双语流式识别）"
-},
-{
-    "name": "yt_asr_model_status_none",
-    "value": "未下载（约 190MB，建议 Wi-Fi 网络）"
-},
-{
-    "name": "yt_asr_model_downloading",
-    "value": "下载中"
-},
-{
-    "name": "yt_asr_model_download",
-    "value": "下载模型"
-},
-{
-    "name": "yt_asr_model_delete",
-    "value": "删除模型"
-},
-{
-    "name": "yt_ai_action_cancel",
-    "value": "取消"
-},
+        {
+            "name": "yt_player_subtitle_auto_translated",
+            "value": "自动翻译"
+        },
+        {
+            "name": "yt_option_ai_translate",
+            "value": "AI 字幕翻译"
+        },
+        {
+            "name": "yt_option_ai_subtitle",
+            "value": "AI 字幕"
+        },
+        {
+            "name": "yt_ai_translate_engine",
+            "value": "翻译引擎"
+        },
+        {
+            "name": "yt_ai_translate_engine_gtx",
+            "value": "Google 免费翻译"
+        },
+        {
+            "name": "yt_ai_translate_engine_llm",
+            "value": "自定义 LLM（OpenAI 兼容）"
+        },
+        {
+            "name": "yt_ai_translate_llm_section",
+            "value": "LLM 配置"
+        },
+        {
+            "name": "yt_ai_translate_base_url",
+            "value": "接口地址（Base URL）"
+        },
+        {
+            "name": "yt_ai_translate_model",
+            "value": "模型名称"
+        },
+        {
+            "name": "yt_ai_translate_api_key",
+            "value": "API Key"
+        },
+        {
+            "name": "yt_ai_translate_test",
+            "value": "测试连接"
+        },
+        {
+            "name": "yt_ai_translate_testing",
+            "value": "测试中…"
+        },
+        {
+            "name": "yt_ai_translate_test_ok",
+            "value": "连接成功"
+        },
+        {
+            "name": "yt_ai_translate_test_fail",
+            "value": "连接失败，请检查配置"
+        },
+        {
+            "name": "yt_ai_translate_display_section",
+            "value": "显示"
+        },
+        {
+            "name": "yt_ai_translate_bilingual",
+            "value": "双语对照"
+        },
+        {
+            "name": "yt_ai_translate_bilingual_subtitle",
+            "value": "同时显示原文与译文"
+        },
+        {
+            "name": "yt_ai_translate_note",
+            "value": "字幕文本将发送到所选翻译服务。目标语言与「内容翻译语言」一致。"
+        },
+        {
+            "name": "yt_ai_translate_menu",
+            "value": "AI 翻译"
+        },
+        {
+            "name": "yt_ai_translate_llm_not_configured",
+            "value": "请先在设置中完成 LLM 配置"
+        },
+        {
+            "name": "yt_ai_translate_partial_fail",
+            "value": "部分字幕翻译失败，已保留原文"
+        },
+        {
+            "name": "yt_ai_translate_failed",
+            "value": "字幕翻译失败，请稍后重试"
+        },
+        {
+            "name": "yt_setting_system_ai_caption",
+            "value": "系统 AI 字幕"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_subtitle",
+            "value": "由系统实时识别播放中的音频（部分机型支持，中/英文）"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source",
+            "value": "AI 字幕源语言"
+        },
+        {
+            "name": "yt_setting_system_ai_caption_source_zh",
+            "value": "中文"
+        },
+        {
+            "name": "yt_asr_menu",
+            "value": "AI 生成字幕"
+        },
+        {
+            "name": "yt_asr_phase_model",
+            "value": "下载模型"
+        },
+        {
+            "name": "yt_asr_live_progress",
+            "value": "实时识别中…"
+        },
+        {
+            "name": "yt_asr_failed",
+            "value": "AI 生成字幕失败，请稍后重试"
+        },
+        {
+            "name": "yt_asr_model_section",
+            "value": "端侧识别模型"
+        },
+        {
+            "name": "yt_asr_model_status_ready",
+            "value": "已就绪（中英双语流式识别）"
+        },
+        {
+            "name": "yt_asr_model_status_none",
+            "value": "未下载（约 190MB，建议 Wi-Fi 网络）"
+        },
+        {
+            "name": "yt_asr_model_downloading",
+            "value": "下载中"
+        },
+        {
+            "name": "yt_asr_model_download",
+            "value": "下载模型"
+        },
+        {
+            "name": "yt_asr_model_delete",
+            "value": "删除模型"
+        },
+        {
+            "name": "yt_ai_action_cancel",
+            "value": "取消"
+        },
         {
             "name": "yt_player_chapters",
             "value": "章节"
@@ -1747,6 +1795,10 @@
         {
             "name": "yt_sub_sync_failed",
             "value": "同步关注列表失败"
+        },
+        {
+            "name": "yt_sub_write_failed",
+            "value": "订阅操作未能同步到 YouTube，已恢复原状态"
         },
         {
             "name": "yt_refresh_failed",
@@ -3488,7 +3540,6 @@
             "name": "yt_option_clear_history_subtitle",
             "value": "删除全部本地观看历史与播放进度"
         },
-
         {
             "name": "yt_toast_history_cleared",
             "value": "观看历史已清除"
@@ -3604,8 +3655,7 @@
         {
             "name": "yt_home_mode_long",
             "value": "Long videos"
-        }
-    ,
+        },
         {
             "name": "yt_download_pause",
             "value": "Pause"
@@ -3845,7 +3895,7 @@
         {
             "name": "yt_translation_region",
             "value": "区域（Region）"
-        },
+        },
         {
             "name": "yt_exp_title",
             "value": "实验性功能"
@@ -4145,6 +4195,46 @@
         {
             "name": "yt_update_later",
             "value": "稍后"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_channel",
+            "value": "确定取消订阅“%s”吗？"
+        },
+        {
+            "name": "yt_confirm_unsubscribe_generic",
+            "value": "确定取消订阅该频道吗？"
+        },
+        {
+            "name": "yt_about_fork_notice",
+            "value": "本应用是 YourPipe 的自用改进分支（fork），以 GPLv3 许可分发"
+        },
+        {
+            "name": "yt_about_upstream",
+            "value": "上游项目 YourPipe"
+        },
+        {
+            "name": "yt_changelog_fork_1",
+            "value": "独立身份：包名 com.github.da3456.litevideo、应用名 LiteVideo，与原版并存可双开"
+        },
+        {
+            "name": "yt_changelog_fork_2",
+            "value": "订阅动作写回 YouTube 账号，并与云端订阅名单双向核对；取消订阅先弹确认"
+        },
+        {
+            "name": "yt_changelog_fork_3",
+            "value": "首页卡片长按改为底部半模态菜单，下拉把手或点空白处关闭"
+        },
+        {
+            "name": "yt_changelog_fork_4",
+            "value": "「不感兴趣 / 不推荐该频道 / 保存到稍后观看」改为提交服务端反馈"
+        },
+        {
+            "name": "yt_changelog_fork_5",
+            "value": "移除收藏相关按钮与菜单项，第 3 个页签改为播放列表"
+        },
+        {
+            "name": "yt_changelog_fork_6",
+            "value": "首页信息流按批供给（一批 3 页，再点一次首页页签开下一批）；检查更新指向本仓库"
         }
     ]
 }

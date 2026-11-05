@@ -20,12 +20,8 @@ export class ActionHub {
   openPlaylist: (playlist: SearchPlaylistItem) => void = () => {};
   openSubscriptionFeed: () => void = () => {};
   closePage: () => void = () => {};
-  addFavorite: (video: VideoItem) => void = () => {};
-  removeFavorite: (videoId: string) => void = () => {};
   addSubscription: (channel: SearchChannelItem) => void = () => {};
   removeSubscription: (channelId: string) => void = () => {};
-  addPlaylist: (playlist: SearchPlaylistItem) => void = () => {};
-  removePlaylist: (playlistId: string) => void = () => {};
   shareVideo: (video: VideoItem) => void = () => {};
   shareChannel: (channel: SearchChannelItem) => void = () => {};
   sharePlaylist: (playlist: SearchPlaylistItem) => void = () => {};
@@ -36,6 +32,19 @@ export class ActionHub {
    * 由 Index 实现（根组件托管弹窗 UIContext）。
    */
   downloadVideo: (video: VideoItem) => void = () => {};
+
+  /**
+   * 卡片长按菜单「保存到稍后观看」：写回账号的 Watch later（需登录，未登录提示）。
+   * 由 Index 实现（弹窗/toast 与 FeedServiceProvider 都在根组件）。
+   */
+  saveToWatchLater: (video: VideoItem) => void = () => {};
+
+  /**
+   * 长按菜单里的服务端反馈项（网页的「不感兴趣 / 不推荐该频道」这一类）：
+   * 把该条 feed 响应自带的 `feedbackEndpoint.token` 原样回传 Innertube `feedback`，
+   * 成功后服务端不再推这条内容。token 由 `FeedFeedbackStore` 在解析 feed 时记下。
+   */
+  sendFeedFeedback: (video: VideoItem, token: string) => void = () => {};
 
   /** Save the current play queue as a local playlist. */
   saveCurrentQueueAsLocal: (name: string) => void = () => {};

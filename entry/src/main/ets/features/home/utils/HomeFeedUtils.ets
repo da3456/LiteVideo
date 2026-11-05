@@ -1,5 +1,6 @@
 import { VideoItem } from 'youtube_core';
 import { VideoBuildResult } from '../model/FeedResult';
+import { FeedFeedbackStore } from '../../../common/FeedFeedbackStore';
 import { ThumbnailPlaceholder } from '../../../common/ThumbnailPlaceholder';
 import { getContinuationToken } from './ContinuationUtils';
 import {
@@ -192,8 +193,13 @@ export function buildHomeKioskVideoItems(
   let idCounter = startId;
   const items: Array<VideoItem> = [];
   let nextPageToken: string | null = null;
+  // 每批 feed 允许重新探测 2 条结构（真机定位反馈 token 位置用）。
+  FeedFeedbackStore.resetProbe();
 
   rawItems.forEach((content) => {
+    // 顺手把这一条自带的服务端反馈项（不感兴趣 / 不推荐该频道 的 token）记进缓存。
+    // scanItemNode 会自己往里钻，所以 renderer / viewmodel 两种结构都只扫这一层。
+    FeedFeedbackStore.scanItemNode(content);
     const rich = content["richItemRenderer"] as Record<string, Object>;
     if (rich) {
       const richContent = rich["content"] as Record<string, Object>;

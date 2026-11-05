@@ -1,7 +1,6 @@
-import { i18n } from '@kit.LocalizationKit';
-import { ContentCountry } from 'youtube_core';
-import { Localization } from 'youtube_core';
 import { fetchBrowsePage } from 'youtube_core';
+import { LocaleBundle } from '../../common/LocaleBundle';
+import { SearchLocaleManager } from '../../common/SearchLocaleManager';
 
 export class ChannelDetails {
   description: string;
@@ -38,16 +37,6 @@ export class ChannelProfile {
     this.subscriberText = subscriberText;
     this.videoCountText = videoCountText;
     this.handle = handle;
-  }
-}
-
-class LocaleContext {
-  localization: Localization;
-  contentCountry: ContentCountry;
-
-  constructor(localization: Localization, contentCountry: ContentCountry) {
-    this.localization = localization;
-    this.contentCountry = contentCountry;
   }
 }
 
@@ -101,11 +90,11 @@ export class ChannelInfoService {
     return new ChannelProfile(name, description, bannerUrl, avatarUrl, subscriberText, videoCountText, handle);
   }
 
-  private resolveLocale(): LocaleContext {
-    const language: string = i18n.System.getSystemLanguage();
-    const localization = new Localization(language || Localization.DEFAULT.getLanguageCode(), 'GB');
-    const contentCountry = new ContentCountry('GB');
-    return new LocaleContext(localization, contentCountry);
+  private resolveLocale(): LocaleBundle {
+    // 与其余 browse/search 调用方共用同一份归一化 locale：这里曾直接把
+    // i18n.System.getSystemLanguage()（真机为 "zh-Hans-CN" 这类带文字代码的标签）
+    // 当作 context.client.hl 发出，而 YouTube 的 hl 只接受它自己的界面语言代码。
+    return SearchLocaleManager.getSearchLocaleBundle();
   }
 
   private extractDescription(root: Record<string, Object>): string {

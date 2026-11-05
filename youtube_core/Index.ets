@@ -80,6 +80,7 @@ export { AuthExpiredError, isAuthRejectionResponse } from './src/main/ets/auth/A
 
 // ── service ──
 export {
+  addVideoToPlaylist,
   fetchBrowseContinuation,
   fetchBrowsePage,
   fetchRssFeed,
@@ -87,5 +88,8 @@ export {
   fetchSearchPage,
   fetchSearchSuggestions,
   fetchTvBrowseContinuation,
-  fetchTvBrowsePage
+  fetchTvBrowsePage,
+  postFeedFeedback,
+  subscribeChannels,
+  unsubscribeChannels
 } from './src/main/ets/service/YoutubeApi';

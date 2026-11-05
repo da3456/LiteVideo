@@ -648,6 +648,190 @@ export async function fetchTvBrowseContinuation(
   return getJsonPostResponseTv('browse', JSON.stringify(jsonStruct), localization, withAuth);
 }
 
+function assertInnertubeMutationOk(endpoint: string, response: Object | null): void {
+  if (!response) {
+    throw new Error(`Empty ${endpoint} response`);
+  }
+  const err = (response as Record<string, Object>)['error'];
+  if (err) {
+    const rec = err as Record<string, Object>;
+    const detail = String(rec['message'] ?? rec['status'] ?? JSON.stringify(rec));
+    throw new Error(`${endpoint} rejected: ${detail.substring(0, 200)}`);
+  }
+}
+
+/**
+ * 订阅写入：Innertube `subscription/subscribe` / `subscription/unsubscribe`。
+ * WEB 走 Cookie + SAPISIDHASH，TV 走 OAuth Bearer；两条 rail 的 body 形状相同，
+ * `channelIds` 单独即可（`params` 只控制通知铃铛，缺省沿用服务端默认）。
+ */
+async function postSubscriptionMutation(
+  endpoint: string,
+  channelIds: string[],
+  localization: Localization,
+  contentCountry: ContentCountry,
+  useTvRail: boolean
+): Promise<void> {
+  const ids: string[] = [];
+  channelIds.forEach((id) => {
+    const trimmed = (id || '').trim();
+    if (trimmed.length > 0 && ids.indexOf(trimmed) < 0) {
+      ids.push(trimmed);
+    }
+  });
+  if (ids.length === 0) {
+    throw new Error(`${endpoint}: empty channelIds`);
+  }
+  let response: Object | null;
+  if (useTvRail) {
+    const body: Record<string, Object> = prepareTvJsonBuilder(localization, contentCountry);
+    body['channelIds'] = ids;
+    response = await getJsonPostResponseTv(endpoint, JSON.stringify(body), localization, true);
+  } else {
+    const body: Record<string, Object> = await prepareDesktopJsonBuilder(localization, contentCountry);
+    body['channelIds'] = ids;
+    response = await getJsonPostResponse(endpoint, JSON.stringify(body), localization, undefined, true);
+  }
+  assertInnertubeMutationOk(endpoint, response);
+  logger.info(`[SubWrite] stage=ok endpoint=${endpoint} count=${ids.length} rail=${useTvRail ? 'tv' : 'web'}`);
+}
+
+export async function subscribeChannels(
+  localization: Localization,
+  contentCountry: ContentCountry,
+  channelIds: string[],
+  useTvRail: boolean = false
+): Promise<void> {
+  await postSubscriptionMutation('subscription/subscribe', channelIds, localization, contentCountry, useTvRail);
+}
+
+export async function unsubscribeChannels(
+  localization: Localization,
+  contentCountry: ContentCountry,
+  channelIds: string[],
+  useTvRail: boolean = false
+): Promise<void> {
+  await postSubscriptionMutation('subscription/unsubscribe', channelIds, localization, contentCountry, useTvRail);
+}
+
+/**
+ * 播放列表写入：Innertube `playlist/addVideoToPlaylist`（「稍后观看」的系统列表 id 就是 `WL`）。
+ * body 只需要 `playlistId` + `videoId`，认证形状与订阅写入一致（WEB Cookie+SAPISIDHASH /
+ * TV OAuth Bearer）。服务端返回带 `error` 时抛出，由调用方回滚提示。
+ */
+export async function addVideoToPlaylist(
+  playlistId: string,
+  videoId: string,
+  localization: Localization,
+  contentCountry: ContentCountry,
+  useTvRail: boolean = false
+): Promise<void> {
+  const list = (playlistId || '').trim();
+  const vid = (videoId || '').trim();
+  if (list.length === 0 || vid.length === 0) {
+    throw new Error(`playlist/addVideoToPlaylist: empty playlistId/videoId (playlist=${list} video=${vid})`);
+  }
+  const endpoint = 'playlist/addVideoToPlaylist';
+  let response: Object | null;
+  if (useTvRail) {
+    const body: Record<string, Object> = prepareTvJsonBuilder(localization, contentCountry);
+    body['playlistId'] = list;
+    body['videoId'] = vid;
+    response = await getJsonPostResponseTv(endpoint, JSON.stringify(body), localization, true);
+  } else {
+    const body: Record<string, Object> = await prepareDesktopJsonBuilder(localization, contentCountry);
+    body['playlistId'] = list;
+    body['videoId'] = vid;
+    response = await getJsonPostResponse(endpoint, JSON.stringify(body), localization, undefined, true);
+  }
+  assertInnertubeMutationOk(endpoint, response);
+  logger.info(`[PlaylistWrite] stage=ok endpoint=${endpoint} playlist=${list} videoId=${vid} rail=${useTvRail ? 'tv' : 'web'}`);
+}
+
+/** `feedbackResponses` 的受理统计，用于日志和「服务端有没有落库」的判据。 */
+interface FeedbackVerdict {
+  count: number;
+  processed: number;
+}
+
+/**
+ * 服务端「不感兴趣 / 不推荐该频道」反馈：Innertube `feedback`。
+ * token 是 feed 响应里 `feedbackEndpoint.feedbackToken` 那个不透明串（服务端签发的
+ * protobuf base64，客户端无法构造），只能原样回传；成功后服务端把该条目从推荐里摘掉。
+ *
+ * body 形状是 `FeedbackRequest`：`feedbackTokens` 是 **repeated string**，
+ * 加上 `isFeedbackTokenUnencrypted` / `shouldMerge` 两个布尔。
+ * ⚠ 单数 `feedbackToken` **不是这个 message 的字段**：proto3 JSON 解析把未知字段丢掉，
+ * 于是服务端回 200、不带错误、也**什么都不记**——本地看着像成功了，账号侧查无此事。
+ * 判据看响应里的 `feedbackResponses[]`：没有这个数组就是没被受理（抛错），
+ * 有就把每条的 `isProcessed` 打进日志。
+ * 认证形状与订阅写入一致（WEB Cookie+SAPISIDHASH / TV OAuth Bearer）。
+ */
+export async function postFeedFeedback(
+  feedbackToken: string,
+  localization: Localization,
+  contentCountry: ContentCountry,
+  useTvRail: boolean = false
+): Promise<void> {
+  const token = (feedbackToken || '').trim();
+  if (token.length === 0) {
+    throw new Error('feedback: empty feedbackToken');
+  }
+  const endpoint = 'feedback';
+  let response: Object | null;
+  if (useTvRail) {
+    const body: Record<string, Object> = prepareTvJsonBuilder(localization, contentCountry);
+    fillFeedbackRequestBody(body, token);
+    response = await getJsonPostResponseTv(endpoint, JSON.stringify(body), localization, true);
+  } else {
+    const body: Record<string, Object> = await prepareDesktopJsonBuilder(localization, contentCountry);
+    fillFeedbackRequestBody(body, token);
+    response = await getJsonPostResponse(endpoint, JSON.stringify(body), localization, undefined, true);
+  }
+  assertInnertubeMutationOk(endpoint, response);
+  const verdict = readFeedbackVerdict(response);
+  if (verdict.count === 0) {
+    logger.warn(`[FeedFeedback] stage=noop rail=${useTvRail ? 'tv' : 'web'} tokenLength=${token.length} `
+      + `reason=no_feedbackResponses`);
+    throw new Error('feedback: server returned no feedbackResponses');
+  }
+  logger.info(`[FeedFeedback] stage=ok endpoint=${endpoint} rail=${useTvRail ? 'tv' : 'web'} `
+    + `tokenLength=${token.length} responses=${verdict.count} processed=${verdict.processed}`);
+}
+
+function fillFeedbackRequestBody(body: Record<string, Object>, token: string): void {
+  const tokens: string[] = [token];
+  body['feedbackTokens'] = tokens;
+  body['isFeedbackTokenUnencrypted'] = false;
+  body['shouldMerge'] = false;
+}
+
+/** `feedbackResponses[].isProcessed`：服务端有没有真的把这条反馈落库。 */
+function readFeedbackVerdict(response: Object | null): FeedbackVerdict {
+  const none: FeedbackVerdict = { count: 0, processed: 0 };
+  if (!response || typeof response !== 'object') {
+    return none;
+  }
+  const list = (response as Record<string, Object>)['feedbackResponses'];
+  if (!Array.isArray(list)) {
+    return none;
+  }
+  let count = 0;
+  let processed = 0;
+  const items = list as Object[];
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (!item || typeof item !== 'object') {
+      continue;
+    }
+    count += 1;
+    if ((item as Record<string, Object>)['isProcessed'] === true) {
+      processed += 1;
+    }
+  }
+  return { count: count, processed: processed };
+}
+
 export async function fetchSearchSuggestions(
   localization: Localization,
   contentCountry: ContentCountry,

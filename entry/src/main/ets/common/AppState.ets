@@ -18,8 +18,8 @@ export class UIConfig {
   @Track darkMode: YourtubeDarkMode = YourtubeDarkMode.SYSTEM;
   @Track userLanguage: string = 'default';
   @Track systemLanguage: string = 'en-Latn';
-  @Track searchLanguage: string = 'default';
-  @Track searchCountry: string = 'default';
+  @Track searchLanguage: string = 'en';
+  @Track searchCountry: string = 'US';
   /** Comment translation target: 'default' follows the app UI language. */
   @Track translationLanguage: string = 'default';
   /** tlang 自动翻译字幕目标语言：'default' 跟随翻译语言设置（translationLanguage）。 */
@@ -29,9 +29,9 @@ export class UIConfig {
   @Track isAnimation: boolean = true;
   @Track animationSpeed: number = 300;
   @Track enableLogger: boolean = false;
-  @Track homeLayoutMode: string = 'list';
+  @Track homeLayoutMode: string = 'grid';
   /** 网格卡片密度：'compact'(+1 列) | 'auto'(随宽度阈值) | 'cozy'(-1 列)。 */
-  @Track homeGridDensity: string = 'auto';
+  @Track homeGridDensity: string = 'compact';
   /** After login: 'recommended' | 'kiosk'. Signed-out always uses kiosk. */
   @Track homeFeedStyle: string = 'recommended';
   /** When signed in: pull cloud history + subscription list on app launch (one-way). */
@@ -97,16 +97,16 @@ export class UIConfig {
     const config = new UIConfig();
     config.darkMode = PreferencesStore.getString('cfg_darkMode', YourtubeDarkMode.SYSTEM) as YourtubeDarkMode;
     config.userLanguage = PreferencesStore.getString('cfg_userLanguage', 'default');
-    config.searchLanguage = PreferencesStore.getString('cfg_searchLanguage', 'default');
-    config.searchCountry = PreferencesStore.getString('cfg_searchCountry', 'default');
+    config.searchLanguage = PreferencesStore.getString('cfg_searchLanguage', 'en');
+    config.searchCountry = PreferencesStore.getString('cfg_searchCountry', 'US');
     config.translationLanguage = PreferencesStore.getString('cfg_translationLanguage', 'default');
     config.subtitleTranslateLanguage = PreferencesStore.getString('cfg_subtitleTranslateLanguage', 'default');
     config.colorPreset = PreferencesStore.getString('cfg_colorPreset', 'default');
     config.enableLogger = PreferencesStore.getString('cfg_enableLogger', 'false') === 'true';
     config.isAnimation = PreferencesStore.getString('cfg_isAnimation', 'true') !== 'false';
-    config.homeLayoutMode = PreferencesStore.getString('cfg_homeLayoutMode', 'list');
+    config.homeLayoutMode = PreferencesStore.getString('cfg_homeLayoutMode', 'grid');
     config.homeGridDensity = UIConfig.normalizeHomeGridDensity(
-      PreferencesStore.getString('cfg_homeGridDensity', 'auto')
+      PreferencesStore.getString('cfg_homeGridDensity', 'compact')
     );
     config.homeFeedStyle = UIConfig.normalizeHomeFeedStyle(
       PreferencesStore.getString('cfg_homeFeedStyle', 'recommended')

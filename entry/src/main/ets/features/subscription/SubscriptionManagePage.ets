@@ -10,13 +10,13 @@ import { ChannelCard } from '../../features/user/components/ChannelCard';
 import { ChannelInfoService, ChannelProfile } from '../../features/user/ChannelInfoService';
 import { PreferencesStore } from '../../common/PreferencesStore';
 import { LocalStore } from '../../common/LocalStore';
-import { FeedServiceProvider } from '../../common/FeedServiceProvider';
+import { SubscriptionStateSync } from '../../common/SubscriptionStateSync';
 
 const logger = AppLog.getInstance('SubscriptionManagePage');
 
 @Component
 export struct SubscriptionManagePage {
-  @StorageLink('subscriptions') subscriptions: SubscriptionUser[] = [];
+  @StorageLink('subscriptions') @Watch('onSubscriptionsChanged') subscriptions: SubscriptionUser[] = [];
   @StorageLink('authStatus') authStatus: AuthAccountStatus = new AuthAccountStatus();
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig();
   @Consume('safeAreaTop') safeAreaTop: number = 0;
@@ -33,6 +33,19 @@ export struct SubscriptionManagePage {
   }
 
   aboutToAppear(): void {
+    this.syncCloudThenLoadProfiles(false);
+  }
+
+  /**
+   * 云端核对不只在页面首建时跑（页签切换由 Index 触发、登录后由 Index 触发），
+   * 列表被换掉后卡片元数据要跟着重建；id 集合没变（只是回填头像/订阅数）就不重跑。
+   */
+  private onSubscriptionsChanged(): void {
+    const ids = this.subscriptions.map((item: SubscriptionUser) => item.channelId);
+    if (ids.length === Object.keys(this.channelMap).length
+      && ids.every((id: string) => this.channelMap[id] !== undefined)) {
+      return;
+    }
     this.loadProfiles();
   }
 
@@ -103,60 +116,35 @@ export struct SubscriptionManagePage {
     PreferencesStore.setString('subscriptionsJson', LocalStore.saveSubscriptions(list));
   }
 
-  private mergeRemoteChannels(remote: SubscriptionUser[]): number {
-    if (!remote || remote.length === 0) {
-      return 0;
+  /**
+   * 云端名单是权威：网页端退订的频道由 SubscriptionStateSync 删掉（只删 fromCloud
+   * 标记过、且快照完整、且不在本地改动宽限期内的条目 —— 离线订阅不会凭空消失），
+   * 云端新增的订阅在这里补进来。
+   */
+  private async syncCloudThenLoadProfiles(force: boolean): Promise<void> {
+    try {
+      await this.syncCloudSubscriptions(force);
+    } finally {
+      await this.loadProfiles();
     }
-    const map: Record<string, SubscriptionUser> = {};
-    this.subscriptions.forEach((item) => {
-      map[item.channelId] = item;
-    });
-    let added = 0;
-    remote.forEach((item) => {
-      const id = (item.channelId || '').trim();
-      if (!id) {
-        return;
-      }
-      const prev = map[id];
-      if (prev) {
-        map[id] = new SubscriptionUser(
-          id,
-          item.displayName || prev.displayName,
-          item.avatarUrl || prev.avatarUrl,
-          item.subscriberText || prev.subscriberText,
-          item.videoCountText || prev.videoCountText,
-          item.description || prev.description,
-          item.thumbnailColor || prev.thumbnailColor
-        );
-      } else {
-        map[id] = item;
-        added += 1;
-      }
-    });
-    const merged: SubscriptionUser[] = [];
-    Object.keys(map).forEach((key) => {
-      merged.push(map[key]);
-    });
-    this.persistSubscriptions(merged);
-    return added;
   }
 
-  private async syncCloudSubscriptions(): Promise<void> {
+  private async syncCloudSubscriptions(force: boolean): Promise<void> {
     if (!this.isSignedIn()) {
       this.syncMessage = this.tr($r('app.string.yt_sub_sync_sign_in_first'));
       return;
     }
     try {
-      const library = FeedServiceProvider.getInstance().getUserLibraryService();
-      const channels = await library.fetchSubscribedChannels();
-      if (channels.length === 0) {
-        this.syncMessage = this.tr($r('app.string.yt_sub_sync_cloud_empty'));
+      const result = await SubscriptionStateSync.getInstance().sync('subscriptions_page', force);
+      if (result.skipped) {
+        // 空响应不能当「云端全退光了」处理，否则一次风控/分页失败就清空整份列表。
+        this.syncMessage = result.skipReason === 'cloud_empty'
+          ? this.tr($r('app.string.yt_sub_sync_cloud_empty'))
+          : '';
         return;
       }
-      const added = this.mergeRemoteChannels(channels);
-      this.syncMessage = added > 0
-        ? getContext().resourceManager.getStringSync($r('app.string.yt_sub_sync_result_added').id, channels.length, added)
-        : getContext().resourceManager.getStringSync($r('app.string.yt_sub_sync_result').id, channels.length);
+      this.syncMessage = getContext().resourceManager
+        .getStringSync($r('app.string.yt_sub_sync_result').id, result.cloud);
     } catch (err) {
       logger.error('syncCloudSubscriptions failed:', JSON.stringify(err));
       this.syncMessage = this.tr($r('app.string.yt_sub_sync_failed'));
@@ -195,8 +183,7 @@ export struct SubscriptionManagePage {
     const startedAt = Date.now();
     const prevCount = this.subscriptions.length;
     try {
-      await this.syncCloudSubscriptions();
-      await this.loadProfiles();
+      await this.syncCloudThenLoadProfiles(true);
       logger.info(`[SubRefresh] stage=complete elapsed=${Date.now() - startedAt}ms channels=${this.subscriptions.length} prev=${prevCount}`);
     } catch (err) {
       logger.error('onPullRefresh failed:', JSON.stringify(err));
@@ -231,7 +218,8 @@ export struct SubscriptionManagePage {
         subscriberText,
         videoCountText,
         item.description || profile.description || '',
-        item.thumbnailColor || ''
+        item.thumbnailColor || '',
+        item.fromCloud
       );
       if (!changed
         && (merged.displayName !== item.displayName || merged.avatarUrl !== item.avatarUrl
@@ -299,8 +287,7 @@ export struct SubscriptionManagePage {
                     ? this.channelMap[item.channelId]
                     : this.buildPlaceholder(item, index),
                   typeLabel: $r('app.string.yt_label_user'),
-                  showDescription: true,
-                  forceActionLabel: $r('app.string.yt_action_unsubscribe')
+                  showDescription: true
                 })
               }
               .transition(customAnimationUtil.isScaleTran(`${this.profileEpoch}_${item.channelId}`, this.uiConfig))
