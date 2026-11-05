@@ -43,7 +43,8 @@
   (`https://github.com/da3456/LiteVideo`); in-app update check from Options/About
   reads the latest release (with a `version.json` asset) and opens the repo page.
   The fork has no AppGallery test channel and publishes no Release yet, so the
-  update check silently finds nothing — upstream's own store/community entries
+  empty `releases.atom` makes a manual update check report failure (the startup
+  check stays silent) — upstream's own store/community entries
   (QQ group, Telegram group, AppTest) are kept in the About and update pages but
   labelled as belonging to the original YourPipe, so a user still running
   upstream can reach the author's channels.
