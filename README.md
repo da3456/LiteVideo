@@ -41,49 +41,55 @@ YouTube 抽取器、鉴权链路、下载、代理与实验性功能等均沿用
 
 ## 2. 与上游的差异
 
-### 2.1 新增
+以下逐条列出本 fork 相对上游基点 `c3d985bb` 的全部改动。
 
-| 功能 | 实现范围 | 说明 |
-|---|---|---|
-| 订阅状态写回服务端 | `youtube_core` · `entry` | 关注 / 取消关注在更新本地列表的同时提交 Innertube `subscription/subscribe` 与 `subscription/unsubscribe`；写入失败回滚本地状态并提示（`yt_sub_write_failed`）。未登录时仅在本地生效，登录时不做批量补传。 |
-| 订阅名单双向核对 | `common/SubscriptionStateSync` | 以云端频道名单为准裁剪本地条目，由持久化的 `SubscriptionUser.fromCloud` 标记控制；本地刚写入的条目在 30 秒宽限期内不参与裁剪，避免离线订阅被误删。触发点：订阅页显示与下拉刷新、播放详情页、我的页、登录完成。 |
-| 信息流服务端反馈 | `common/FeedFeedbackStore` | 「不感兴趣」「不推荐该频道」提交服务端下发的 `feedbackToken`，「保存到稍后观看」写入账号的 Watch Later 列表；不做任何客户端本地屏蔽。token 通过深度遍历卡片 JSON 获取（遍历上限 28 层），结果按 videoId 缓存并限额。 |
-| 频道长按菜单 | `common/components/ChannelContextMenu` | 频道条目长按仅显示频道级操作（订阅 / 退订 / 不推荐该频道），不与视频卡片菜单混用。 |
-| 相对发布时间 | `common/utils/PublishTimeFormat` | 卡片时间按 YouTube 网页端的紧凑格式显示（如 `4h ago`）。 |
-| 独立的 fork 标识 | `AppScope` · 14 个语言资源 | 包名、厂商、应用名、图标（浅色 / 深色两套）、版本号与仓库链接全部指向本 fork；「关于」页新增 fork 说明与上游项目链接。 |
+- **独立应用身份**：包名改为 `com.github.da3456.litevideo`，厂商改为 `da3456`，应用名 `LiteVideo`
+  覆盖全部 14 个语言资源，图标改为浅色 / 深色两套配色；可与原版 YourPipe 共存安装、数据互不影响。
+- **仓库与更新指向本 fork**：「关于」页、检查更新、源码链接均指向 `da3456/LiteVideo`；
+  `UpdateChecker` 继续走 `releases.atom`，不引入匿名 REST 限流问题。
+- **保留上游署名**：「关于」页新增「上游项目 YourPipe」入口与 fork 说明段落，页脚保留上游版权行并追加
+  `Fork © 2026 da3456`；应用内更新日志第一条为 fork 自己的改动，上游历史条目原样保留。
+- **版本号与上游脱钩**：自 `1.0.x` 独立编号，且 `versionCode` 始终高于上游 GitHub Release，
+  避免启动时的静默检查把用户指向原版仓库。
+- **订阅状态写回服务端**：关注 / 取消关注在更新本地列表的同时提交 Innertube
+  `subscription/subscribe` 与 `subscription/unsubscribe`，写入失败回滚本地状态并提示
+  （`yt_sub_write_failed`）；未登录时仅本地生效，登录时不做批量补传。
+- **订阅名单双向核对**（`common/SubscriptionStateSync`）：以云端频道名单为准裁剪本地条目，由持久化的
+  `SubscriptionUser.fromCloud` 标记控制；本地刚写入的条目在 30 秒宽限期（`LOCAL_MUTATION_GRACE_MS`）
+  内不参与裁剪，离线订阅不会被误删。触发点为订阅页显示与下拉刷新、播放详情页、我的页、登录完成。
+- **取消订阅增加确认**：卡片、频道页、播放详情页、频道长按菜单等全部入口都先弹确认对话框，
+  确认后才执行移除并写回云端，避免灰色小按钮一键退订。
+- **订阅按钮样式统一**：改为圆形 pill 形态，覆盖播放页、频道页与订阅管理页。
+- **首页卡片长按改为底部半模态面板**：替换上游 220vp 浮层（会把卡片顶得位移），面板满宽、高度随内容确定、
+  背景虚化遮罩，下滑把手或点击空白处收起；顶部拖拽条为自绘控件，因为在当前 SDK 下
+  `SheetType.BOTTOM` 搭配单个 `FIT_CONTENT` detent 时系统 `dragBar` 不渲染。
+- **频道条目独立长按菜单**（`common/components/ChannelContextMenu`）：只显示频道级操作
+  （订阅 / 退订 / 不推荐该频道），不与视频卡片菜单混用。
+- **信息流反馈改为服务端提交**（`common/FeedFeedbackStore`）：「不感兴趣」「不推荐该频道」提交服务端下发的
+  `feedbackToken`，「保存到稍后观看」写入账号的 Watch Later 列表；不做任何客户端本地屏蔽。
+  token 通过深度遍历卡片 JSON 获取（上限 28 层），结果按 videoId 缓存并限额。
+- **修复反馈请求体形状**：Innertube `FeedbackRequest` 的 token 字段是 `repeated`，上游按单数
+  `feedbackToken` 构造时 proto3 会静默丢弃该字段（服务端返回 200 但不记录）；改为 `feedbackTokens`
+  数组提交，并以响应 `feedbackResponses[].isProcessed` 判定是否真正落库。
+- **修复缩略图长按无响应**：卡片缩略图层的拖拽手势会吞掉长按事件，关闭该层 `draggable` 后图片区域
+  同样可以呼出菜单。
+- **首页信息流按批供给**：一批 3 页（约 60 条），取满后停止自动翻页；下拉刷新或在首页再次点击首页页签
+  开启下一批。列表内容不做去重、不做过滤，服务端返回什么就显示什么。
+- **卡片显示对齐 YouTube 网页端**：相对发布时间压缩为 `4h ago` 一类短格式（`common/utils/PublishTimeFormat`）、
+  卡片信息行等高对齐等。
+- **移除收藏界面**：视频卡片收藏按钮、卡片长按菜单收藏项、播放列表卡片心形按钮及「收藏的视频」分区全部去除，
+  底部第三个页签改为 Playlists（`yt_tab_playlists`）；`favorites` 存储、备份 / 恢复与清除全部数据的接线保留。
+- **移除上游社区与商店入口**：「关于」页的 QQ 群与 Telegram 群条目、更新页的 AppGallery 测试渠道按钮。
+  这些渠道由原作者运营，保留会把本 fork 的用户引到原版。
+- **许可证与文档整理**：新增 `LICENSES/THIRD-PARTY-NOTICES.md`（vendored MPV / FFmpeg / dav1d / mbedTLS /
+  libxml2 的版本、出处与静态链接分析，以及被参考项目的许可清单）；`libmpv_napi/LICENSE` 的空 MIT 模板
+  占位符替换为 GPL-3.0 与第三方声明；本 README 重写为 fork 说明。
+- **文案覆盖 14 份语言资源**：新增与修改的用户可见文案同步到全部语言，未使用的历史 key
+  （`yt_action_favorite`、`yt_tab_favorites`、`yt_about_qq_group`、`yt_about_tg_group`、
+  `yt_update_open_appgallery`、`yt_home_no_new_videos`）保留在资源中，仅为减少与上游的合并冲突。
 
-### 2.2 变更
-
-| 项目 | 说明 |
-|---|---|
-| 首页卡片长按菜单 | 由 220vp 浮层改为满宽底部半模态面板：高度随内容确定、背景虚化遮罩、下滑把手或点击空白处收起。面板顶部的拖拽条为自绘控件——在当前 SDK 下，`SheetType.BOTTOM` 搭配单个 `FIT_CONTENT` detent 时系统 `dragBar` 不渲染。 |
-| 取消订阅 | 所有入口（卡片、频道页、播放详情页、频道长按菜单）均先弹出确认对话框，确认后执行移除并写回云端。 |
-| 首页信息流供给策略 | 按批供给：一批 3 页（约 60 条），取满后停止自动翻页；下拉刷新或在首页再次点击首页页签开启下一批。列表内容不做去重、不做过滤。 |
-| 订阅按钮样式 | 统一为圆形 pill 形态，覆盖播放页、频道页与订阅管理页。 |
-| 版本编号 | 与上游脱钩，自 `1.0.x` 独立编号，`versionCode` 始终高于上游 GitHub Release，以免启动时的静默更新检查指向原版仓库。 |
-
-### 2.3 移除
-
-| 项目 | 说明 |
-|---|---|
-| 收藏界面 | 视频卡片收藏按钮、卡片长按菜单收藏项、播放列表卡片心形按钮及收藏页中的「收藏的视频」分区。底部第三个页签改为 Playlists（`yt_tab_playlists`）。`favorites` 存储、备份 / 恢复与清除全部数据的接线保留。 |
-| 上游社区入口 | 「关于」页的 QQ 群与 Telegram 群条目。 |
-| 上游分发渠道 | 更新页的 AppGallery 测试渠道按钮。该渠道由原作者运营，保留会引导本 fork 的用户安装原版。 |
-
-上述被移除项对应的字符串资源（`yt_action_favorite`、`yt_tab_favorites`、`yt_about_qq_group`、
-`yt_about_tg_group`、`yt_update_open_appgallery` 等）仍保留在各语言资源中，仅为减少与上游的合并冲突。
-
-### 2.4 修复
-
-| 问题 | 说明 |
-|---|---|
-| 信息流反馈请求无效果 | Innertube `FeedbackRequest` 的 token 字段是 `repeated`，上游按单数 `feedbackToken` 构造请求体时，proto3 会静默丢弃该字段：服务端返回 200 但不记录任何反馈。改为 `feedbackTokens` 数组提交，并以响应 `feedbackResponses[].isProcessed` 判定服务端是否真正落库。 |
-| 缩略图长按无响应 | 卡片缩略图上的拖拽手势会吞掉长按事件，导致图片区域无法呼出菜单。关闭该层 `draggable` 后恢复正常。 |
-
-### 2.5 未改动
-
-播放内核（MPV + vendored FFmpeg）、抽取器与鉴权、SABR / PoToken 链路、HLS、网络与代理、下载引擎、
-SponsorBlock / DeArrow / AiSList、直播聊天、翻译服务、端侧 ASR —— 全部为上游实现。
+未改动的部分：播放内核（MPV + vendored FFmpeg）、抽取器与鉴权、SABR / PoToken 链路、HLS、网络与代理、
+下载引擎、SponsorBlock / DeArrow / AiSList、直播聊天、翻译服务、端侧 ASR —— 全部为上游实现。
 第三方组件的许可与出处见 [LICENSES/THIRD-PARTY-NOTICES.md](LICENSES/THIRD-PARTY-NOTICES.md)，
 应用内「关于」页亦保留上游版权与开源组件声明。
 
