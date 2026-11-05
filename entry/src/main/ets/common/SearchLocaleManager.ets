@@ -33,7 +33,13 @@ export class SearchLocaleManager {
     if (selected !== SearchLocaleManager.DEFAULT_SEARCH_COUNTRY) {
       return selected;
     }
-    return SearchLocaleManager.FALLBACK_COUNTRY;
+    return SearchLocaleManager.systemCountry();
+  }
+
+  /** 'default' = 跟随系统地区；系统地区拿不到或不是两位国家码时才退回 GB。 */
+  private static systemCountry(): string {
+    const region = (i18n.System.getSystemRegion() || '').trim().toUpperCase().replace(/-/g, '');
+    return /^[A-Z]{2}$/.test(region) ? region : SearchLocaleManager.FALLBACK_COUNTRY;
   }
 
   static setSearchLanguage(languageCode: string): void {

@@ -4235,6 +4235,22 @@
         {
             "name": "yt_changelog_fork_6",
             "value": "Le flux d’accueil est servi par lots (3 pages, nouvelle pression sur l’onglet Accueil pour le suivant) ; la vérification des mises à jour pointe vers ce dépôt"
+        },
+        {
+            "name": "yt_about_upstream_notice",
+            "value": "Ces groupes sont gérés par l'auteur de YourPipe d'origine. LiteVideo n'y répond pas ; ils concernent les utilisateurs de l'application d'origine."
+        },
+        {
+            "name": "yt_about_litevideo_desc",
+            "value": "Cette application · un fork personnel du YourPipe d’origine"
+        },
+        {
+            "name": "yt_about_yourpipe_desc",
+            "value": "Application d’origine · maintenue par Talon"
+        },
+        {
+            "name": "yt_update_upstream_channel_notice",
+            "value": "Le lien AppTest ci-dessous est le canal de test de YourPipe d'origine sur AppGallery de Huawei. LiteVideo ne distribue que du code source, sans canal de store."
         }
     ]
 }

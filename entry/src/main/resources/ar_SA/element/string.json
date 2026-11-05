@@ -4235,6 +4235,22 @@
         {
             "name": "yt_changelog_fork_6",
             "value": "يُقدَّم تدفق الرئيسية على دفعات (٣ صفحات لكل دفعة، انقر تبويب الرئيسية مجددًا للدفعة التالية)؛ والتحقق من التحديثات يشير إلى هذا المستودع"
+        },
+        {
+            "name": "yt_about_upstream_notice",
+            "value": "هذه المجتمعات يديرها مؤلف تطبيق YourPipe الأصلي، ولا يجيب LiteVideo عن الأسئلة فيها؛  فهي لمن ما زال يستخدم التطبيق الأصلي."
+        },
+        {
+            "name": "yt_about_litevideo_desc",
+            "value": "هذا التطبيق · نسخة مشتقة شخصية من YourPipe الأصلي"
+        },
+        {
+            "name": "yt_about_yourpipe_desc",
+            "value": "التطبيق الأصلي · من تطوير Talon"
+        },
+        {
+            "name": "yt_update_upstream_channel_notice",
+            "value": "رابط AppTest أدناه هو قناة اختبار تطبيق YourPipe الأصلي في AppGallery من هواوي. لا يوفّر LiteVideo أي قناة متجر لأنه يوزّع الشيفرة المصدرية فقط."
         }
     ]
 }

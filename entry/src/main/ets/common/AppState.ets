@@ -18,8 +18,8 @@ export class UIConfig {
   @Track darkMode: YourtubeDarkMode = YourtubeDarkMode.SYSTEM;
   @Track userLanguage: string = 'default';
   @Track systemLanguage: string = 'en-Latn';
-  @Track searchLanguage: string = 'en';
-  @Track searchCountry: string = 'US';
+  @Track searchLanguage: string = 'default';
+  @Track searchCountry: string = 'default';
   /** Comment translation target: 'default' follows the app UI language. */
   @Track translationLanguage: string = 'default';
   /** tlang 自动翻译字幕目标语言：'default' 跟随翻译语言设置（translationLanguage）。 */
@@ -97,8 +97,8 @@ export class UIConfig {
     const config = new UIConfig();
     config.darkMode = PreferencesStore.getString('cfg_darkMode', YourtubeDarkMode.SYSTEM) as YourtubeDarkMode;
     config.userLanguage = PreferencesStore.getString('cfg_userLanguage', 'default');
-    config.searchLanguage = PreferencesStore.getString('cfg_searchLanguage', 'en');
-    config.searchCountry = PreferencesStore.getString('cfg_searchCountry', 'US');
+    config.searchLanguage = PreferencesStore.getString('cfg_searchLanguage', 'default');
+    config.searchCountry = PreferencesStore.getString('cfg_searchCountry', 'default');
     config.translationLanguage = PreferencesStore.getString('cfg_translationLanguage', 'default');
     config.subtitleTranslateLanguage = PreferencesStore.getString('cfg_subtitleTranslateLanguage', 'default');
     config.colorPreset = PreferencesStore.getString('cfg_colorPreset', 'default');

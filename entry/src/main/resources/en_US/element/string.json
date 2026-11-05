@@ -4235,6 +4235,22 @@
         {
             "name": "yt_changelog_fork_6",
             "value": "Home feed is served in batches (3 pages per batch, tap the Home tab again for the next); update check points at this repo"
+        },
+        {
+            "name": "yt_about_upstream_notice",
+            "value": "These groups are run by the author of the original YourPipe. LiteVideo doesn't answer questions there — they're for people still using the original app."
+        },
+        {
+            "name": "yt_about_litevideo_desc",
+            "value": "This app · a personal fork of the original YourPipe"
+        },
+        {
+            "name": "yt_about_yourpipe_desc",
+            "value": "Original app · maintained by Talon"
+        },
+        {
+            "name": "yt_update_upstream_channel_notice",
+            "value": "The AppTest link below is the original YourPipe's test channel on Huawei AppGallery. LiteVideo distributes source code only and has no store channel."
         }
     ]
 }

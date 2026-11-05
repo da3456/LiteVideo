@@ -4235,6 +4235,22 @@
         {
             "name": "yt_changelog_fork_6",
             "value": "El feed de inicio se sirve por lotes (3 páginas por lote, pulsa Inicio otra vez para el siguiente); la búsqueda de actualizaciones apunta a este repositorio"
+        },
+        {
+            "name": "yt_about_upstream_notice",
+            "value": "Estos grupos los gestiona el autor del YourPipe original. LiteVideo no responde en ellos; son para quienes siguen usando la aplicación original."
+        },
+        {
+            "name": "yt_about_litevideo_desc",
+            "value": "Esta aplicación · una bifurcación personal del YourPipe original"
+        },
+        {
+            "name": "yt_about_yourpipe_desc",
+            "value": "Aplicación original · mantenida por Talon"
+        },
+        {
+            "name": "yt_update_upstream_channel_notice",
+            "value": "El enlace AppTest de abajo es el canal de pruebas del YourPipe original en AppGallery de Huawei. LiteVideo solo distribuye código fuente y no tiene canal de tienda."
         }
     ]
 }

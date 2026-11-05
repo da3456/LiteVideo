@@ -16,8 +16,10 @@ const LATEST_VERSION_JSON_URL = 'https://github.com/da3456/LiteVideo/releases/la
 
 /** 更新检查与「打开仓库」都指向本 fork；没有 Release 时检查静默失败。 */
 export const GITHUB_REPO_URL = 'https://github.com/da3456/LiteVideo';
-/** 上游原项目：AppGallery 测试渠道是原版的，本 fork 不自带商店入口，只保留来源链接。 */
+/** 上游原项目：本 fork 不自带商店渠道，只保留来源链接。 */
 export const UPSTREAM_REPO_URL = 'https://github.com/Ember5843/YourPipe';
+/** 原版 YourPipe 的 AppGallery 测试渠道，入口保留给仍在用原版的用户。 */
+export const APPGALLERY_TEST_URL = 'https://appgallery.huawei.com/apptest/AOd7gmH8iD5';
 
 export type UpdateCheckStatus = 'upToDate' | 'updateAvailable' | 'failed';
 export type UpdateCheckSource = 'startup' | 'manual';

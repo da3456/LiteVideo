@@ -4235,6 +4235,22 @@
         {
             "name": "yt_changelog_fork_6",
             "value": "ホームのフィードはバッチ供給（1 バッチ 3 ページ、ホームタブをもう一度タップで次へ）。更新確認は本リポジトリを見るように変更"
+        },
+        {
+            "name": "yt_about_upstream_notice",
+            "value": "以下のコミュニティは原版 YourPipe の作者が運営しています。LiteVideo では回答していませんので、原版をお使いの方はこちらからお願いします。"
+        },
+        {
+            "name": "yt_about_litevideo_desc",
+            "value": "本アプリ · 原版 YourPipe の個人用フォーク"
+        },
+        {
+            "name": "yt_about_yourpipe_desc",
+            "value": "原版アプリ · Talon が開発"
+        },
+        {
+            "name": "yt_update_upstream_channel_notice",
+            "value": "下の AppTest は原版 YourPipe の Huawei AppGallery テストチャネルです。LiteVideo はソースのみの配布で、ストアチャネルを持ちません。"
         }
     ]
 }

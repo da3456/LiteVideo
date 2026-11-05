@@ -5,6 +5,7 @@ import { SECTION_CARD_RADIUS } from '../../common/components/MediaCardTokens';
 import { UIConfig } from '../../common/AppState';
 import { resourceManager } from '@kit.LocalizationKit';
 import {
+  APPGALLERY_TEST_URL,
   GITHUB_REPO_URL,
   UPSTREAM_REPO_URL,
   UpdateCheckResult,
@@ -287,6 +288,17 @@ export struct OptionsUpdatePage {
           Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
           this.ActionLink($r('sys.symbol.arrow_counterclockwise'),
             $r('app.string.yt_about_upstream'), UPSTREAM_REPO_URL, 'upstream')
+          Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
+          // 原版的商店渠道：入口保留给仍在用原版的用户，本 fork 没有商店渠道。
+          Text($r('app.string.yt_update_upstream_channel_notice'))
+            .fontSize(11)
+            .fontColor($r('app.color.yourtube_text_hint'))
+            .lineHeight(17)
+            .width('100%')
+            .padding({ left: 16, right: 16, top: 10, bottom: 10 })
+          Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
+          this.ActionLink($r('sys.symbol.star_fill'),
+            $r('app.string.yt_update_open_appgallery'), APPGALLERY_TEST_URL, 'appgallery')
         }
         .width('100%')
         .backgroundColor($r('app.color.yourtube_bg_surface_muted'))

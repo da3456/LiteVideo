@@ -4235,6 +4235,22 @@
         {
             "name": "yt_changelog_fork_6",
             "value": "홈 피드를 묶음으로 공급(한 묶음 3 페이지, 홈 탭을 다시 눌러 다음 묶음); 업데이트 확인은 이 저장소를 가리킴"
+        },
+        {
+            "name": "yt_about_upstream_notice",
+            "value": "아래 커뮤니티는 원본 YourPipe의 제작자가 운영하는 곳입니다. LiteVideo는 이곳에서 답변하지 않으므로, 원본 앱을 사용하는 경우에만 이용하세요."
+        },
+        {
+            "name": "yt_about_litevideo_desc",
+            "value": "현재 앱 · 원본 YourPipe의 개인 포크"
+        },
+        {
+            "name": "yt_about_yourpipe_desc",
+            "value": "원본 앱 · Talon이 관리"
+        },
+        {
+            "name": "yt_update_upstream_channel_notice",
+            "value": "아래 AppTest는 원본 YourPipe의 화웨이 AppGallery 테스트 채널입니다. LiteVideo는 소스만 배포하며 스토어 채널이 없습니다."
         }
     ]
 }

@@ -1,7 +1,6 @@
 import { UIConfig } from '../AppState';
 import { customAnimationUtil } from '../AnimationUtil';
 import { OptionItem } from './OptionItem';
-import { PlaybackSectionTitle } from './PlaybackSectionTitle';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { AppLog } from '../AppLog';
 import { getAppVersion } from '../AppVersion';
@@ -183,7 +182,7 @@ const AI_PROVIDER_ITEMS: AiProviderItem[] = [
 const CHANGELOG: ChangelogEntry[] = [
   {
     // fork 自己的改动记在第一条，上游历史条目原样保留在下面。
-    version: 'LiteVideo 1.0.23', date: '2026-11-05',
+    version: 'LiteVideo 1.0.25', date: '2026-11-05',
     changes: [
       $r('app.string.yt_changelog_fork_1'),
       $r('app.string.yt_changelog_fork_2'),
@@ -703,8 +702,6 @@ export struct AboutPage {
               .margin({ top: 6 })
 
             // ── 标识 / 来源 ──
-            // 上游作者的 QQ / Telegram 社群入口已移除：那是原版 YourPipe 的群，
-            // 留在这个 fork 里只会把用户引到别人那里去。
             Column({ space: 0 }) {
               OptionItem({
                 imageIcon: $r('app.media.app_icon'),
@@ -730,6 +727,47 @@ export struct AboutPage {
                 transparentBackground: true,
                 onClickAction: () => this.openExternalLink(UPSTREAM_REPO_URL),
               })
+              Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
+              // 两个应用的身份行：本 fork 与原版，各自图标 + 名称。
+              OptionItem({
+                imageIcon: $r('app.media.about_logo_litevideo'),
+                title: 'LiteVideo',
+                subtitle: $r('app.string.yt_about_litevideo_desc'),
+                transparentBackground: true,
+                onClickAction: () => this.openExternalLink(GITHUB_REPO_URL),
+              })
+              Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
+              OptionItem({
+                imageIcon: $r('app.media.about_logo_yourpipe'),
+                title: 'YourPipe',
+                subtitle: $r('app.string.yt_about_yourpipe_desc'),
+                transparentBackground: true,
+                onClickAction: () => this.openExternalLink(UPSTREAM_REPO_URL),
+              })
+              Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
+              // 原版的反馈社群：入口保留给仍在用原版的用户，本 fork 不在这些群里答疑。
+              Text($r('app.string.yt_about_upstream_notice'))
+                .fontSize(11)
+                .fontColor($r('app.color.yourtube_text_hint'))
+                .lineHeight(17)
+                .width('100%')
+                .padding({ left: 16, right: 16, top: 10, bottom: 10 })
+              Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
+              OptionItem({
+                imageIcon: $r('app.media.about_logo_qq'),
+                title: $r('app.string.yt_about_qq_group'),
+                subtitle: '2167068947',
+                transparentBackground: true,
+                onClickAction: () => this.copyToClipboard('2167068947'),
+              })
+              Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
+              OptionItem({
+                imageIcon: $r('app.media.about_logo_telegram'),
+                title: $r('app.string.yt_about_tg_group'),
+                subtitle: 't.me/yourpipegroup',
+                transparentBackground: true,
+                onClickAction: () => this.copyToClipboard('t.me/yourpipegroup'),
+              })
             }
             .width('100%')
             .backgroundColor($r('app.color.yourtube_bg_surface_muted'))
@@ -739,45 +777,6 @@ export struct AboutPage {
           .width('100%')
           .alignItems(HorizontalAlign.Center)
           .padding({ top: 20, bottom: 24, left: 16, right: 16 })
-
-          // ── 项目信息 ────────────────────────────────────────
-          Column({ space: 0 }) {
-            PlaybackSectionTitle({ title: $r('app.string.yt_about_project_info') })
-
-            Column({ space: 0 }) {
-              OptionItem({
-                icon: $r('sys.symbol.doc_plaintext'),
-                title: $r('app.string.yt_about_open_source'),
-                subtitle: `${OPEN_SOURCE_ITEMS.length} ${getContext().resourceManager.getStringSync($r('app.string.yt_label_projects').id)}`,
-                iconColor: this.themePrimary,
-                transparentBackground: true,
-                onClickAction: () => { this.onNavigate('about_open_source'); }
-              })
-              Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
-              OptionItem({
-                icon: $r('sys.symbol.star_fill'),
-                title: $r('app.string.yt_about_ai_models'),
-                subtitle: `${AI_PROVIDER_ITEMS.length} ${getContext().resourceManager.getStringSync($r('app.string.yt_label_vendors').id)}`,
-                iconColor: this.themePrimary,
-                transparentBackground: true,
-                onClickAction: () => { this.onNavigate('about_ai_models'); }
-              })
-              Divider().color($r('app.color.yourtube_divider')).margin({ left: 16, right: 16 })
-              OptionItem({
-                icon: $r('sys.symbol.clock'),
-                title: $r('app.string.yt_about_changelog'),
-                subtitle: `${getContext().resourceManager.getStringSync($r('app.string.yt_label_latest_version').id)}${CHANGELOG[0].version}`,
-                iconColor: this.themePrimary,
-                transparentBackground: true,
-                onClickAction: () => { this.onNavigate('about_changelog'); }
-              })
-            }
-            .width('100%')
-            .backgroundColor($r('app.color.yourtube_bg_surface_muted'))
-            .borderRadius(SECTION_CARD_RADIUS)
-            .clip(true)
-          }
-          .width('100%').padding({ left: 16, right: 16 })
 
           // ── 底部版权 ──
           // 上游版权行原样保留（GPLv3 要求保留全部既有版权声明），

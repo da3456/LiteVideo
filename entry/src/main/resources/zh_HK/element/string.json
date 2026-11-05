@@ -4235,6 +4235,22 @@
         {
             "name": "yt_changelog_fork_6",
             "value": "首頁資訊流按批供給（一批 3 頁，再點一次首頁分頁開下一批）；檢查更新指向本倉庫"
+        },
+        {
+            "name": "yt_about_upstream_notice",
+            "value": "以下社群由原版 YourPipe 的作者營運，LiteVideo 唔喺呢啲群裡答疑；仍係用緊原版的可以喺呢度回饋。"
+        },
+        {
+            "name": "yt_about_litevideo_desc",
+            "value": "本應用 · 基於原版 YourPipe 嘅自用分支"
+        },
+        {
+            "name": "yt_about_yourpipe_desc",
+            "value": "原版應用 · 由 Talon 維護"
+        },
+        {
+            "name": "yt_update_upstream_channel_notice",
+            "value": "下方的 AppTest 係原版 YourPipe 喺華為應用市場嘅測試頻道；LiteVideo 只係分發原始碼，冇商店頻道。"
         }
     ]
 }

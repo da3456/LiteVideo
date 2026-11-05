@@ -4235,6 +4235,22 @@
         {
             "name": "yt_changelog_fork_6",
             "value": "首页信息流按批供给（一批 3 页，再点一次首页页签开下一批）；检查更新指向本仓库"
+        },
+        {
+            "name": "yt_about_upstream_notice",
+            "value": "以下社群由原版 YourPipe 的作者运营，LiteVideo 不在这些群里答疑；仍在使用原版的可以在这里反馈。"
+        },
+        {
+            "name": "yt_about_litevideo_desc",
+            "value": "本应用 · 基于原版 YourPipe 的自用分支"
+        },
+        {
+            "name": "yt_about_yourpipe_desc",
+            "value": "原版应用 · 由 Talon 维护"
+        },
+        {
+            "name": "yt_update_upstream_channel_notice",
+            "value": "下面的 AppTest 是原版 YourPipe 在华为应用市场的测试渠道；LiteVideo 只分发源码，没有商店渠道。"
         }
     ]
 }
